@@ -61,8 +61,8 @@ function renderBlock(text: string) {
   // Paragraphs: double newline
   html = html.replace(/\n\n+/g, '</p><p>')
 
-  // Single newlines within a paragraph
-  html = html.replace(/\n/g, ' ')
+  // Single newlines → line breaks
+  html = html.replace(/\n/g, '<br>')
 
   return '<p>' + html + '</p>'
 }
