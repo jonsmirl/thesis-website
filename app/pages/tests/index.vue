@@ -1,12 +1,6 @@
 <template>
   <div class="container">
-    <header>
-      <h1><NuxtLink to="/">CES Formalization</NuxtLink></h1>
-      <div class="user-bar">
-        <span>{{ user?.email }}</span>
-        <button @click="handleLogout">Sign out</button>
-      </div>
-    </header>
+    <NavHeader />
 
     <div class="page-header">
       <h2>Empirical Test Scorecard</h2>
@@ -70,7 +64,6 @@
 </template>
 
 <script setup lang="ts">
-const user = useSupabaseUser()
 const client = useSupabaseClient()
 
 const filterStatus = ref('')
@@ -107,20 +100,10 @@ function topStats(stats: Record<string, any>) {
   const keys = Object.keys(stats).slice(0, 4)
   return Object.fromEntries(keys.map(k => [k, stats[k]]))
 }
-
-async function handleLogout() {
-  await client.auth.signOut()
-  navigateTo('/login')
-}
 </script>
 
 <style scoped>
 .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid #eee; }
-header h1 { margin: 0; font-size: 1.4rem; }
-header h1 a { color: inherit; text-decoration: none; }
-.user-bar { display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: #666; }
-.user-bar button { padding: 0.3rem 0.6rem; background: none; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
 .page-header { margin-bottom: 1rem; }
 .page-header h2 { margin: 0 0 0.25rem; }
 .subtitle { color: #666; margin: 0; font-size: 0.9rem; }

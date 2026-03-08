@@ -1,14 +1,7 @@
 <template>
-  <div class="container">
-    <header>
-      <h1>CES Formalization Project</h1>
-      <div class="user-bar">
-        <span>{{ user?.email }}</span>
-        <button @click="handleLogout">Sign out</button>
-      </div>
-    </header>
-
-    <main>
+  <div>
+    <NavHeader />
+    <main class="container">
       <NuxtLink to="/theorems" class="card">
         <h2>Lean 4 Proofs</h2>
         <p>117 files, ~1,826 declarations, 3 axioms, ~29,000 lines</p>
@@ -34,16 +27,6 @@
   </div>
 </template>
 
-<script setup lang="ts">
-const user = useSupabaseUser()
-const client = useSupabaseClient()
-
-async function handleLogout() {
-  await client.auth.signOut()
-  navigateTo('/login')
-}
-</script>
-
 <style scoped>
 .container {
   max-width: 800px;
@@ -51,25 +34,6 @@ async function handleLogout() {
   padding: 2rem 1rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
-}
-header h1 { margin: 0; font-size: 1.4rem; }
-.user-bar { display: flex; align-items: center; gap: 0.75rem; font-size: 0.85rem; color: #666; }
-.user-bar button {
-  padding: 0.3rem 0.6rem;
-  background: none;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-}
-.user-bar button:hover { background: #f5f5f5; }
 .card {
   display: block;
   background: white;
