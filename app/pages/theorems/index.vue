@@ -8,22 +8,26 @@
     </div>
 
     <div class="stats-banner">
-      <div class="stat-box" style="background: #eff6ff; border-color: #bfdbfe;">
+      <div class="stat-box current" style="background: #fef9c3; border-color: #fde047;">
+        <span class="stat-num">{{ sections?.length || 0 }}</span>
+        <span class="stat-label">Overview</span>
+      </div>
+      <NuxtLink to="/theorems/all" class="stat-box" style="background: #eff6ff; border-color: #bfdbfe;">
         <span class="stat-num">{{ totalDecls }}</span>
         <span class="stat-label">Declarations</span>
-      </div>
-      <div class="stat-box" style="background: #ecfdf5; border-color: #bbf7d0;">
+      </NuxtLink>
+      <NuxtLink to="/theorems/all?status=proved" class="stat-box" style="background: #ecfdf5; border-color: #bbf7d0;">
         <span class="stat-num">{{ totalMarquee }}</span>
         <span class="stat-label">Key Theorems</span>
-      </div>
-      <div class="stat-box" style="background: #f5f3ff; border-color: #ddd6fe;">
+      </NuxtLink>
+      <NuxtLink to="/theorems/all?status=axiom" class="stat-box" style="background: #f5f3ff; border-color: #ddd6fe;">
         <span class="stat-num">3</span>
         <span class="stat-label">Axioms</span>
-      </div>
-      <div class="stat-box" style="background: #ecfeff; border-color: #a5f3fc;">
+      </NuxtLink>
+      <NuxtLink to="/theorems/all?status=trivial" class="stat-box" style="background: #ecfeff; border-color: #a5f3fc;">
         <span class="stat-num">129</span>
         <span class="stat-label">Schematics</span>
-      </div>
+      </NuxtLink>
     </div>
 
     <div class="section-grid">
@@ -73,7 +77,7 @@ const totalMarquee = computed(() =>
 .subtitle { color: #666; margin: 0; font-size: 0.9rem; }
 .stats-banner {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 0.75rem;
   margin-bottom: 2rem;
 }
@@ -82,6 +86,19 @@ const totalMarquee = computed(() =>
   border-radius: 8px;
   padding: 0.75rem 1rem;
   text-align: center;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.1s;
+  cursor: pointer;
+}
+.stat-box:hover:not(.current) {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+.stat-box.current {
+  cursor: default;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 2px #eab308;
 }
 .stat-num {
   display: block;
@@ -110,7 +127,7 @@ const totalMarquee = computed(() =>
 .all-link a:hover { text-decoration: underline; }
 
 @media (max-width: 640px) {
-  .stats-banner { grid-template-columns: repeat(2, 1fr); }
+  .stats-banner { grid-template-columns: repeat(3, 1fr); }
   .section-grid { grid-template-columns: 1fr; }
 }
 </style>

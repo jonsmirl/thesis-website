@@ -66,12 +66,13 @@
 </template>
 
 <script setup lang="ts">
+const route = useRoute()
 const client = useSupabaseClient()
 
 const search = ref('')
 const filterKind = ref('')
 const filterPaper = ref('')
-const filterStatus = ref('')
+const filterStatus = ref((route.query.status as string) || '')
 const page = ref(1)
 const perPage = 50
 
