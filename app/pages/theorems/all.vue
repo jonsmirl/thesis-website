@@ -4,16 +4,17 @@
 
     <div class="page-header">
       <h2>All Lean 4 Declarations</h2>
-      <p class="subtitle">{{ theorems.length }} declarations across {{ uniqueFiles }} files</p>
+      <p class="subtitle">{{ totalCount }} declarations</p>
       <NuxtLink to="/theorems" class="back-link">Back to section overview</NuxtLink>
     </div>
 
     <div class="controls">
       <input
-        v-model="search"
+        v-model="searchInput"
         type="text"
         placeholder="Search theorems..."
         class="search-input"
+        @input="onSearchInput"
       />
       <select v-model="filterKind" class="filter-select">
         <option value="">All kinds</option>
@@ -31,18 +32,18 @@
         <option value="trivial">trivial</option>
       </select>
       <label v-if="filterMarquee" class="marquee-label"><input type="checkbox" v-model="filterMarquee" /> Key only</label>
-      <button v-if="search || filterKind || filterPaper || filterStatus || filterMarquee" class="clear-btn" @click="clearFilters">Clear</button>
+      <button v-if="searchInput || filterKind || filterPaper || filterStatus || filterMarquee" class="clear-btn" @click="clearFilters">Clear</button>
     </div>
 
     <div class="stats-bar">
-      <span class="stat">{{ filtered.length }} results</span>
-      <span class="stat" v-if="filterKind || filterPaper || filterStatus || search">
-        (filtered from {{ theorems.length }})
+      <span class="stat">{{ filteredCount }} results</span>
+      <span class="stat" v-if="isFiltered">
+        (filtered from {{ totalCount }})
       </span>
     </div>
 
     <div class="theorem-list">
-      <div v-for="t in paginated" :key="t.id" class="theorem-card">
+      <div v-for="t in rows" :key="t.id" class="theorem-card">
         <div class="theorem-header">
           <NuxtLink :to="`/theorems/${t.name}`" class="theorem-name">{{ t.display_name || t.name }}</NuxtLink>
           <div class="badges">
@@ -72,6 +73,7 @@
 const route = useRoute()
 const client = useSupabaseClient()
 
+const searchInput = ref('')
 const search = ref('')
 const filterKind = ref((route.query.kind as string) || '')
 const filterPaper = ref((route.query.paper as string) || '')
@@ -80,54 +82,84 @@ const filterMarquee = ref((route.query.marquee as string) === 'true')
 const page = ref(1)
 const perPage = 50
 
-const { data: theorems } = await useAsyncData('theorems-all', async () => {
-  // Supabase defaults to 1000 rows max; fetch all ~1870 in two pages
-  const pageSize = 1000
-  let all: any[] = []
-  let from = 0
-  while (true) {
-    const { data, error } = await client
-      .from('theorems')
-      .select('id, name, display_name, file_path, paper, kind, docstring, status, line_number, is_marquee')
-      .order('file_path')
-      .order('line_number')
-      .range(from, from + pageSize - 1)
-    if (error) throw error
-    if (!data || data.length === 0) break
-    all = all.concat(data)
-    if (data.length < pageSize) break
-    from += pageSize
-  }
-  return all
+// Debounce search to avoid a query per keystroke
+let searchTimer: ReturnType<typeof setTimeout> | null = null
+function onSearchInput() {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    search.value = searchInput.value
+  }, 300)
+}
+
+// Initialize search from URL if present
+if (route.query.q) {
+  searchInput.value = route.query.q as string
+  search.value = route.query.q as string
+}
+
+// Static dropdown options (stable, no need to fetch dynamically)
+const kinds = ['axiom', 'def', 'inductive', 'lemma', 'noncomputable def', 'structure', 'theorem']
+const papers = ['applications', 'curvature_roles', 'dynamics', 'entry_exit', 'foundations', 'hierarchy', 'macro_extension', 'potential', 'two_world']
+
+// Total declaration count (unfiltered)
+const { data: totals } = await useAsyncData('theorems-totals', async () => {
+  const { count, error } = await client
+    .from('theorems')
+    .select('*', { count: 'exact', head: true })
+  if (error) throw error
+  return { total: count || 0 }
 })
 
-const kinds = computed(() => [...new Set(theorems.value?.map(t => t.kind))].sort())
-const papers = computed(() => [...new Set(theorems.value?.map(t => t.paper).filter(Boolean))].sort())
-const uniqueFiles = computed(() => new Set(theorems.value?.map(t => t.file_path)).size)
+const totalCount = computed(() => totals.value?.total || 0)
 
-const filtered = computed(() => {
-  let result = theorems.value || []
-  if (search.value) {
-    const q = search.value.toLowerCase()
-    result = result.filter(t =>
-      t.name.toLowerCase().includes(q) ||
-      t.display_name?.toLowerCase().includes(q) ||
-      t.docstring?.toLowerCase().includes(q)
+const isFiltered = computed(() =>
+  !!(search.value || filterKind.value || filterPaper.value || filterStatus.value || filterMarquee.value)
+)
+
+// Build Supabase query with current filters
+function buildQuery(countOnly = false) {
+  let q = client
+    .from('theorems')
+    .select(
+      countOnly
+        ? '*'
+        : 'id, name, display_name, file_path, paper, kind, docstring, status, line_number, is_marquee',
+      countOnly ? { count: 'exact', head: true } : { count: 'exact' }
     )
+
+  if (search.value) {
+    const pattern = `%${search.value}%`
+    q = q.or(`name.ilike.${pattern},display_name.ilike.${pattern},docstring.ilike.${pattern}`)
   }
-  if (filterKind.value) result = result.filter(t => t.kind === filterKind.value)
-  if (filterPaper.value) result = result.filter(t => t.paper === filterPaper.value)
-  if (filterStatus.value) result = result.filter(t => t.status === filterStatus.value)
-  if (filterMarquee.value) result = result.filter(t => t.is_marquee)
-  return result
-})
+  if (filterKind.value) q = q.eq('kind', filterKind.value)
+  if (filterPaper.value) q = q.eq('paper', filterPaper.value)
+  if (filterStatus.value) q = q.eq('status', filterStatus.value)
+  if (filterMarquee.value) q = q.eq('is_marquee', true)
 
-const totalPages = computed(() => Math.ceil(filtered.value.length / perPage))
-const paginated = computed(() => {
-  const start = (page.value - 1) * perPage
-  return filtered.value.slice(start, start + perPage)
-})
+  if (!countOnly) {
+    const from = (page.value - 1) * perPage
+    q = q.order('file_path').order('line_number').range(from, from + perPage - 1)
+  }
 
+  return q
+}
+
+// Fetch filtered page of results
+const { data: result, refresh } = await useAsyncData(
+  'theorems-filtered',
+  async () => {
+    const { data, count, error } = await buildQuery()
+    if (error) throw error
+    return { rows: data || [], count: count || 0 }
+  },
+  { watch: [search, filterKind, filterPaper, filterStatus, filterMarquee, page] }
+)
+
+const rows = computed(() => result.value?.rows || [])
+const filteredCount = computed(() => result.value?.count || 0)
+const totalPages = computed(() => Math.ceil(filteredCount.value / perPage))
+
+// Reset page when filters change (but not when page itself changes)
 watch([search, filterKind, filterPaper, filterStatus, filterMarquee], () => { page.value = 1 })
 
 function truncate(s: string, n: number) {
@@ -141,6 +173,7 @@ function githubUrl(filePath: string, line?: number) {
 }
 
 function clearFilters() {
+  searchInput.value = ''
   search.value = ''
   filterKind.value = ''
   filterPaper.value = ''
@@ -159,6 +192,7 @@ function clearFilters() {
 .controls { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
 .search-input { flex: 1; min-width: 200px; padding: 0.5rem 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem; }
 .filter-select { padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 0.85rem; background: white; }
+.marquee-label { display: flex; align-items: center; gap: 0.25rem; font-size: 0.85rem; color: #555; padding: 0.5rem; }
 .stats-bar { font-size: 0.8rem; color: #888; margin-bottom: 0.75rem; }
 .stat { margin-right: 0.5rem; }
 .theorem-list { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -167,7 +201,7 @@ function clearFilters() {
 .theorem-name { font-weight: 600; font-size: 0.95rem; color: #111; text-decoration: none; font-family: 'SF Mono', 'Fira Code', monospace; }
 .theorem-name:hover { color: #0066cc; }
 .badges { display: flex; gap: 0.25rem; flex-wrap: wrap; }
-.badge { font-size: 0.7rem; padding: 0.15rem 0.4rem; border-radius: 3px; background: #f0f0f0; color: #555; }
+.badge { font-size: 0.7rem; padding: 0.15rem 0.4rem; border-radius: 3px; background: #f0f0f0; color: #555; text-decoration: none; }
 .badge.proved { background: #e6f4ea; color: #1a7f37; }
 .badge.sorry { background: #fff3cd; color: #856404; }
 .badge.axiom { background: #e8d5f5; color: #6f42c1; }
