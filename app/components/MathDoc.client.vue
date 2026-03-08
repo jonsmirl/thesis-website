@@ -5,6 +5,7 @@
 <script setup lang="ts">
 import katex from 'katex'
 import 'katex/dist/katex.min.css'
+import { citationRegex, getCitationUrl } from '~/utils/citations'
 
 const props = defineProps<{ text: string }>()
 
@@ -57,6 +58,13 @@ function renderBlock(text: string) {
 
   // Markdown backtick `...`
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
+
+  // Citation hyperlinks: Author (Year) → linked
+  html = html.replace(citationRegex, (match) => {
+    const url = getCitationUrl(match)
+    if (url) return `<a href="${url}" class="citation-link" target="_blank" rel="noopener">${match}</a>`
+    return match
+  })
 
   // Paragraphs: double newline
   html = html.replace(/\n\n+/g, '</p><p>')
@@ -116,5 +124,13 @@ function escapeHtml(s: string) {
 }
 .proof-body p {
   margin: 0.3rem 0;
+}
+.math-doc :deep(.citation-link) {
+  color: #0066cc;
+  text-decoration: none;
+  border-bottom: 1px dotted #0066cc;
+}
+.math-doc :deep(.citation-link:hover) {
+  border-bottom-style: solid;
 }
 </style>
