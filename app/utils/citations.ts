@@ -2,14 +2,14 @@
 // Used by MathDoc to auto-link citations in docstrings
 export const citationUrls: Record<string, string> = {
   // Accent variants (map to same URLs)
-  'Aczél 1948': 'https://doi.org/10.1007/978-3-7643-8749-5',
+  'Aczél 1948': 'https://projecteuclid.org/euclid.bams/1183511892',
   'Shumailov et al 2023': 'https://doi.org/10.1038/s41586-024-07566-y',
 
   // Foundations & Mathematics
   'Kolmogorov 1930': 'https://doi.org/10.1007/BF01448380',
   'Nagumo 1930': 'https://doi.org/10.1007/BF01448380',
   'Kolmogorov-Nagumo 1930': 'https://doi.org/10.1007/BF01448380',
-  'Aczel 1948': 'https://doi.org/10.1007/978-3-7643-8749-5',
+  'Aczel 1948': 'https://projecteuclid.org/euclid.bams/1183511892',
   'Hardy, Littlewood, and Polya 1934': 'https://doi.org/10.1017/CBO9780511816079',
   'Onsager 1931': 'https://doi.org/10.1103/PhysRev.37.405',
   'Kramers 1940': 'https://doi.org/10.1016/S0031-8914(40)90098-2',
@@ -35,7 +35,7 @@ export const citationUrls: Record<string, string> = {
   'Hart 1995': 'https://doi.org/10.1093/0198288816.001.0001',
   'North 1990': 'https://doi.org/10.1017/CBO9780511808678',
   'Simon 1962': 'https://www.jstor.org/stable/985254',
-  'Jones 1995': 'https://doi.org/10.1086/261725',
+  'Jones 1995': 'https://doi.org/10.1086/262002',
   'Acemoglu 2002': 'https://doi.org/10.1093/restud/69.4.781',
   'Perez 2002': 'https://doi.org/10.4337/9781781005323',
   'Kyle 1985': 'https://doi.org/10.2307/1913210',
@@ -51,7 +51,7 @@ export const citationUrls: Record<string, string> = {
   // Information Theory & Statistical Mechanics
   'Tsallis 2009': 'https://doi.org/10.1007/978-0-387-85359-8',
   'Santos 1997': 'https://doi.org/10.1063/1.532107',
-  'Abe 2000': 'https://doi.org/10.1016/S0375-9601(00)00582-X',
+  'Abe 2000': 'https://doi.org/10.1016/S0375-9601(00)00337-6',
   'Suyari 2004': 'https://doi.org/10.1109/TIT.2004.834751',
   'Amari 1985': 'https://doi.org/10.1007/978-1-4612-5056-2',
   'Amari 1998': 'https://doi.org/10.1214/aos/1028144844',
