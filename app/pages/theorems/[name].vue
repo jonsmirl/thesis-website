@@ -26,10 +26,10 @@
         <p class="docstring">{{ theorem.docstring }}</p>
       </div>
 
-      <div v-if="theorem.source_code" class="section">
-        <h3>Source</h3>
+      <details v-if="theorem.source_code" class="source-details">
+        <summary class="section-summary"><h3>Lean 4 Proof</h3></summary>
         <LeanHighlight :code="theorem.source_code" />
-      </div>
+      </details>
 
       <!-- Dependencies -->
       <div v-if="depsOn.length" class="section">
@@ -203,4 +203,11 @@ function githubUrl(filePath: string, line?: number) {
 .file-link { color: #0066cc; text-decoration: none; font-family: monospace; }
 .file-link:hover { text-decoration: underline; }
 .badge { text-decoration: none; }
+.source-details { margin-bottom: 1.5rem; border: 1px solid #eee; border-radius: 6px; }
+.section-summary { padding: 0.6rem 1rem; cursor: pointer; background: #fafafa; border-radius: 6px; list-style: none; }
+.section-summary::-webkit-details-marker { display: none; }
+.section-summary::before { content: '\25B6 '; font-size: 0.7rem; color: #999; }
+.source-details[open] > .section-summary::before { content: '\25BC '; }
+.source-details[open] > .section-summary { border-radius: 6px 6px 0 0; border-bottom: 1px solid #eee; }
+.section-summary h3 { display: inline; font-size: 0.9rem; color: #666; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; }
 </style>
