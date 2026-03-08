@@ -9,7 +9,11 @@
     </div>
     <div class="card-stats">
       <span class="pill" v-if="section.theorem_count">{{ section.theorem_count }} declarations</span>
-      <span class="pill marquee" v-if="section.marquee_count">{{ section.marquee_count }} key theorems</span>
+      <span class="pill marquee" v-if="section.marquee_count">{{ section.marquee_count }} key</span>
+      <span class="pill proved" v-if="section.status_counts?.proved">{{ section.status_counts.proved }} proved</span>
+      <span class="pill trivial" v-if="section.status_counts?.trivial">{{ section.status_counts.trivial }} trivial</span>
+      <span class="pill sorry" v-if="section.status_counts?.sorry">{{ section.status_counts.sorry }} sorry</span>
+      <span class="pill axiom" v-if="section.status_counts?.axiom">{{ section.status_counts.axiom }} axiom</span>
     </div>
   </NuxtLink>
 </template>
@@ -23,6 +27,7 @@ defineProps<{
     color: string
     theorem_count: number
     marquee_count: number
+    status_counts?: Record<string, number>
   }
 }>()
 </script>
@@ -85,4 +90,8 @@ defineProps<{
   background: #ecfdf5;
   color: #059669;
 }
+.pill.proved { background: #e6f4ea; color: #1a7f37; }
+.pill.sorry { background: #fff3cd; color: #856404; }
+.pill.axiom { background: #e8d5f5; color: #6f42c1; }
+.pill.trivial { background: #d1ecf1; color: #0c5460; }
 </style>

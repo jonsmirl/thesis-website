@@ -13,12 +13,12 @@
           <h2>{{ section.title }}</h2>
           <p class="section-desc">{{ section.description }}</p>
           <div class="section-stats">
-            <span>{{ section.theorem_count }} declarations</span>
+            <NuxtLink :to="`/theorems/all?section=${section.number}`" class="stat-link">{{ section.theorem_count }} declarations</NuxtLink>
             <span>{{ section.marquee_count }} key theorems</span>
-            <span>{{ statusCounts.proved }} proved</span>
-            <span v-if="statusCounts.trivial">{{ statusCounts.trivial }} trivial</span>
-            <span v-if="statusCounts.sorry">{{ statusCounts.sorry }} sorry</span>
-            <span v-if="statusCounts.axiom">{{ statusCounts.axiom }} axiom</span>
+            <NuxtLink :to="`/theorems/all?status=proved`" class="stat-link">{{ statusCounts.proved }} proved</NuxtLink>
+            <NuxtLink v-if="statusCounts.trivial" :to="`/theorems/all?status=trivial`" class="stat-link">{{ statusCounts.trivial }} trivial</NuxtLink>
+            <NuxtLink v-if="statusCounts.sorry" :to="`/theorems/all?status=sorry`" class="stat-link">{{ statusCounts.sorry }} sorry</NuxtLink>
+            <NuxtLink v-if="statusCounts.axiom" :to="`/theorems/all?status=axiom`" class="stat-link">{{ statusCounts.axiom }} axiom</NuxtLink>
           </div>
         </div>
       </div>
@@ -47,20 +47,21 @@
           <div v-for="t in sectionTheorems" :key="t.id" class="decl-row">
             <NuxtLink :to="`/theorems/${t.name}`" class="decl-name">{{ t.name }}</NuxtLink>
             <span class="decl-kind">{{ t.kind }}</span>
-            <span class="badge" :class="t.status">{{ t.status }}</span>
-            <span class="decl-file">{{ t.file_path?.split('/').pop() }}</span>
+            <NuxtLink :to="`/theorems/all?status=${t.status}`" class="badge" :class="t.status">{{ t.status }}</NuxtLink>
+            <a :href="githubUrl(t.file_path, t.line_number)" target="_blank" class="decl-file">{{ t.file_path?.split('/').pop() }}<span v-if="t.line_number">:{{ t.line_number }}</span></a>
           </div>
         </div>
       </details>
 
       <!-- Navigation -->
       <div class="nav-links">
-        <NuxtLink v-if="section.number > 1" :to="`/theorems/section/${section.number - 1}`" class="nav-prev">
-          &laquo; Section {{ section.number - 1 }}
+        <NuxtLink v-if="prevSection" :to="`/theorems/section/${prevSection.number}`" class="nav-prev">
+          &laquo; {{ prevSection.number }}. {{ prevSection.title }}
         </NuxtLink>
         <span v-else></span>
-        <NuxtLink v-if="section.number < 17" :to="`/theorems/section/${section.number + 1}`" class="nav-next">
-          Section {{ section.number + 1 }} &raquo;
+        <NuxtLink to="/theorems" class="nav-center">All Sections</NuxtLink>
+        <NuxtLink v-if="nextSection" :to="`/theorems/section/${nextSection.number}`" class="nav-next">
+          {{ nextSection.number }}. {{ nextSection.title }} &raquo;
         </NuxtLink>
       </div>
     </div>
@@ -175,6 +176,24 @@ const statusCounts = computed(() => {
   }
   return counts
 })
+
+// Fetch adjacent sections for nav titles
+const { data: adjacentSections } = await useAsyncData(`adjacent-${sectionNumber}`, async () => {
+  const { data } = await client
+    .from('derivation_sections')
+    .select('number, title')
+    .in('number', [sectionNumber - 1, sectionNumber + 1])
+  return data || []
+})
+
+const prevSection = computed(() => adjacentSections.value?.find(s => s.number === sectionNumber - 1))
+const nextSection = computed(() => adjacentSections.value?.find(s => s.number === sectionNumber + 1))
+
+function githubUrl(filePath: string, line?: number) {
+  const base = 'https://github.com/jonsmirl/thesis/blob/main'
+  const url = `${base}/${filePath}`
+  return line ? `${url}#L${line}` : url
+}
 </script>
 
 <style scoped>
@@ -293,4 +312,10 @@ const statusCounts = computed(() => {
   text-decoration: none;
 }
 .nav-links a:hover { text-decoration: underline; }
+.nav-center { color: #666; font-size: 0.85rem; }
+.stat-link { color: #888; text-decoration: none; }
+.stat-link:hover { text-decoration: underline; color: #0066cc; }
+.decl-file { color: #0066cc; text-decoration: none; font-size: 0.7rem; font-family: monospace; }
+.decl-file:hover { text-decoration: underline; }
+.badge { text-decoration: none; }
 </style>

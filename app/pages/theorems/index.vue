@@ -32,7 +32,7 @@
 
     <div class="section-grid">
       <SectionCard
-        v-for="s in sections"
+        v-for="s in enrichedSections"
         :key="s.number"
         :section="s"
       />
@@ -62,6 +62,27 @@ const totalDecls = computed(() =>
 
 const totalMarquee = computed(() =>
   sections.value?.reduce((sum, s) => sum + (s.marquee_count || 0), 0) || 0
+)
+
+// Fetch per-section status counts
+const { data: statusCounts } = await useAsyncData('section-status-counts', async () => {
+  const { data, error } = await client
+    .rpc('section_status_counts')
+  if (error) return {}
+  // Turn array into map: section_id -> { proved, sorry, trivial, axiom }
+  const map: Record<number, Record<string, number>> = {}
+  for (const row of (data || [])) {
+    if (!map[row.section_id]) map[row.section_id] = {}
+    map[row.section_id][row.status] = row.cnt
+  }
+  return map
+})
+
+const enrichedSections = computed(() =>
+  (sections.value || []).map(s => ({
+    ...s,
+    status_counts: statusCounts.value?.[s.id] || {}
+  }))
 )
 </script>
 

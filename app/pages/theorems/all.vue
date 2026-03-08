@@ -30,6 +30,7 @@
         <option value="axiom">axiom</option>
         <option value="trivial">trivial</option>
       </select>
+      <button v-if="search || filterKind || filterPaper || filterStatus" class="clear-btn" @click="clearFilters">Clear</button>
     </div>
 
     <div class="stats-bar">
@@ -44,15 +45,16 @@
         <div class="theorem-header">
           <NuxtLink :to="`/theorems/${t.name}`" class="theorem-name">{{ t.display_name || t.name }}</NuxtLink>
           <div class="badges">
-            <span class="badge kind">{{ t.kind }}</span>
-            <span class="badge" :class="t.status">{{ t.status }}</span>
-            <span class="badge paper" v-if="t.paper">{{ t.paper }}</span>
+            <a class="badge kind" href="#" @click.prevent="filterKind = t.kind">{{ t.kind }}</a>
+            <a class="badge" :class="t.status" href="#" @click.prevent="filterStatus = t.status">{{ t.status }}</a>
+            <a class="badge paper" v-if="t.paper" href="#" @click.prevent="filterPaper = t.paper">{{ t.paper }}</a>
           </div>
         </div>
         <p v-if="t.docstring" class="docstring">{{ truncate(t.docstring, 200) }}</p>
         <div class="theorem-meta">
-          <span>{{ t.file_path }}</span>
-          <span v-if="t.line_number">:{{ t.line_number }}</span>
+          <a :href="githubUrl(t.file_path, t.line_number)" target="_blank" class="file-link">
+            {{ t.file_path }}<span v-if="t.line_number">:{{ t.line_number }}</span>
+          </a>
         </div>
       </div>
     </div>
@@ -70,8 +72,8 @@ const route = useRoute()
 const client = useSupabaseClient()
 
 const search = ref('')
-const filterKind = ref('')
-const filterPaper = ref('')
+const filterKind = ref((route.query.kind as string) || '')
+const filterPaper = ref((route.query.paper as string) || '')
 const filterStatus = ref((route.query.status as string) || '')
 const page = ref(1)
 const perPage = 50
@@ -128,6 +130,19 @@ watch([search, filterKind, filterPaper, filterStatus], () => { page.value = 1 })
 function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + '...' : s
 }
+
+function githubUrl(filePath: string, line?: number) {
+  const base = 'https://github.com/jonsmirl/thesis/blob/main'
+  const url = `${base}/${filePath}`
+  return line ? `${url}#L${line}` : url
+}
+
+function clearFilters() {
+  search.value = ''
+  filterKind.value = ''
+  filterPaper.value = ''
+  filterStatus.value = ''
+}
 </script>
 
 <style scoped>
@@ -159,4 +174,8 @@ function truncate(s: string, n: number) {
 .pagination { display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; }
 .pagination button { padding: 0.4rem 0.8rem; border: 1px solid #ddd; border-radius: 4px; background: white; cursor: pointer; }
 .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+.file-link { color: #0066cc; text-decoration: none; font-family: monospace; font-size: 0.75rem; }
+.file-link:hover { text-decoration: underline; }
+.clear-btn { padding: 0.5rem 0.75rem; border: 1px solid #ddd; border-radius: 4px; background: #fff; cursor: pointer; font-size: 0.85rem; color: #666; }
+.clear-btn:hover { background: #f5f5f5; }
 </style>

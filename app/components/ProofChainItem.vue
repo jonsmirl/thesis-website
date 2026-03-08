@@ -31,7 +31,9 @@
               >{{ d.name }}</NuxtLink>
             </div>
             <div class="file-loc">
-              <code>{{ item.file_path }}<span v-if="item.line_number">:{{ item.line_number }}</span></code>
+              <a :href="githubUrl(item.file_path, item.line_number)" target="_blank" class="file-link">
+                {{ item.file_path }}<span v-if="item.line_number">:{{ item.line_number }}</span>
+              </a>
             </div>
           </div>
         </div>
@@ -41,6 +43,12 @@
 </template>
 
 <script setup lang="ts">
+function githubUrl(filePath?: string, line?: number) {
+  const base = 'https://github.com/jonsmirl/thesis/blob/main'
+  const url = `${base}/${filePath || ''}`
+  return line ? `${url}#L${line}` : url
+}
+
 defineProps<{
   item: {
     name: string
@@ -157,10 +165,11 @@ details[open] > .chain-summary::before { transform: rotate(90deg); }
   margin-top: 0.4rem;
   color: #999;
 }
-.file-loc code {
+.file-link {
   font-size: 0.75rem;
-  background: #f0f0f0;
-  padding: 0.1rem 0.3rem;
-  border-radius: 3px;
+  color: #0066cc;
+  text-decoration: none;
+  font-family: monospace;
 }
+.file-link:hover { text-decoration: underline; }
 </style>

@@ -14,9 +14,9 @@
       <div class="detail-header">
         <h2>{{ theorem.display_name || theorem.name }}</h2>
         <div class="badges">
-          <span class="badge kind">{{ theorem.kind }}</span>
-          <span class="badge" :class="theorem.status">{{ theorem.status }}</span>
-          <span class="badge paper" v-if="theorem.paper">{{ theorem.paper }}</span>
+          <NuxtLink :to="`/theorems/all?kind=${theorem.kind}`" class="badge kind">{{ theorem.kind }}</NuxtLink>
+          <NuxtLink :to="`/theorems/all?status=${theorem.status}`" class="badge" :class="theorem.status">{{ theorem.status }}</NuxtLink>
+          <NuxtLink v-if="theorem.paper" :to="`/theorems/all?paper=${theorem.paper}`" class="badge paper">{{ theorem.paper }}</NuxtLink>
           <span class="badge marquee" v-if="theorem.is_marquee">key theorem</span>
         </div>
       </div>
@@ -65,14 +65,31 @@
       <div class="section">
         <h3>Location</h3>
         <p class="meta">
-          <code>{{ theorem.file_path }}</code>
-          <span v-if="theorem.line_number"> line {{ theorem.line_number }}</span>
+          <a :href="githubUrl(theorem.file_path, theorem.line_number)" target="_blank" class="file-link">
+            {{ theorem.file_path }}<span v-if="theorem.line_number">:{{ theorem.line_number }}</span>
+          </a>
         </p>
       </div>
 
       <div v-if="theorem.section" class="section">
         <h3>Module Section</h3>
         <p>{{ theorem.section }}</p>
+      </div>
+
+      <!-- Same-file neighbors -->
+      <div v-if="neighbors.length" class="section">
+        <h3>In the same file</h3>
+        <div class="dep-grid">
+          <NuxtLink
+            v-for="n in neighbors"
+            :key="n.name"
+            :to="`/theorems/${n.name}`"
+            class="dep-chip"
+          >
+            <span class="dep-dot" :class="n.status"></span>
+            {{ n.name }}
+          </NuxtLink>
+        </div>
       </div>
     </div>
     <div v-else>
@@ -116,6 +133,27 @@ const { data: usedBy } = await useAsyncData(`used-by-${route.params.name}`, asyn
     .eq('to_id', theorem.value.id)
   return (data || []).map(d => (d.theorems as any)).filter(Boolean)
 })
+
+// Same-file neighbors
+const { data: neighborsRaw } = await useAsyncData(`neighbors-${route.params.name}`, async () => {
+  if (!theorem.value?.file_path) return []
+  const { data } = await client
+    .from('theorems')
+    .select('name, status, line_number')
+    .eq('file_path', theorem.value.file_path)
+    .neq('name', theorem.value.name)
+    .order('line_number')
+    .limit(20)
+  return data || []
+})
+
+const neighbors = computed(() => neighborsRaw.value || [])
+
+function githubUrl(filePath: string, line?: number) {
+  const base = 'https://github.com/jonsmirl/thesis/blob/main'
+  const url = `${base}/${filePath}`
+  return line ? `${url}#L${line}` : url
+}
 </script>
 
 <style scoped>
@@ -162,4 +200,7 @@ const { data: usedBy } = await useAsyncData(`used-by-${route.params.name}`, asyn
 .dep-dot.sorry { background: #fbbf24; }
 .dep-dot.axiom { background: #a78bfa; }
 .dep-dot.trivial { background: #67e8f9; }
+.file-link { color: #0066cc; text-decoration: none; font-family: monospace; }
+.file-link:hover { text-decoration: underline; }
+.badge { text-decoration: none; }
 </style>
