@@ -68,10 +68,9 @@ function renderBlock(text: string) {
 }
 
 function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+  // Only escape &. Don't escape < and > since docstrings are trusted Lean content
+  // and may contain math comparisons like ρ < 0 that should render as-is.
+  return s.replace(/&/g, '&amp;')
 }
 </script>
 

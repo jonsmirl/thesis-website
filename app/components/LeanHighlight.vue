@@ -10,11 +10,21 @@ const highlighted = computed(() => {
 
   let html = escapeHtml(props.code)
 
-  // Comments (-- to end of line)
-  html = html.replace(/(--.*?)$/gm, '<span class="lh-comment">$1</span>')
+  // Extract comments first, replace with placeholders to avoid keyword matches inside them
+  const comments: string[] = []
+  const placeholder = (i: number) => `\x00CMT${i}\x00`
 
   // Multi-line comments /- ... -/
-  html = html.replace(/(\/\-[\s\S]*?\-\/)/g, '<span class="lh-comment">$1</span>')
+  html = html.replace(/(\/\-[\s\S]*?\-\/)/g, (m) => {
+    comments.push(m)
+    return placeholder(comments.length - 1)
+  })
+
+  // Single-line comments (-- to end of line)
+  html = html.replace(/(--.*?)$/gm, (m) => {
+    comments.push(m)
+    return placeholder(comments.length - 1)
+  })
 
   // sorry (make it stand out)
   html = html.replace(/\b(sorry)\b/g, '<span class="lh-sorry">$1</span>')
@@ -28,10 +38,7 @@ const highlighted = computed(() => {
     'variable', 'set_option', 'attribute',
   ]
   const kwRe = new RegExp(`\\b(${keywords.join('|')})\\b`, 'g')
-  html = html.replace(kwRe, (m) => {
-    // Don't re-highlight inside existing spans
-    return `<span class="lh-keyword">${m}</span>`
-  })
+  html = html.replace(kwRe, (m) => `<span class="lh-keyword">${m}</span>`)
 
   // Tactic keywords
   const tactics = [
@@ -53,6 +60,11 @@ const highlighted = computed(() => {
 
   // Strings
   html = html.replace(/(&quot;[^&]*?&quot;)/g, '<span class="lh-string">$1</span>')
+
+  // Restore comments with highlighting
+  for (let i = 0; i < comments.length; i++) {
+    html = html.replace(placeholder(i), `<span class="lh-comment">${comments[i]}</span>`)
+  }
 
   return html
 })
