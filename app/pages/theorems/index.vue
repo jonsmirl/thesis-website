@@ -21,11 +21,11 @@
         <span class="stat-label">Key Theorems</span>
       </NuxtLink>
       <NuxtLink to="/theorems/all?status=axiom" class="stat-box" style="background: #f5f3ff; border-color: #ddd6fe;">
-        <span class="stat-num">3</span>
+        <span class="stat-num">{{ totalAxioms }}</span>
         <span class="stat-label">Axioms</span>
       </NuxtLink>
       <NuxtLink to="/theorems/all?status=trivial" class="stat-box" style="background: #ecfeff; border-color: #a5f3fc;">
-        <span class="stat-num">129</span>
+        <span class="stat-num">{{ totalSchematics }}</span>
         <span class="stat-label">Schematics</span>
       </NuxtLink>
     </div>
@@ -63,6 +63,16 @@ const totalDecls = computed(() =>
 const totalMarquee = computed(() =>
   sections.value?.reduce((sum, s) => sum + (s.marquee_count || 0), 0) || 0
 )
+
+const totalAxioms = computed(() => {
+  const m = statusCounts.value || {}
+  return Object.values(m).reduce((sum, sc: any) => sum + (sc.axiom || 0), 0)
+})
+
+const totalSchematics = computed(() => {
+  const m = statusCounts.value || {}
+  return Object.values(m).reduce((sum, sc: any) => sum + (sc.trivial || 0), 0)
+})
 
 // Fetch per-section status counts
 const { data: statusCounts } = await useAsyncData('section-status-counts', async () => {
