@@ -163,7 +163,17 @@ const totalPages = computed(() => Math.ceil(filteredCount.value / perPage))
 watch([search, filterKind, filterPaper, filterStatus, filterMarquee], () => { page.value = 1 })
 
 function truncate(s: string, n: number) {
-  return s.length > n ? s.slice(0, n) + '...' : s
+  // Strip markdown bold and LaTeX delimiters for plain-text list preview
+  let plain = s
+    .replace(/\*\*Proof\.\*\*[\s\S]*$/, '')  // remove proof sketch
+    .replace(/\*\*(.*?)\*\*/g, '$1')          // **bold** → bold
+    .replace(/\$\$([\s\S]*?)\$\$/g, '$1')     // $$math$$ → math
+    .replace(/\$([^$]*?)\$/g, '$1')           // $math$ → math
+    .replace(/\\([a-zA-Z]+)/g, '$1')          // \command → command
+    .replace(/[{}_^]/g, '')                    // remove LaTeX braces/sub/sup
+    .replace(/\s+/g, ' ')                     // collapse whitespace
+    .trim()
+  return plain.length > n ? plain.slice(0, n) + '...' : plain
 }
 
 function githubUrl(filePath: string, line?: number) {
