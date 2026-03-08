@@ -4,13 +4,13 @@
 
 <script setup lang="ts">
 import katex from 'katex'
+import 'katex/dist/katex.min.css'
 
 const props = defineProps<{ text: string }>()
 
 const rendered = computed(() => {
   if (!props.text) return ''
 
-  // Replace display math $$...$$ first, then inline $...$
   let html = escapeHtml(props.text)
 
   // Display math: $$...$$
@@ -43,8 +43,6 @@ function escapeHtml(s: string) {
 </script>
 
 <style>
-@import 'katex/dist/katex.min.css';
-
 .math-doc {
   line-height: 1.7;
   white-space: normal;
