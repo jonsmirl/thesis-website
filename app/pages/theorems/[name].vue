@@ -23,7 +23,7 @@
 
       <div v-if="theorem.docstring" class="section">
         <h3>Documentation</h3>
-        <p class="docstring">{{ theorem.docstring }}</p>
+        <MathDoc :text="theorem.docstring" class="docstring" />
       </div>
 
       <details v-if="theorem.source_code" class="source-details">
