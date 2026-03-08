@@ -9,7 +9,7 @@
     </header>
 
     <main>
-      <section class="card">
+      <NuxtLink to="/theorems" class="card">
         <h2>Lean 4 Proofs</h2>
         <p>117 files, ~1,826 declarations, 3 axioms, ~29,000 lines</p>
         <ul>
@@ -19,17 +19,17 @@
           <li>Paper 4: Hierarchical Architecture (10 files)</li>
           <li>Extensions: Macro, Two-World, ML (30+ files)</li>
         </ul>
-      </section>
+      </NuxtLink>
 
-      <section class="card">
+      <NuxtLink to="/tests" class="card">
         <h2>Empirical Tests</h2>
         <p>88 test scripts, 75 result files, 184 figures</p>
-      </section>
+      </NuxtLink>
 
-      <section class="card">
+      <NuxtLink to="/papers" class="card">
         <h2>Papers</h2>
         <p>9 papers + Papers A &amp; B (information geometry bridge)</p>
-      </section>
+      </NuxtLink>
     </main>
   </div>
 </template>
@@ -71,12 +71,17 @@ header h1 { margin: 0; font-size: 1.4rem; }
 }
 .user-bar button:hover { background: #f5f5f5; }
 .card {
+  display: block;
   background: white;
   border: 1px solid #eee;
   border-radius: 8px;
   padding: 1.25rem 1.5rem;
   margin-bottom: 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s;
 }
+.card:hover { border-color: #0066cc; }
 .card h2 { margin: 0 0 0.5rem; font-size: 1.1rem; }
 .card p { margin: 0 0 0.5rem; color: #555; font-size: 0.9rem; }
 .card ul { margin: 0.5rem 0 0; padding-left: 1.25rem; font-size: 0.9rem; color: #444; }
