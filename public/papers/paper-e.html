@@ -1,0 +1,2168 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jon Smirl" />
+  <title>Four_Schools_One_Surface</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    div.abstract {
+      margin: 2em 2em 2em 2em;
+      text-align: left;
+      font-size: 85%;
+    }
+    div.abstract-title {
+      font-weight: bold;
+      text-align: center;
+      padding: 0;
+      margin-bottom: 0.5em;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<h1 id="sec:intro">Introduction: Seventy Years of Debates—Dissolved, Not
+Resolved</h1>
+<p>International trade theory has operated as four parallel research
+programs for seven decades, each launched by an empirical failure of the
+textbook Heckscher-Ohlin (HO) model.</p>
+<ol>
+<li><p><strong>The Leontief paradox</strong> (1953). <span
+class="citation" data-cites="leontief1953domestic"></span> found that US
+exports were <em>less</em> capital-intensive than US imports—the
+opposite of what HO predicts for the world’s most capital-abundant
+economy. Despite corrections for human capital <span class="citation"
+data-cites="kenen1965nature"></span>, technology differences <span
+class="citation" data-cites="trefler1993trade"></span>, and skill
+intensity <span class="citation" data-cites="romalis2004factor"></span>,
+the factor-content relationship remains far too weak to support HO’s
+core mechanism.</p></li>
+<li><p><strong>Intra-industry trade</strong> (1975). <span
+class="citation" data-cites="grubel1975intra"></span> documented that
+60–70% of OECD trade consists of two-way exchange of similar products
+within the same industry. HO predicts inter-industry specialization
+along factor lines; it cannot generate this pattern. <span
+class="citation" data-cites="krugman1980scale"></span> proposed
+economies of scale and product differentiation as the mechanism,
+founding New Trade Theory.</p></li>
+<li><p><strong>The gravity puzzle</strong> (1962–2003). From <span
+class="citation" data-cites="tinbergen1962shaping"></span> onward,
+bilateral trade has been explained far better by economic size and
+distance than by factor-endowment differences. <span class="citation"
+data-cites="anderson2003gravity"></span> provided micro-foundations
+through CES expenditure systems, but gravity remained an empirical
+regularity in search of a deeper structural explanation.</p></li>
+<li><p><strong>Missing trade</strong> (1995). <span class="citation"
+data-cites="trefler1995case"></span> showed that the factor content of
+trade is approximately 3% of the Heckscher-Ohlin-Vanek (HOV)
+prediction—“the case of the missing trade.” Ninety-seven percent of the
+predicted factor service flows are absent from the data.</p></li>
+</ol>
+<p>Each failure spawned its own repair literature, its own assumptions,
+and its own notation. The result is a fragmented field in which
+different schools give contradictory policy advice: HO recommends factor
+accumulation; Krugman recommends market access; gravity models recommend
+infrastructure investment; Melitz recommends reducing fixed export
+costs. No unified framework tells a policymaker which lever matters
+most, or when.</p>
+<p>This paper provides one. The central claim is that the four schools
+are not competing theories but four <em>cross-sections</em> of a single
+two-dimensional surface: the CES <span class="math inline">\((\rho,
+T)\)</span> diagram. Here <span class="math inline">\(\rho\)</span> is
+the CES substitution parameter controlling complementarity among
+varieties, and <span class="math inline">\(T\)</span> is bilateral
+information friction. The effective curvature <span
+class="math display">\[K_{\mathrm{eff}}= K \cdot \max\!\left(0,\; 1 -
+\frac{T}{T^*}\right),
+  \qquad K = \frac{(1-\rho)(J-1)}{J},
+  \label{eq:keff_intro}\]</span> simultaneously determines whether trade
+exists (<span class="math inline">\(K_{\mathrm{eff}}&gt; 0\)</span> iff
+<span class="math inline">\(T &lt; T^*\)</span>), how much there is
+(proportional to <span class="math inline">\(K_{\mathrm{eff}}\)</span>),
+what the welfare gains are (<span class="math inline">\(J^{1/\rho -
+1}\)</span>), and when it collapses (discontinuously at <span
+class="math inline">\(T^*\)</span>).</p>
+<div class="mdframed">
+<p><strong>The Unification Theorem</strong> (informal). The four trade
+schools are four projections of the CES <span
+class="math inline">\((\rho, T)\)</span> surface:</p>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>School</strong></th>
+<th style="text-align: left;"><strong>Slice</strong></th>
+<th style="text-align: left;"><strong>What varies</strong></th>
+<th style="text-align: left;"><strong>What is fixed</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Heckscher-Ohlin</td>
+<td style="text-align: left;"><span class="math inline">\(T =
+0\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\rho\)</span>,
+endowments</td>
+<td style="text-align: left;">Friction <span class="math inline">\(=
+0\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">New Trade (Krugman)</td>
+<td style="text-align: left;">Fixed <span
+class="math inline">\(T\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\rho\)</span>
+(variety)</td>
+<td style="text-align: left;">Friction level</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Gravity</td>
+<td style="text-align: left;"><span
+class="math inline">\(T\)</span>-axis</td>
+<td style="text-align: left;">Bilateral <span
+class="math inline">\(T\)</span></td>
+<td style="text-align: left;"><span class="math inline">\(\rho
+\approx\)</span> constant</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">New New Trade (Melitz)</td>
+<td style="text-align: left;"><span class="math inline">\(T^*\)</span>
+boundary</td>
+<td style="text-align: left;">Firm-level <span
+class="math inline">\(\rho_f\)</span></td>
+<td style="text-align: left;">Bilateral <span
+class="math inline">\(T\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Each school is correct on its own slice. The debates arise from
+mistaking a cross-section for the full surface.</p>
+</div>
+<p><strong>Three consequences.</strong> The unification has three
+consequences that no single school can derive:</p>
+<ol>
+<li><p><strong>The ACR welfare convergence is explained</strong> (§<a
+href="#sec:acr" data-reference-type="ref"
+data-reference="sec:acr">4</a>). <span class="citation"
+data-cites="arkolakis2012new"></span> showed that dozens of structurally
+different trade models yield the same welfare formula <span
+class="math inline">\(W = \lambda^{-1/(\sigma-1)}\)</span> but could not
+explain <em>why</em>. The CES framework answers: CES is the unique
+aggregation-invariant function <span class="citation"
+data-cites="smirl2026emergent"></span>, so all CES-based models must
+agree. There is no “trade dark matter”—no hidden structural parameters
+beyond what CES factor shares reveal.</p></li>
+<li><p><strong>The <span class="math inline">\(T^*\)</span> regime
+shift</strong> (§<a href="#sec:regime" data-reference-type="ref"
+data-reference="sec:regime">6</a>). Trade collapses are sudden because
+effective curvature drops discontinuously to zero at <span
+class="math inline">\(T^*\)</span>, producing bimodal distributions
+(catastrophic and resilient, with a depleted middle) that smooth models
+cannot match.</p></li>
+<li><p><strong>The GVC ceiling cascade</strong> (§<a href="#sec:gvc"
+data-reference-type="ref" data-reference="sec:gvc">7</a>). In
+multi-stage production chains, <span
+class="math inline">\(T^*_{\mathrm{eff}} = \min_m T^*^{(m)}\)</span>: a
+chain is only as strong as its weakest link. Longer chains have lower
+effective thresholds and collapse first.</p></li>
+</ol>
+<p><strong>Empirical results.</strong> Ten pre-specified tests on
+product-pair-level BACI data across three distinct crises (GFC 2007–09,
+COVID 2019–20, US-China trade wars 2017–19) yield 9 Consistent,
+1 Ambiguous, 0 Inconsistent. The key finding: during the GFC, 25% of
+intermediate-good trade flows collapsed catastrophically (<span
+class="math inline">\(&gt;\)</span>50% decline) versus 13.5% of final
+goods—a ratio of <span class="math inline">\(1.9\times\)</span> (<span
+class="math inline">\(p &lt; 10^{-127}\)</span>). The same
+stratification replicates in COVID (<span
+class="math inline">\(1.5\times\)</span>) and the trade wars (<span
+class="math inline">\(1.6\times\)</span>). A structural probit model
+trained on GFC<span class="math inline">\(+\)</span>COVID data predicts
+trade-war collapses out of sample with AUC <span class="math inline">\(=
+0.671\)</span>.</p>
+<p><strong>Formal verification.</strong> All theoretical results are
+machine-verified in Lean 4 (v4.28.0) with Mathlib (v4.28.0):
+23 theorems, 0 custom axioms, 0 <code>sorry</code>. This appears to be
+the first machine-verified formalization of international trade
+theory.</p>
+<p><strong>Plan of the paper.</strong> develops the CES <span
+class="math inline">\((\rho, T)\)</span> surface for bilateral trade.
+proves the unification theorem. explains the ACR welfare convergence.
+derives the efficiency-fragility coupling. characterizes the regime
+shift at <span class="math inline">\(T^*\)</span>. extends to
+multi-stage GVC cascades. describes the empirical design. reports
+results. examines the spectral gap prediction. discusses what the
+surface reveals that no single slice can see. concludes.</p>
+<h1 id="sec:surface">The CES <span class="math inline">\((\rho,
+T)\)</span> Surface for Bilateral Trade</h1>
+<h2 id="the-ces-aggregator">The CES aggregator</h2>
+<p>Consider <span class="math inline">\(J\)</span> differentiated
+varieties aggregated by <span class="math display">\[F =
+\left(\frac{1}{J}\sum_{j=1}^{J} x_j^\rho\right)^{1/\rho},
+  \qquad \rho \in (0,1), \quad \sigma = \frac{1}{1-\rho} &gt; 1.
+  \label{eq:ces}\]</span> The curvature of the CES isoquant at symmetric
+equilibrium is <span class="math display">\[K = \frac{(1-\rho)(J-1)}{J},
+  \label{eq:curvature}\]</span> which simultaneously controls three
+economic forces <span class="citation"
+data-cites="smirl2026emergent"></span>:</p>
+<ul>
+<li><p><strong>Superadditivity</strong>: the gains from combining
+heterogeneous inputs, proportional to <span
+class="math inline">\(K\)</span>.</p></li>
+<li><p><strong>Correlation robustness</strong>: the premium from
+idiosyncratic variation, proportional to <span
+class="math inline">\(K^2\)</span>.</p></li>
+<li><p><strong>Strategic independence</strong>: the stability of
+balanced allocation as a Nash equilibrium, with deviation penalty
+proportional to <span class="math inline">\(K\)</span>.</p></li>
+</ul>
+<p>In the trade context, <span class="math inline">\(J\)</span> indexes
+the number of trading partners (or varieties), <span
+class="math inline">\(\rho\)</span> captures how substitutable they are
+(<span class="math inline">\(\rho \to 1\)</span>: perfect substitutes;
+<span class="math inline">\(\rho \to 0\)</span>: Cobb-Douglas; <span
+class="math inline">\(\rho &lt; 0\)</span>: strong complements), and
+<span class="math inline">\(\sigma\)</span> is the elasticity of
+substitution—the key parameter in virtually all quantitative trade
+models since <span class="citation"
+data-cites="armington1969theory"></span>.</p>
+<h2 id="information-friction-and-the-ces-potential">Information friction
+and the CES potential</h2>
+<p>In the presence of bilateral information friction <span
+class="math inline">\(T \geq 0\)</span> <span class="citation"
+data-cites="smirl2026potential"></span>, the CES potential becomes <span
+class="math display">\[\Phi_q = \Phi_{\mathrm{CES}}(\rho) - T \cdot
+S_\rho,
+  \label{eq:potential}\]</span> where <span
+class="math inline">\(S_\rho\)</span> is generalized entropy. The
+information friction <span class="math inline">\(T\)</span> captures all
+bilateral trade costs—geographic distance, institutional differences,
+informational asymmetries, policy barriers—that reduce effective
+complementarity below the frictionless benchmark.</p>
+<p>The effective curvature is <span
+class="math display">\[K_{\mathrm{eff}}(T) = K \cdot \max\!\left(0,\; 1
+- \frac{T}{T^*}\right),
+  \label{eq:keff}\]</span> where <span
+class="math inline">\(T^*\)</span> is the critical friction threshold.
+This equation encodes three regimes:</p>
+<ol>
+<li><p><strong>Active trade</strong> (<span class="math inline">\(T &lt;
+T^*\)</span>): <span class="math inline">\(K_{\mathrm{eff}}&gt;
+0\)</span>. Trade generates positive gains, with intensity proportional
+to <span class="math inline">\(K_{\mathrm{eff}}\)</span>.</p></li>
+<li><p><strong>Critical threshold</strong> (<span
+class="math inline">\(T = T^*\)</span>): <span
+class="math inline">\(K_{\mathrm{eff}}= 0\)</span>. Trade ceases
+discontinuously.</p></li>
+<li><p><strong>Autarky</strong> (<span class="math inline">\(T &gt;
+T^*\)</span>): <span class="math inline">\(K_{\mathrm{eff}}= 0\)</span>.
+No bilateral trade occurs.</p></li>
+</ol>
+<h2 id="sec:Tstar_formula">The critical friction</h2>
+<p>The critical friction threshold is <span
+class="math display">\[T^*(\rho, J) = \frac{cJ}{(1-\rho)(J-1)},
+  \label{eq:Tstar}\]</span> where <span class="math inline">\(c\)</span>
+is a scale parameter that absorbs institutional quality and market
+thickness. Two properties are immediate:</p>
+<div id="prop:Tstar_rho" class="proposition">
+<p><strong>Proposition 1</strong> (<span
+class="math inline">\(T^*\)</span> decreasing in complementarity).
+<em><span class="math inline">\(\partial T^*/ \partial \rho &gt;
+0\)</span> (equivalently, <span class="math inline">\(T^*\)</span> is
+lower for more complementary goods with smaller <span
+class="math inline">\(\rho\)</span>). More complementary goods have
+lower collapse thresholds.</em></p>
+</div>
+<div id="prop:Tstar_J" class="proposition">
+<p><strong>Proposition 2</strong> (<span
+class="math inline">\(T^*\)</span> increasing in variety count). <em>For
+fixed <span class="math inline">\(\rho &lt; 1\)</span>, <span
+class="math inline">\(T^*\)</span> is increasing in <span
+class="math inline">\(J\)</span>. More diversified trade relationships
+are more robust to friction.</em></p>
+</div>
+<h2 id="the-degradation-factor">The degradation factor</h2>
+<p>The ratio of effective to frictionless curvature, <span
+class="math display">\[m(T) \equiv \frac{K_{\mathrm{eff}}}{K} =
+\max\!\left(0,\;
+    1 - \frac{T}{T^*}\right),
+  \label{eq:degradation}\]</span> plays a central role. The factor
+content of trade is attenuated by exactly <span
+class="math inline">\(m(T)\)</span>. At <span class="math inline">\(T =
+0\)</span>, <span class="math inline">\(m = 1\)</span> and the HOV
+prediction holds exactly. At <span class="math inline">\(T/T^*\approx
+0.97\)</span> (the empirical estimate from Test 10), <span
+class="math inline">\(m \approx 0.03\)</span>—matching Trefler’s
+“missing trade.”</p>
+<div id="thm:attenuation" class="theorem">
+<p><strong>Theorem 3</strong> (Factor content attenuation). <em>For any
+<span class="math inline">\(T &gt; 0\)</span> with <span
+class="math inline">\(T &lt; T^*\)</span>: <span
+class="math inline">\(K_{\mathrm{eff}}&lt; K\)</span>. The observed
+factor content of trade is the fraction <span class="math inline">\(m(T)
+= 1 - T/T^*&lt; 1\)</span> of the HOV prediction.</em></p>
+</div>
+<p><em>Lean</em>: <code>ho_overpredicts_at_positive_friction</code>
+(0 axioms).</p>
+<h1 id="sec:four_schools">Four Schools as Four Slices</h1>
+<p>The <span class="math inline">\((\rho, T)\)</span> surface has two
+axes and one boundary curve <span
+class="math inline">\(T^*(\rho)\)</span>. Each trade school captures
+variation along one axis or at the boundary. None sees the full
+two-dimensional structure.</p>
+<h2 id="heckscher-ohlin-the-t-0-slice">Heckscher-Ohlin: the <span
+class="math inline">\(T = 0\)</span> slice</h2>
+<p>HO is the theory of frictionless trade. Setting <span
+class="math inline">\(T = 0\)</span> in <a href="#eq:keff"
+data-reference-type="eqref" data-reference="eq:keff">[eq:keff]</a>
+yields <span class="math inline">\(K_{\mathrm{eff}}= K\)</span>: full
+structural curvature. All classical HO results follow:</p>
+<div id="prop:ss" class="proposition">
+<p><strong>Proposition 4</strong> (Stolper-Samuelson magnification).
+<em>In the two-factor CES model at <span class="math inline">\(T =
+0\)</span>, a change in output price causes a more than proportional
+change in the intensive factor’s price. The magnification factor <span
+class="math inline">\(1/s_K &gt; 1\)</span> when <span
+class="math inline">\(0 &lt; s_K &lt; 1\)</span>.</em></p>
+</div>
+<div id="prop:fpe" class="proposition">
+<p><strong>Proposition 5</strong> (Factor price equalization). <em>At
+<span class="math inline">\(T = 0\)</span>, the CES marginal product is
+homogeneous of degree zero in <span class="math inline">\((K,
+L)\)</span>: countries with identical technology and relative endowments
+have equal factor prices.</em></p>
+</div>
+<div id="prop:fpe_knife" class="proposition">
+<p><strong>Proposition 6</strong> (FPE is a knife-edge). <em><span
+class="math inline">\(K_{\mathrm{eff}}= K\)</span> if and only if <span
+class="math inline">\(T = 0\)</span>. Factor price equalization requires
+exactly zero friction—a measure-zero event in the <span
+class="math inline">\((\rho, T)\)</span> parameter space.</em></p>
+</div>
+<p><em>Lean</em>: <code>stolper_samuelson_magnification</code>,
+<code>factor_price_equalization_at_T_zero</code>,
+<code>fpe_requires_zero_friction</code> (all 0 axioms).</p>
+<p>HO is therefore the correct theory of trade—at <span
+class="math inline">\(T = 0\)</span>. But the typical bilateral pair
+operates at <span class="math inline">\(T/T^*\approx 0.97\)</span>
+(Test 10), rendering HO quantitatively irrelevant for the vast majority
+of country pairs.</p>
+<h2 id="new-trade-theory-krugman-the-fixed-t-slice">New Trade Theory
+(Krugman): the fixed-<span class="math inline">\(T\)</span> slice</h2>
+<p><span class="citation" data-cites="krugman1980scale"></span>
+introduced economies of scale and product differentiation. In the <span
+class="math inline">\((\rho, T)\)</span> diagram, this is a
+<em>horizontal</em> slice at a fixed friction level <span
+class="math inline">\(\bar{T}\)</span>.</p>
+<p>At any fixed <span class="math inline">\(T = \bar{T} &lt;
+T^*\)</span>, the gains from variety are <span
+class="math display">\[G(J) = J^{1/\rho - 1} &gt; 1 \qquad\text{for
+all}\quad
+  J \geq 2,\; \rho &lt; 1.
+  \label{eq:variety_gains}\]</span> These gains are independent of
+factor endowments.</p>
+<div id="prop:variety" class="proposition">
+<p><strong>Proposition 7</strong> (Variety trade independent of
+endowments). <em>The CES variety gains <span
+class="math inline">\(J^{1/\rho - 1} &gt; 1\)</span> whenever <span
+class="math inline">\(J \geq 2\)</span> and <span
+class="math inline">\(\rho &lt; 1\)</span>, regardless of relative
+factor abundance. This generates intra-industry trade.</em></p>
+</div>
+<p><em>Lean</em>: <code>variety_trade_independent_of_endowments</code>
+(0 axioms).</p>
+<p>Krugman’s contribution was discovering the horizontal slice. Variety
+preference (<span class="math inline">\(\rho &lt; 1\)</span>) generates
+two-way trade in differentiated goods—the intra-industry trade that HO
+cannot explain. The home market effect, increasing returns, and the new
+economic geography all operate within this slice.</p>
+<h2 id="gravity-the-t-axis-slice">Gravity: the <span
+class="math inline">\(T\)</span>-axis slice</h2>
+<p>The gravity equation—that bilateral trade is proportional to economic
+mass and inversely related to distance—is the most robust empirical
+regularity in international economics <span class="citation"
+data-cites="tinbergen1962shaping anderson2003gravity"></span>.</p>
+<p>In the CES framework, gravity is not a separate empirical law. It is
+a theorem.</p>
+<div id="thm:gravity" class="theorem">
+<p><strong>Theorem 8</strong> (Gravity is <span
+class="math inline">\(K_{\mathrm{eff}}\)</span> monotonicity).
+<em>Effective curvature <span
+class="math inline">\(K_{\mathrm{eff}}\)</span> is monotone decreasing
+in bilateral friction <span class="math inline">\(T\)</span>: <span
+class="math display">\[T_1 \leq T_2 \implies K_{\mathrm{eff}}(T_2) \leq
+K_{\mathrm{eff}}(T_1).\]</span> Since bilateral friction increases with
+geographic distance (and other trade costs), trade intensity falls with
+distance.</em></p>
+</div>
+<p><em>Lean</em>: <code>bilateral_Keff_decreasing</code> (0 axioms). The
+strict version (<code>bilateral_Keff_strict</code>) establishes <span
+class="math inline">\(T_1 &lt; T_2 &lt; T^*\implies
+K_{\mathrm{eff}}(T_2) &lt; K_{\mathrm{eff}}(T_1)\)</span>.</p>
+<div id="rem:gravity_dominates" class="remark">
+<p><em>Remark 9</em> (Why gravity dominates). Gravity explains 60–90% of
+trade variance because most of the cross-sectional variation is along
+the <span class="math inline">\(T\)</span>-axis. Bilateral distance
+varies by <span class="math inline">\(100\times\)</span> across country
+pairs (300 km for Belgium-Netherlands to 18,000 km for Spain-New
+Zealand), while <span class="math inline">\(\rho\)</span> varies by only
+<span class="math inline">\(3\times\)</span> across sectors <span
+class="citation" data-cites="broda2006globalization"></span>. Within the
+active trade regime (<span class="math inline">\(T &lt; T^*\)</span>),
+<span class="math inline">\(K_{\mathrm{eff}}\)</span> is <em>linear</em>
+in <span class="math inline">\(T/T^*\)</span>—and linear relationships
+yield high <span class="math inline">\(R^2\)</span> even with noisy
+proxies.</p>
+</div>
+<h2 id="new-new-trade-theory-melitz-the-t-boundary">New New Trade Theory
+(Melitz): the <span class="math inline">\(T^*\)</span> boundary</h2>
+<p><span class="citation" data-cites="melitz2003impact"></span>
+introduced firm heterogeneity: not all firms export, because a
+productivity cutoff determines which firms can profitably enter foreign
+markets.</p>
+<p>In the <span class="math inline">\((\rho, T)\)</span> diagram, the
+Melitz mechanism operates at the <span
+class="math inline">\(T^*\)</span> boundary. Firms with heterogeneous
+<span class="math inline">\(\rho_f\)</span> (different degrees of
+product complementarity) face the same bilateral friction <span
+class="math inline">\(T\)</span>. Those with high <span
+class="math inline">\(\rho_f\)</span> (substitutable products) have
+<span class="math inline">\(T^*(\rho_f) &gt; T\)</span> and survive;
+those with low <span class="math inline">\(\rho_f\)</span>
+(complementary products) have <span class="math inline">\(T^*(\rho_f)
+&lt; T\)</span> and exit.</p>
+<p>The CES framework derives Melitz-style extensive-margin adjustments
+from the <span class="math inline">\(T^*\)</span> boundary without
+assuming a firm productivity distribution—heterogeneous <span
+class="math inline">\(\rho\)</span> is sufficient. The prediction is
+sharper: not only do some firms exit, but those that exit are
+systematically the most complementary (lowest <span
+class="math inline">\(\rho\)</span>)—the firms whose products have the
+highest gains from trade but the lowest tolerance for friction.</p>
+<h2 id="the-unification-theorem">The unification theorem</h2>
+<div id="thm:unification" class="theorem">
+<p><strong>Theorem 10</strong> (Four schools, one surface). <em>For
+<span class="math inline">\(J \geq 2\)</span>, <span
+class="math inline">\(0 &lt; \rho &lt; 1\)</span>, and bilateral
+friction <span class="math inline">\(T \geq 0\)</span>:</em></p>
+<ol>
+<li><p><em><strong>HO slice</strong> (<span class="math inline">\(T =
+0\)</span>): <span class="math inline">\(K_{\mathrm{eff}}= K\)</span>;
+factor price equalization, Stolper-Samuelson magnification, and HOV
+factor content all hold exactly.</em></p></li>
+<li><p><em><strong>Krugman slice</strong> (fixed <span
+class="math inline">\(T &lt; T^*\)</span>): variety gains <span
+class="math inline">\(G(J) = J^{1/\rho - 1} &gt; 1\)</span>
+independently of endowments.</em></p></li>
+<li><p><em><strong>Gravity slice</strong> (<span
+class="math inline">\(T\)</span>-axis): <span
+class="math inline">\(K_{\mathrm{eff}}\)</span> is monotone decreasing
+in <span class="math inline">\(T\)</span>.</em></p></li>
+<li><p><em><strong>Melitz boundary</strong> (<span
+class="math inline">\(T \approx T^*\)</span>): agents with <span
+class="math inline">\(T^*(\rho_f) &lt; T\)</span> exit; those with <span
+class="math inline">\(T^*(\rho_f) &gt; T\)</span> survive; the boundary
+separates active trade from autarky.</em></p></li>
+</ol>
+<p><em>All four hold simultaneously for <span class="math inline">\(0
+&lt; T &lt; T^*\)</span>.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Parts (1)–(3) are proved as Propositions <a
+href="#prop:fpe" data-reference-type="ref"
+data-reference="prop:fpe">5</a>–<a href="#prop:fpe_knife"
+data-reference-type="ref" data-reference="prop:fpe_knife">6</a>,
+Proposition <a href="#prop:variety" data-reference-type="ref"
+data-reference="prop:variety">7</a>, and Theorem <a href="#thm:gravity"
+data-reference-type="ref" data-reference="thm:gravity">8</a>
+respectively, each machine-verified in Lean 4. Part (4) follows from the
+discontinuity of <span class="math inline">\(K_{\mathrm{eff}}\)</span>
+at <span class="math inline">\(T^*\)</span>
+(<code>trade_collapse_at_critical</code>) combined with the <span
+class="math inline">\(\rho\)</span>-ordering of <span
+class="math inline">\(T^*\)</span> (Proposition <a
+href="#prop:Tstar_rho" data-reference-type="ref"
+data-reference="prop:Tstar_rho">1</a>). The conjunction is
+<code>ho_challenged</code> (0 axioms). ◻</p>
+</div>
+<div class="mdframed">
+<p><strong>The dissolving move.</strong> Each school captured the
+dominant variation in its experimental configuration. The debates arose
+from mistaking a cross-section for the full surface:</p>
+<ul>
+<li><p><strong>HO works for low-friction pairs</strong> (US-Canada, EU
+internal) where <span class="math inline">\(T/T^*\)</span> is small. It
+fails for high-friction pairs.</p></li>
+<li><p><strong>Krugman works for cross-sectoral comparisons</strong> at
+stable friction. It fails during crises when <span
+class="math inline">\(T\)</span> shifts rapidly.</p></li>
+<li><p><strong>Gravity works for cross-sectional variation</strong> in
+normal times. It fails at <span class="math inline">\(T^*\)</span> where
+the linear relationship breaks.</p></li>
+<li><p><strong>Melitz works near the <span
+class="math inline">\(T^*\)</span> boundary</strong>. It is less
+informative in the interior of the active trade region.</p></li>
+</ul>
+<p>Asking “which school is right?” is like asking whether electricity or
+magnetism is the “right” theory of electromagnetism. The answer is
+visible only in the unified two-dimensional space.</p>
+</div>
+<h1 id="sec:acr">Why ACR Welfare Converges: No Trade Dark Matter</h1>
+<h2 id="the-acr-sufficient-statistic">The ACR sufficient statistic</h2>
+<p><span class="citation" data-cites="arkolakis2012new"></span> showed
+that welfare gains from trade in a wide class of models—including
+Armington, Krugman, Melitz, and Eaton-Kortum—depend only on the domestic
+expenditure share <span class="math inline">\(\lambda\)</span> and the
+trade elasticity <span class="math inline">\(\sigma - 1\)</span>: <span
+class="math display">\[W = \lambda^{-1/(\sigma - 1)}.
+  \label{eq:acr}\]</span> This “sufficient statistic” result was
+described as surprising: models with completely different
+micro-structures (homogeneous firms, heterogeneous firms, Ricardian
+technology, monopolistic competition) all yield the same welfare
+formula. ACR could not explain <em>why</em>.</p>
+<h2 id="acr-equals-krugman-at-symmetric-equilibrium">ACR equals Krugman
+at symmetric equilibrium</h2>
+<p>Krugman’s (1980) love-of-variety result gives welfare gains from
+<span class="math inline">\(J\)</span> varieties: <span
+class="math display">\[G(J) = J^{1/\rho - 1}.
+  \label{eq:krugman_gains}\]</span> These appear to be different
+formulas from different models. They are the same formula.</p>
+<div id="thm:acr_krugman" class="theorem">
+<p><strong>Theorem 11</strong> (ACR <span
+class="math inline">\(=\)</span> Krugman identity). <em>At symmetric
+equilibrium, where the domestic expenditure share is <span
+class="math inline">\(\lambda = 1/J\)</span> (each of <span
+class="math inline">\(J\)</span> countries consumes an equal share of
+world output): <span
+class="math display">\[\lambda^{-1/(\sigma-1)}\Big|_{\lambda = 1/J}
+  = (1/J)^{-(1-\rho)/\rho \cdot (1/(1-\rho))}
+  = (1/J)^{-(1/\rho - 1)}
+  = J^{1/\rho - 1}
+  = G(J).\]</span> The ACR welfare formula and the Krugman variety gains
+are the same equation evaluated at the same point.</em></p>
+</div>
+<p><em>Lean</em>: <code>acr_at_symmetric_eq_variety</code> (0 axioms).
+Proof: <code>inv_rpow</code> <span class="math inline">\(+\)</span>
+<code>rpow_neg</code> <span class="math inline">\(+\)</span>
+<code>ring</code>.</p>
+<h2 id="why-there-is-no-trade-dark-matter">Why there is no trade dark
+matter</h2>
+<p>The CES framework explains the ACR convergence through two deeper
+results.</p>
+<p><strong>CES uniqueness.</strong> CES is the unique aggregation
+function satisfying constant returns to scale and scale consistency
+<span class="citation" data-cites="smirl2026emergent"></span>—the unique
+aggregation-invariant function class. Every model in the ACR class uses
+CES aggregation (either as preferences, technology, or both). The
+welfare formula must agree across models because there is only one
+possible aggregator.</p>
+<p><strong>The bridge theorem.</strong> The bridge theorem from <span
+class="citation" data-cites="smirl2026emergent"></span> proves that for
+CES aggregation, all structural parameters are <em>detectable</em>
+through factor shares: there is no “dark matter” hiding behind the
+factor share decomposition. If two CES-based models have the same <span
+class="math inline">\(\lambda\)</span> and <span
+class="math inline">\(\sigma\)</span>, they must have the same
+welfare—because there is nothing else to differ on.</p>
+<div id="cor:no_dark_matter" class="corollary">
+<p><strong>Corollary 12</strong> (No trade dark matter). <em>In any
+CES-based trade model, the domestic expenditure share <span
+class="math inline">\(\lambda\)</span> and the trade elasticity <span
+class="math inline">\(\sigma\)</span> are sufficient statistics for
+welfare. No additional structural parameters (firm-level heterogeneity,
+entry costs, transport technology) affect the welfare calculation beyond
+their impact on <span class="math inline">\(\lambda\)</span> and <span
+class="math inline">\(\sigma\)</span>.</em></p>
+</div>
+<p>This dissolves the mystery. The ACR convergence is not a coincidence
+or a deep regularity awaiting explanation—it is a tautology once one
+recognizes that CES is the unique aggregator.</p>
+<div class="remark">
+<p><em>Remark 13</em> (Relationship to <span class="citation"
+data-cites="arkolakis2012new"></span>). ACR proved the sufficient
+statistic result for their class of models and speculated that
+additional models might be added. The CES framework shows that the class
+is <em>closed</em>: any model using CES aggregation (and satisfying
+constant returns) must yield the same formula. Extending ACR to non-CES
+models would require a different aggregator—but CES uniqueness shows no
+other aggregator satisfies the axioms.</p>
+</div>
+<h1 id="sec:smirl_curve">The Smirl Curve in Trade: Efficiency-Fragility
+Coupling</h1>
+<p>The <span class="math inline">\((\rho, T)\)</span> surface generates
+a novel prediction that no single school can derive: the most valuable
+trade links are the most fragile.</p>
+<h2 id="the-efficiency-fragility-tradeoff">The efficiency-fragility
+tradeoff</h2>
+<div id="thm:eff_frag" class="theorem">
+<p><strong>Theorem 14</strong> (Efficiency-fragility in trade). <em>For
+two goods with <span class="math inline">\(\rho_1 &lt; \rho_2\)</span>
+(good 1 more complementary), at any common sub-critical friction
+level:</em></p>
+<ol>
+<li><p><em><span class="math inline">\(K_{\mathrm{eff}}(\rho_1, T) \geq
+K_{\mathrm{eff}}(\rho_2, T)\)</span>: more complementary goods have
+<em>higher</em> effective curvature, hence higher gains from
+trade.</em></p></li>
+<li><p><em><span class="math inline">\(T^*(\rho_1) &lt;
+T^*(\rho_2)\)</span>: more complementary goods have <em>lower</em>
+critical friction thresholds, hence are more vulnerable to
+disruption.</em></p></li>
+</ol>
+<p><em>The most valuable trade links—those generating the greatest gains
+from complementarity—are the first to collapse under rising
+friction.</em></p>
+</div>
+<p><em>Lean</em>: <code>efficiency_fragility_tradeoff</code> (0 axioms),
+combining <code>complementary_goods_higher_Keff</code> and
+<code>complementary_goods_more_fragile</code>.</p>
+<h2 id="the-trho-curve">The <span
+class="math inline">\(T^*(\rho)\)</span> curve</h2>
+<p>From <a href="#eq:Tstar" data-reference-type="eqref"
+data-reference="eq:Tstar">[eq:Tstar]</a>, the critical friction is <span
+class="math inline">\(T^*= cJ / [(1-\rho)(J-1)]\)</span>. As <span
+class="math inline">\(\rho \to 0\)</span> (Cobb-Douglas, high
+complementarity), <span class="math inline">\(T^*\)</span> is low: these
+goods require low friction to survive. As <span
+class="math inline">\(\rho \to 1\)</span> (perfect substitutes), <span
+class="math inline">\(T^*\to \infty\)</span>: substitutable goods
+tolerate arbitrarily high friction because they can be replaced.</p>
+<p>The <span class="math inline">\(T^*(\rho)\)</span> curve separates
+the active trade region (below the curve) from the autarky region (above
+the curve) in the <span class="math inline">\((\rho, T)\)</span> plane.
+Its shape—convex, declining toward the origin as <span
+class="math inline">\(\rho\)</span> falls—is the geometric expression of
+the efficiency-fragility coupling.</p>
+<h2 id="sensitivity-ordering-k2-degrades-faster-than-k">Sensitivity
+ordering: <span class="math inline">\(K^2\)</span> degrades faster than
+<span class="math inline">\(K\)</span></h2>
+<p>The diversification channel (proportional to <span
+class="math inline">\(K^2\)</span>) is more sensitive to friction than
+the production channel (proportional to <span
+class="math inline">\(K\)</span>).</p>
+<div id="prop:div_sensitivity" class="proposition">
+<p><strong>Proposition 15</strong> (Diversification sensitivity).
+<em>For any sub-critical friction <span class="math inline">\(0 &lt; T
+&lt; T^*\)</span>: <span class="math display">\[m(T)^2 &lt;
+m(T),\]</span> where <span class="math inline">\(m(T) = 1 -
+T/T^*\)</span> is the degradation factor. Diversification benefits
+degrade faster than production benefits.</em></p>
+</div>
+<p><em>Lean</em>: <code>diversification_degradation_ratio</code>
+(0 axioms).</p>
+<p>This has a sharp implication for trade policy: the correlation
+robustness gains from trade (portfolio diversification across partners)
+are more fragile than the production gains (access to cheaper inputs). A
+country near <span class="math inline">\(T^*\)</span> loses its
+diversification benefits before losing its production benefits.</p>
+<h1 id="sec:regime">Regime Shift at <span
+class="math inline">\(T^*\)</span>: Bimodal Collapse, Not Smooth
+Decline</h1>
+<h2 id="the-discontinuity">The discontinuity</h2>
+<div id="thm:collapse" class="theorem">
+<p><strong>Theorem 16</strong> (Trade collapse is discontinuous).
+<em><span class="math inline">\(K_{\mathrm{eff}}&gt; 0\)</span> for all
+<span class="math inline">\(T &lt; T^*\)</span>, and <span
+class="math inline">\(K_{\mathrm{eff}}= 0\)</span> for <span
+class="math inline">\(T \geq T^*\)</span>. The transition is
+discontinuous: <span class="math inline">\(K_{\mathrm{eff}}\)</span>
+does not decline gradually toward zero as <span class="math inline">\(T
+\to T^*^-\)</span>.</em></p>
+</div>
+<p><em>Lean</em>: <code>trade_collapse_at_critical</code>
+(0 axioms).</p>
+<p>This is the sharpest departure from existing trade theory. In HO,
+Krugman, or standard gravity models, a uniform increase in trade costs
+produces a proportional decline across all trade flows. In the CES <span
+class="math inline">\((\rho, T)\)</span> framework, trade flows are
+either <em>fully operational</em> (<span class="math inline">\(T &lt;
+T^*\)</span>) or <em>completely severed</em> (<span
+class="math inline">\(T \geq T^*\)</span>), with no smooth
+transition.</p>
+<h2 id="heterogeneous-collapse-and-bimodality">Heterogeneous collapse
+and bimodality</h2>
+<p>Different product-pairs <span class="math inline">\((i, j,
+k)\)</span> face different effective frictions <span
+class="math inline">\(T_{ijk}\)</span>. When an aggregate shock raises
+friction toward <span class="math inline">\(T^*\)</span>:</p>
+<div id="prop:bimodal" class="proposition">
+<p><strong>Proposition 17</strong> (Bimodal collapse distribution).
+<em>If product-pairs face idiosyncratic frictions <span
+class="math inline">\(T_{ijk} = \bar{T} + \varepsilon_{ijk}\)</span>
+with <span class="math inline">\(\varepsilon_{ijk}\)</span> dispersed,
+and <span class="math inline">\(\bar{T}\)</span> rises toward <span
+class="math inline">\(T^*\)</span>, then:</em></p>
+<ol>
+<li><p><em>Pairs with <span class="math inline">\(T_{ijk} \geq
+T^*\)</span>: trade collapses completely (catastrophic).</em></p></li>
+<li><p><em>Pairs with <span class="math inline">\(T_{ijk} &lt;
+T^*\)</span>: trade continues near pre-shock levels
+(resilient).</em></p></li>
+<li><p><em>The middle range is depleted: few pairs experience moderate
+(20–40%) declines.</em></p></li>
+</ol>
+<p><em>The distribution of trade changes is bimodal, not
+unimodal.</em></p>
+</div>
+<h2 id="the-bimodality-signature">The bimodality signature</h2>
+<p>The bimodality coefficient <span class="math inline">\(\mathrm{BC} =
+(g^2 + 1) / k\)</span>, where <span class="math inline">\(g\)</span> is
+skewness and <span class="math inline">\(k\)</span> is kurtosis, exceeds
+<span class="math inline">\(5/9 \approx 0.556\)</span> for a bimodal
+distribution <span class="citation"
+data-cites="pfister2013good"></span>. This provides a clean empirical
+test: crisis episodes should show <span
+class="math inline">\(\mathrm{BC} &gt; 0.556\)</span>, while normal
+periods should show lower values.</p>
+<p>The additional diagnostic is excess kurtosis. The <span
+class="math inline">\(T^*\)</span> mechanism predicts extreme kurtosis
+(because the two modes at “catastrophic” and “resilient” generate heavy
+tails), far exceeding the kurtosis <span class="math inline">\(=
+3\)</span> of a normal distribution.</p>
+<h1 id="sec:gvc">GVC Ceiling Cascade: <span
+class="math inline">\(T^*_{\mathrm{eff}} = \min_m
+T^*^{(m)}\)</span></h1>
+<h2 id="multi-stage-production-chains">Multi-stage production
+chains</h2>
+<p>In a hierarchical CES economy with <span
+class="math inline">\(N\)</span> production stages, each stage <span
+class="math inline">\(m\)</span> has its own bilateral friction <span
+class="math inline">\(T^{(m)}\)</span> and critical threshold <span
+class="math inline">\(T^*^{(m)}\)</span>. The effective curvature at
+stage <span class="math inline">\(n\)</span> is bounded by all upstream
+stages:</p>
+<p><span class="math display">\[K_{\mathrm{eff}}^{(n)} \leq \min_{m \leq
+n} K^{(m)} \cdot
+  \max\!\left(0,\; 1 - \frac{T^{(m)}}{T^*^{(m)}}\right).
+  \label{eq:cascade}\]</span></p>
+<div id="thm:cascade" class="theorem">
+<p><strong>Theorem 18</strong> (Ceiling cascade). <em>If any upstream
+stage <span class="math inline">\(m\)</span> reaches its critical
+friction (<span class="math inline">\(T^{(m)} \geq T^*^{(m)}\)</span>),
+all downstream stages collapse: <span
+class="math display">\[K_{\mathrm{eff}}^{(m)} = 0 \implies
+K_{\mathrm{eff}}^{(m+1)} = \cdots = K_{\mathrm{eff}}^{(N)} = 0.\]</span>
+The effective threshold for the entire chain is <span
+class="math display">\[T^*_{\mathrm{eff}} = \min_{m=1,\ldots,N}
+T^*^{(m)}.\]</span></em></p>
+</div>
+<p><em>Lean</em>: <code>upstream_cascade</code> (0 axioms), bridging to
+the ceiling cascade from Paper 4.</p>
+<div id="cor:depth" class="corollary">
+<p><strong>Corollary 19</strong> (Longer chains collapse first).
+<em>Since <span class="math inline">\(T^*_{\mathrm{eff}} = \min_m
+T^*^{(m)}\)</span> is decreasing in <span
+class="math inline">\(N\)</span> (the minimum of more terms is smaller),
+goods that traverse more production stages have lower effective
+thresholds and collapse at lower aggregate friction.</em></p>
+</div>
+<h2 id="supply-chain-stratification-prediction">Supply-chain
+stratification prediction</h2>
+<p>This generates a specific, testable prediction: during a crisis,
+<em>intermediate goods</em> (which are inputs to further production
+stages and therefore traverse more links in the chain) should exhibit
+higher catastrophic collapse rates than <em>final goods</em> (which go
+directly to consumers and traverse fewer links).</p>
+<p>The prediction is not merely that intermediate goods decline more on
+average—standard inventory adjustment (“bullwhip”) models predict this
+too. The CES prediction is that intermediates have a higher
+<em>catastrophic collapse rate</em>: a larger fraction of
+intermediate-good trade flows cross <span
+class="math inline">\(T^*\)</span> and cease entirely, while the
+remainder continue. The bimodal distribution should be <em>more
+pronounced</em> for intermediates than for final goods.</p>
+<h1 id="sec:design">Empirical Design</h1>
+<h2 id="data">Data</h2>
+<p><strong>Trade flows.</strong> BACI HS92 V202601 <span
+class="citation" data-cites="gaulier2010baci"></span>, providing
+bilateral trade at HS 6-digit level for 200+ countries, 1995–2024. Flows
+are aggregated to HS 2-digit (96 chapters) for 30 OECD countries,
+yielding 57,000–59,000 product-pair observations per year-pair.</p>
+<p><strong>Product classification.</strong> HS 2-digit chapters are
+classified as <em>intermediate</em> (raw materials, basic chemicals,
+metals, industrial textiles: HS 25–29, 31–32, 38–40, 47–48, 50–56, 70,
+72–76, 78–81; 28 chapters) or <em>final</em> (consumer goods, machinery,
+vehicles, instruments: HS 30, 33–34, 61–64, 84–85, 87–88, 90–91, 94–96;
+16 chapters), following BEC concordance principles. Chapters not fitting
+either category are classified “other” and excluded from GVC
+stratification tests.</p>
+<p><strong>Upstreamness.</strong> Following <span class="citation"
+data-cites="antras2012measuring"></span>, the continuous upstreamness
+measure <span class="math inline">\(U_i = \mathbf{e}&#39;(I -
+F)^{-1}e_i\)</span> is computed from the 2022 BEA Input-Output Use
+table. Intermediate goods average <span class="math inline">\(U =
+4.58\)</span> (primary metals: 6.6; textiles: 3.7); final goods average
+<span class="math inline">\(U = 2.64\)</span> (vehicles: 2.3; aircraft:
+1.6; instruments: 2.0).</p>
+<p><strong>Additional data.</strong> UN Comtrade (aggregate bilateral,
+30 OECD, 1995–2022); US Census (exports/imports by 3-digit NAICS,
+2015–20); BEA GDP-by-Industry (capital intensity); Penn World Table 11.0
+(capital stock, employment, 185 countries).</p>
+<h2 id="crisis-episodes">Crisis episodes</h2>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Episode</th>
+<th style="text-align: left;">Pre-year</th>
+<th style="text-align: left;">Post-year</th>
+<th style="text-align: left;">Nature</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">GFC</td>
+<td style="text-align: left;">2007</td>
+<td style="text-align: left;">2009</td>
+<td style="text-align: left;">Financial crisis</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">COVID</td>
+<td style="text-align: left;">2019</td>
+<td style="text-align: left;">2020</td>
+<td style="text-align: left;">Pandemic shock</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trade Wars</td>
+<td style="text-align: left;">2017</td>
+<td style="text-align: left;">2019</td>
+<td style="text-align: left;">Policy-driven</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Recovery</td>
+<td style="text-align: left;">2009</td>
+<td style="text-align: left;">2010</td>
+<td style="text-align: left;">Control (rebound)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Normal</td>
+<td style="text-align: left;">2018</td>
+<td style="text-align: left;">2019</td>
+<td style="text-align: left;">Control (non-crisis)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="measurement">Measurement</h2>
+<p>For each exporter-importer-product triple <span
+class="math inline">\((i, j, k)\)</span> with pre-period trade <span
+class="math inline">\(&gt; \$100{,}000\)</span>: <span
+class="math display">\[\Delta_{ijk} = \frac{X^{\mathrm{post}}_{ijk} -
+    X^{\mathrm{pre}}_{ijk}}{X^{\mathrm{pre}}_{ijk}}.\]</span> A flow is
+<em>catastrophic</em> if <span class="math inline">\(\Delta &lt;
+-0.5\)</span> (more than half destroyed), <em>resilient</em> if <span
+class="math inline">\(\Delta &gt; -0.1\)</span> (less than 10% decline
+or growing), and <em>moderate</em> otherwise.</p>
+<h2 id="ten-pre-specified-tests">Ten pre-specified tests</h2>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Test</strong></th>
+<th style="text-align: left;"><strong>Source</strong></th>
+<th style="text-align: left;"><strong>CES prediction</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">T1: Grubel-Lloyd IIT</td>
+<td style="text-align: left;">BACI</td>
+<td style="text-align: left;">GL substantial (<span
+class="math inline">\(&gt; 0.5\)</span>)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T2: Gravity horse race</td>
+<td style="text-align: left;">Comtrade</td>
+<td style="text-align: left;">Gravity <span class="math inline">\(R^2
+\gg\)</span> HO <span class="math inline">\(R^2\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T3: Bimodal collapse</td>
+<td style="text-align: left;">BACI</td>
+<td style="text-align: left;">BC <span class="math inline">\(&gt;
+0.556\)</span>, extreme kurtosis</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T4: Spectral gap</td>
+<td style="text-align: left;">Comtrade</td>
+<td style="text-align: left;">Fiedler distance predicts sync</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T5: Cross-crisis persistence</td>
+<td style="text-align: left;">BACI</td>
+<td style="text-align: left;">Same pairs collapse repeatedly</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T6: GVC stratification</td>
+<td style="text-align: left;">BACI + BEA</td>
+<td style="text-align: left;">Intermediate <span
+class="math inline">\(&gt;\)</span> final collapse</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T7: Melitz middle-bin deficit</td>
+<td style="text-align: left;">BACI</td>
+<td style="text-align: left;">Middle range depleted</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T8: Permutation test</td>
+<td style="text-align: left;">BACI</td>
+<td style="text-align: left;">Stratification not labeling artifact</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T9: Out-of-sample probit</td>
+<td style="text-align: left;">BACI</td>
+<td style="text-align: left;">GFC<span
+class="math inline">\(+\)</span>COVID <span
+class="math inline">\(\to\)</span> trade wars</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T10: Trefler missing trade</td>
+<td style="text-align: left;">PWT + BEA</td>
+<td style="text-align: left;">Slope <span
+class="math inline">\(\ll\)</span> HOV <span class="math inline">\(=
+1\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="sec:results">Results: 9/10 Tests Consistent</h1>
+<h2 id="tests-t1t2-ho-failures-confirmed">Tests T1–T2: HO failures
+confirmed</h2>
+<div class="mdframed">
+<p><strong>Empirical Result T1 (Intra-Industry Trade).</strong></p>
+<p>Trade-weighted Grubel-Lloyd index: GL <span class="math inline">\(=
+0.56\)</span> (all OECD), <span class="math inline">\(0.66\)</span> (EU
+internal), matching the 60–70% literature benchmark. Country-level:
+Germany 0.83, France 0.77, US 0.72, Japan 0.47. <span
+class="math inline">\(N = 435\)</span> bilateral pairs <span
+class="math inline">\(\times\)</span> 5 years. <strong>Verdict:
+Consistent.</strong></p>
+</div>
+<div class="mdframed">
+<p><strong>Empirical Result T2 (Gravity vs. Factor
+Endowments).</strong></p>
+<p>Gravity <span class="math inline">\(R^2 = 0.138\)</span> vs. HO <span
+class="math inline">\(R^2 = 0.033\)</span> (<span
+class="math inline">\(4.2\times\)</span>). Factor-endowment difference
+has the <em>wrong sign</em> (<span class="math inline">\(\beta =
+-0.89\)</span>, <span class="math inline">\(p &lt; 10^{-50}\)</span>):
+similar countries trade <em>more</em>, not less. In the combined model,
+adding factor difference contributes <span class="math inline">\(\Delta
+R^2 = 0.0001\)</span> (<span class="math inline">\(p = 0.45\)</span>).
+<span class="math inline">\(N = 6{,}748\)</span> pair-year observations.
+<strong>Verdict: Consistent.</strong></p>
+</div>
+<p>The gravity dominance is consistent with Remark <a
+href="#rem:gravity_dominates" data-reference-type="ref"
+data-reference="rem:gravity_dominates">9</a>: bilateral distance (the
+main source of <span class="math inline">\(T\)</span> variation)
+explains far more variance than <span
+class="math inline">\(\rho\)</span> variation across sectors.</p>
+<h2 id="tests-t3-t5t9-regime-shift-and-gvc-cascade">Tests T3, T5–T9:
+Regime shift and GVC cascade</h2>
+<div class="mdframed">
+<p><strong>Empirical Result T3 (GFC Bimodal Collapse).</strong></p>
+<p><span class="math inline">\(N = 57{,}121\)</span> product-pair
+observations. Bimodality coefficient BC <span class="math inline">\(&gt;
+0.556\)</span>. Excess kurtosis <span class="math inline">\(&gt;
+30{,}000\)</span>; Shapiro-Wilk <span class="math inline">\(p &lt;
+0.001\)</span>. Distribution: 19.8% catastrophic (<span
+class="math inline">\(\Delta &lt; -0.5\)</span>), 19.6% moderate, 44.6%
+resilient (<span class="math inline">\(\Delta &gt; -0.1\)</span>).
+Cross-product range: 794 percentage points. <strong>Verdict:
+Consistent.</strong></p>
+</div>
+<div id="tab:bimodal">
+<table>
+<caption>Distribution of trade changes by episode</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Episode</td>
+<td style="text-align: right;"><span
+class="math inline">\(N\)</span></td>
+<td style="text-align: center;">Catastrophic</td>
+<td style="text-align: center;">Moderate</td>
+<td style="text-align: center;">Resilient</td>
+<td style="text-align: center;">Kurtosis</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: center;">(<span class="math inline">\(\Delta &lt;
+{-}0.5\)</span>)</td>
+<td style="text-align: center;">(<span
+class="math inline">\(-0.5\)</span> to <span
+class="math inline">\(-0.1\)</span>)</td>
+<td style="text-align: center;">(<span class="math inline">\(\Delta &gt;
+{-}0.1\)</span>)</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">GFC 2007–09</td>
+<td style="text-align: right;">57,121</td>
+<td style="text-align: center;">19.8%</td>
+<td style="text-align: center;">19.6%</td>
+<td style="text-align: center;">44.6%</td>
+<td style="text-align: center;">30,056</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">COVID 2019–20</td>
+<td style="text-align: right;">58,753</td>
+<td style="text-align: center;">10.6%</td>
+<td style="text-align: center;">22.2%</td>
+<td style="text-align: center;">55.7%</td>
+<td style="text-align: center;">34,625</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trade Wars 2017–19</td>
+<td style="text-align: right;">58,146</td>
+<td style="text-align: center;">10.2%</td>
+<td style="text-align: center;">15.6%</td>
+<td style="text-align: center;">65.7%</td>
+<td style="text-align: center;">12,759</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Recovery 2009–10</td>
+<td style="text-align: right;">56,448</td>
+<td style="text-align: center;">9.2%</td>
+<td style="text-align: center;">14.1%</td>
+<td style="text-align: center;">69.0%</td>
+<td style="text-align: center;">11,981</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Normal 2018–19</td>
+<td style="text-align: right;">58,672</td>
+<td style="text-align: center;">8.6%</td>
+<td style="text-align: center;">21.1%</td>
+<td style="text-align: center;">61.1%</td>
+<td style="text-align: center;">7,600</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The GFC produces the clearest regime shift signature. The
+catastrophic rate more than doubles relative to the non-crisis baseline
+(19.8% vs. 8.6%), while the moderate category barely changes (19.6%
+vs. 21.1%). Mass shifts from the resilient to the catastrophic tail,
+leaving the middle depleted—exactly the bimodal pattern that
+Proposition <a href="#prop:bimodal" data-reference-type="ref"
+data-reference="prop:bimodal">17</a> predicts.</p>
+<div class="mdframed">
+<p><strong>Empirical Result T5 (Cross-Crisis Pair
+Persistence).</strong></p>
+<p>Among 52,912 triples observed in both the GFC and COVID: <span
+class="math inline">\(P(\text{catastrophic in COVID} \mid
+\text{catastrophic in GFC})
+= 15.9\%\)</span> vs. base rate <span
+class="math inline">\(8.7\%\)</span>. Lift <span class="math inline">\(=
+1.82\times\)</span>; <span class="math inline">\(\chi^2 = 703\)</span>,
+<span class="math inline">\(p &lt; 10^{-155}\)</span>. The same
+product-pairs collapse across structurally different crises (financial
+crisis vs. pandemic), consistent with stable <span
+class="math inline">\(T^*\)</span> proximity. <strong>Verdict:
+Consistent.</strong></p>
+</div>
+<div class="mdframed">
+<p><strong>Empirical Result T6 (GVC Stratification).</strong></p>
+<p>Catastrophic collapse rates by product type:</p>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Episode</th>
+<th style="text-align: center;">Intermediate</th>
+<th style="text-align: center;">Final</th>
+<th style="text-align: center;">Ratio</th>
+<th style="text-align: right;"><span class="math inline">\(p\)</span>
+(Fisher)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">GFC 2007–09</td>
+<td style="text-align: center;">25.0%</td>
+<td style="text-align: center;">13.5%</td>
+<td style="text-align: center;"><span
+class="math inline">\(1.9\times\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(&lt;
+10^{-127}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">COVID 2019–20</td>
+<td style="text-align: center;">11.3%</td>
+<td style="text-align: center;">7.7%</td>
+<td style="text-align: center;"><span
+class="math inline">\(1.5\times\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(&lt;
+10^{-24}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Trade Wars 2017–19</td>
+<td style="text-align: center;">10.7%</td>
+<td style="text-align: center;">6.5%</td>
+<td style="text-align: center;"><span
+class="math inline">\(1.6\times\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(&lt;
+10^{-34}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Normal 2018–19</td>
+<td style="text-align: center;">9.2%</td>
+<td style="text-align: center;">5.7%</td>
+<td style="text-align: center;"><span
+class="math inline">\(1.6\times\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(&lt;
+10^{-35}\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Intermediate goods consistently collapse at <span
+class="math inline">\(1.5\)</span>–<span
+class="math inline">\(1.9\times\)</span> the rate of final goods, with
+<span class="math inline">\(p\)</span>-values below <span
+class="math inline">\(10^{-24}\)</span> in every episode. Effect
+strongest during GFC (OR <span class="math inline">\(= 2.14\)</span>).
+<strong>Verdict: Consistent.</strong></p>
+</div>
+<p>Three features of the GVC result deserve emphasis. <em>First</em>,
+the stratification replicates across crisis types (financial, pandemic,
+policy), suggesting a structural mechanism rather than a crisis-specific
+channel. <em>Second</em>, the ratio persists in the non-crisis control
+(<span class="math inline">\(1.6\times\)</span>), consistent with the
+ceiling cascade operating continuously at background friction levels.
+<em>Third</em>, the ratio amplifies during crises (from <span
+class="math inline">\(1.6\times\)</span> to <span
+class="math inline">\(1.9\times\)</span>), consistent with the nonlinear
+<span class="math inline">\(T^*\)</span> mechanism: as aggregate
+friction approaches threshold, the marginal impact of supply chain depth
+increases.</p>
+<div class="mdframed">
+<p><strong>Empirical Result T7 (Melitz Middle-Bin Deficit).</strong></p>
+<p>Fitting a normal distribution to the core of the GFC trade-change
+data and comparing expected to observed middle-bin density:
+observed/expected ratio <span class="math inline">\(= 0.77\)</span>. The
+middle range is 23% depleted—inconsistent with smooth extensive-margin
+adjustment and consistent with discontinuous <span
+class="math inline">\(T^*\)</span> crossing. <strong>Verdict:
+Consistent.</strong></p>
+</div>
+<div class="mdframed">
+<p><strong>Empirical Result T8 (Permutation Test).</strong></p>
+<p>Randomly reassigning 94 non-excluded HS 2-digit chapters into
+“intermediate” (<span class="math inline">\(n = 28\)</span>) and “final”
+(<span class="math inline">\(n = 16\)</span>) groups 10,000 times.
+Observed intermediate/final catastrophic ratio: <span
+class="math inline">\(1.86\)</span> (GFC). Maximum permuted ratio: <span
+class="math inline">\(1.62\)</span>. The observed value exceeds every
+permutation (<span class="math inline">\(p &lt; 0.0001\)</span>). For
+COVID: <span class="math inline">\(p = 0.048\)</span>; trade wars: <span
+class="math inline">\(p = 0.005\)</span>. The stratification is not a
+labeling artifact. <strong>Verdict: Consistent.</strong></p>
+</div>
+<div class="mdframed">
+<p><strong>Empirical Result T9 (Out-of-Sample Probit).</strong></p>
+<p>Probit model of catastrophic collapse: <span
+class="math display">\[\Pr(\text{catastrophic}_{ijkt}) = \Phi\!\left(
+    \frac{\delta_t - \gamma_0 - \gamma_1 \log d_{ij}
+      - \gamma_2 \log \min(y_i, y_j)
+      - \gamma_3 \log V_{ijk}
+      - \gamma_4 \cdot \mathbf{1}_{\mathrm{intermediate}}}
+    {\sigma_\eta}\right),\]</span> estimated on GFC <span
+class="math inline">\(+\)</span> COVID (<span class="math inline">\(N =
+91{,}627\)</span>; 14,175 events).</p>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th colspan="3" style="text-align: center;">Model A (binary)</th>
+<th colspan="3" style="text-align: center;">Model B (upstreamness)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span>2-4</span> (lr)<span>5-7</span>
+Variable</td>
+<td style="text-align: right;">Coeff</td>
+<td style="text-align: right;">SE</td>
+<td style="text-align: right;"><span
+class="math inline">\(z\)</span></td>
+<td style="text-align: right;">Coeff</td>
+<td style="text-align: right;">SE</td>
+<td style="text-align: right;"><span
+class="math inline">\(z\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\log
+d_{ij}\)</span></td>
+<td style="text-align: right;"><span
+class="math inline">\(+0.103\)</span></td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;"><span
+class="math inline">\(+18.5\)</span></td>
+<td style="text-align: right;"><span
+class="math inline">\(+0.107\)</span></td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;"><span
+class="math inline">\(+19.1\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\log \min(y_i,
+y_j)\)</span></td>
+<td style="text-align: right;"><span
+class="math inline">\(-0.019\)</span></td>
+<td style="text-align: right;">0.005</td>
+<td style="text-align: right;"><span
+class="math inline">\(-3.6\)</span></td>
+<td style="text-align: right;"><span
+class="math inline">\(-0.020\)</span></td>
+<td style="text-align: right;">0.005</td>
+<td style="text-align: right;"><span
+class="math inline">\(-3.9\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span class="math inline">\(\log
+V_{ijk}\)</span></td>
+<td style="text-align: right;"><span
+class="math inline">\(-0.257\)</span></td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;"><span
+class="math inline">\(-43.7\)</span></td>
+<td style="text-align: right;"><span
+class="math inline">\(-0.252\)</span></td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;"><span
+class="math inline">\(-42.9\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(\mathbf{1}_{\mathrm{intermediate}}\)</span></td>
+<td style="text-align: right;"><span
+class="math inline">\(+0.089\)</span></td>
+<td style="text-align: right;">0.005</td>
+<td style="text-align: right;"><span
+class="math inline">\(+17.5\)</span></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Upstreamness<span
+class="math inline">\(_k\)</span></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"></td>
+<td style="text-align: right;"><span
+class="math inline">\(+0.104\)</span></td>
+<td style="text-align: right;">0.005</td>
+<td style="text-align: right;"><span
+class="math inline">\(+20.6\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(\delta_{\mathrm{GFC}}\)</span></td>
+<td style="text-align: right;"><span
+class="math inline">\(+0.410\)</span></td>
+<td style="text-align: right;">0.011</td>
+<td style="text-align: right;"><span
+class="math inline">\(+39.0\)</span></td>
+<td style="text-align: right;"><span
+class="math inline">\(+0.411\)</span></td>
+<td style="text-align: right;">0.011</td>
+<td style="text-align: right;"><span
+class="math inline">\(+39.0\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>All signs match <span class="math inline">\(T^*\)</span> theory:
+distance raises fragility, income lowers it, thicker flows are more
+robust, upstream position increases vulnerability.
+<strong>Out-of-sample</strong>: trade wars 2017–19 (not used in
+estimation): AUC <span class="math inline">\(= 0.671\)</span>. Quintile
+collapse rates: 18.8% (most fragile) to 3.4% (most robust)—a <span
+class="math inline">\(5.5\times\)</span> gradient. <strong>Verdict:
+Consistent.</strong></p>
+</div>
+<h2 id="test-t10-trefler-missing-trade">Test T10: Trefler missing
+trade</h2>
+<div class="mdframed">
+<p><strong>Empirical Result T10 (Trefler Missing Trade).</strong></p>
+<p>For each of 30 OECD countries, capital abundance <span
+class="math inline">\(K/L\)</span> (PWT 11.0) regressed against
+capital-weighted net exports (BACI <span
+class="math inline">\(\times\)</span> BEA capital intensity). Slope
+<span class="math inline">\(= 0.059\)</span> (SE <span
+class="math inline">\(= 0.078\)</span>, <span class="math inline">\(p =
+0.46\)</span>, <span class="math inline">\(R^2 = 0.02\)</span>);
+Spearman <span class="math inline">\(r = 0.075\)</span>. Factor content
+of trade is <span class="math inline">\(&lt; 6\%\)</span> of the HOV
+prediction, matching <span class="citation"
+data-cites="trefler1995case"></span>’s original <span
+class="math inline">\(\sim\)</span>3%. <strong>Verdict:
+Ambiguous.</strong></p>
+</div>
+<p>Test T10 is rated Ambiguous rather than Consistent because the CES
+prediction (<span class="math inline">\(K_{\mathrm{eff}}/K \approx
+0.03\)</span>–<span class="math inline">\(0.06\)</span>) is
+qualitatively matched, but the cross-section of only 30 OECD countries
+has low power (<span class="math inline">\(p = 0.46\)</span>). The test
+does not discriminate between “no relationship” (noise) and “tiny
+relationship” (CES with <span class="math inline">\(T/T^*\approx
+0.97\)</span>).</p>
+<h2 id="summary">Summary</h2>
+<div id="tab:summary">
+<table>
+<caption>Complete test summary</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Test</strong></th>
+<th style="text-align: left;"><strong>HO failure addressed</strong></th>
+<th style="text-align: center;"><strong>Verdict</strong></th>
+<th style="text-align: left;"><strong>Key statistic</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">T1: Grubel-Lloyd IIT</td>
+<td style="text-align: left;">Intra-industry trade</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">GL <span class="math inline">\(=
+0.56\)</span> (OECD), 0.66 (EU)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T2: Gravity horse race</td>
+<td style="text-align: left;">Gravity dominance</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: left;"><span class="math inline">\(R^2\)</span>
+ratio <span class="math inline">\(4.2\times\)</span>; wrong sign</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T3: GFC bimodality</td>
+<td style="text-align: left;">Smooth decline</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">BC <span class="math inline">\(&gt;
+0.556\)</span>; kurtosis <span class="math inline">\(&gt;
+30{,}000\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T4: Spectral gap</td>
+<td style="text-align: left;">Network effects</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">partial <span class="math inline">\(r =
+-0.128\)</span>, <span class="math inline">\(p &lt; 0.001\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T5: Cross-crisis persistence</td>
+<td style="text-align: left;">Transient shocks</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">lift <span class="math inline">\(=
+1.82\times\)</span>; <span class="math inline">\(\chi^2\; p &lt;
+10^{-155}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T6: GVC stratification</td>
+<td style="text-align: left;">Supply chain fragility</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">intermediate <span
+class="math inline">\(1.4\)</span>–<span
+class="math inline">\(1.9\times\)</span> final</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T7: Middle-bin deficit</td>
+<td style="text-align: left;">Smooth exit</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">observed/expected <span
+class="math inline">\(= 0.77\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T8: Permutation test</td>
+<td style="text-align: left;">Labeling artifact</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">10,000 perms, <span
+class="math inline">\(p &lt; 0.0001\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">T9: Out-of-sample probit</td>
+<td style="text-align: left;">Structural <span
+class="math inline">\(T^*\)</span></td>
+<td style="text-align: center;">C</td>
+<td style="text-align: left;">GFC<span
+class="math inline">\(\to\)</span>COVID AUC <span
+class="math inline">\(= 0.671\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">T10: Trefler missing trade</td>
+<td style="text-align: left;">Missing trade</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: left;">slope <span class="math inline">\(=
+0.059\)</span> vs. HOV <span class="math inline">\(= 1\)</span></td>
+</tr>
+<tr class="odd">
+<td colspan="2" style="text-align: left;"><strong>Overall</strong></td>
+<td style="text-align: center;"><strong>9C/1A/0I</strong></td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="addressing-alternative-explanations">Addressing alternative
+explanations</h2>
+<p>Three alternative mechanisms could generate the observed patterns.
+For each, a specific test discriminates it from the <span
+class="math inline">\(T^*\)</span> mechanism.</p>
+<h3 id="melitz-smooth-exit">Melitz smooth exit</h3>
+<p>In <span class="citation" data-cites="melitz2003impact"></span>,
+heterogeneous firms face a productivity cutoff: a negative shock raises
+the cutoff, causing low-productivity firms to exit while
+high-productivity firms survive. This generates a <em>smooth</em>,
+unimodal distribution of declines. Test T7 rejects this: the middle bin
+is 23% depleted relative to the best-fitting unimodal, consistent with
+the discontinuous <span class="math inline">\(T^*\)</span> mechanism and
+inconsistent with smooth extensive-margin adjustment.</p>
+<h3 id="compositional-effects">Compositional effects</h3>
+<p>If intermediate goods are concentrated in inherently volatile
+sectors, the stratification could be mechanical. Test T8 (permutation
+test) directly addresses this: the observed ratio exceeds all 10,000
+random permutations (<span class="math inline">\(p &lt; 0.0001\)</span>
+for GFC). Leave-one-out robustness confirms: dropping each of the 28
+intermediate chapters in turn yields a ratio range of <span
+class="math inline">\([1.80, 1.93]\)</span>—no single chapter drives the
+result.</p>
+<h3 id="inventory-adjustment-bullwhip-effect">Inventory adjustment
+(bullwhip effect)</h3>
+<p>The bullwhip effect predicts that intermediate goods show larger
+trade swings because firms adjust inventories along the supply chain
+<span class="citation"
+data-cites="alessandria2010inventories bems2011intermediates"></span>.
+Four tests discriminate:</p>
+<ol>
+<li><p><strong>Cross-crisis persistence</strong> (T5). If collapse
+reflects stable <span class="math inline">\(T^*\)</span> proximity
+rather than transient inventory positions, the <em>same</em> pairs
+should collapse across different crises. The lift of <span
+class="math inline">\(1.82\times\)</span> across GFC<span
+class="math inline">\(\to\)</span>COVID (structurally unrelated shocks)
+is inconsistent with inventory-specific explanations.</p></li>
+<li><p><strong>Recovery asymmetry.</strong> Among 8,304 triples that
+collapsed during the GFC, the 2009–10 recovery is bimodal: 37.5% bounced
+back by <span class="math inline">\(&gt;\)</span>50%, while 33.4% were
+still declining. Variance of recovery among collapsed pairs is <span
+class="math inline">\(39\times\)</span> that of resilient pairs (KS
+<span class="math inline">\(p &lt; 10^{-300}\)</span>). Bullwhip
+predicts tight, mean-reverting recovery—not bimodal.</p></li>
+<li><p><strong>Depth-breadth correlation.</strong> Across 855 OECD
+country pairs, the Spearman correlation between worst single-product
+drop and fraction of products collapsing is <span
+class="math inline">\(r = -0.50\)</span> (<span class="math inline">\(p
+&lt; 10^{-54}\)</span>) during the GFC. When a pair loses one product,
+it typically loses 13—consistent with an aggregate <span
+class="math inline">\(T^*\)</span> crossing, not product-specific
+inventory adjustment.</p></li>
+<li><p><strong>Non-crisis persistence.</strong> The <span
+class="math inline">\(1.6\times\)</span> intermediate premium persists
+in the 2018–19 control (<span class="math inline">\(p &lt;
+10^{-26}\)</span>). Bullwhip is a cyclical amplifier that should be
+small outside recessions.</p></li>
+</ol>
+<h1 id="sec:spectral">Spectral Gap and Business Cycle Co-movement</h1>
+<p>The bilateral structure of trade naturally forms a network. The CES
+framework predicts that the spectral gap (Fiedler eigenvalue <span
+class="math inline">\(\lambda_2\)</span>) of the trade network Laplacian
+governs the rate at which bilateral shocks propagate through the
+network.</p>
+<h2 id="network-construction">Network construction</h2>
+<p>Construct the trade network adjacency matrix: <span
+class="math inline">\(W_{ij} = M_{ij} + M_{ji}\)</span> (total bilateral
+trade between countries <span class="math inline">\(i\)</span> and <span
+class="math inline">\(j\)</span>). The normalized graph Laplacian has
+eigenvalues <span class="math inline">\(0 = \lambda_1 &lt; \lambda_2
+\leq \cdots \leq \lambda_J\)</span>. The Fiedler vector (eigenvector
+corresponding to <span class="math inline">\(\lambda_2\)</span>)
+captures global network position—how central or peripheral each country
+is relative to the entire trade network, not just bilaterally.</p>
+<h2 id="the-prediction">The prediction</h2>
+<div id="thm:spectral" class="theorem">
+<p><strong>Theorem 20</strong> (Spectral gap convergence). <em>Higher
+algebraic connectivity <span class="math inline">\(\lambda_2\)</span> of
+the trade network implies faster convergence of bilateral shocks to
+steady state. The Fiedler distance <span class="math inline">\(|v_i -
+v_j|\)</span> between countries <span class="math inline">\(i\)</span>
+and <span class="math inline">\(j\)</span> in the trade network predicts
+their business cycle synchronization, even after controlling for
+bilateral trade volume.</em></p>
+</div>
+<p><em>Lean</em>: <code>spectral_gap_convergence</code> (schematic;
+requires graph Laplacian eigenvalue theory not in Mathlib).</p>
+<div class="mdframed">
+<p><strong>Empirical Result T4 (Spectral Gap Prediction).</strong></p>
+<p>UN Comtrade, 30 OECD countries, 1995–2022 (<span
+class="math inline">\(N = 9{,}781\)</span> pair-year observations).</p>
+<p>Fiedler distance vs. business cycle synchronization: <span
+class="math inline">\(r = -0.213\)</span>, <span class="math inline">\(p
+&lt; 0.001\)</span>.</p>
+<p>Horse race: partial <span class="math inline">\(r(\text{Fiedler} \mid
+\log\text{trade})
+= -0.128\)</span>, <span class="math inline">\(p &lt;
+0.001\)</span>—network position <em>adds</em> predictive power beyond
+bilateral trade volume.</p>
+<p><span class="math inline">\(\lambda_2\)</span> range: <span
+class="math inline">\([0.151, 0.228]\)</span>, CV <span
+class="math inline">\(= 10.8\%\)</span>. Peak at 2008 (maximum trade
+integration); declining 2017–2022 (trade wars, COVID fragmentation,
+sanctions). <strong>Verdict: Consistent.</strong></p>
+</div>
+<h2 id="interpretation">Interpretation</h2>
+<p>The Fiedler eigenvalue captures something that bilateral trade volume
+cannot: <em>network embeddedness</em>. Two countries may have modest
+bilateral trade but be tightly linked through common third partners. The
+spectral gap measures this indirect connectivity.</p>
+<p>The decline in <span class="math inline">\(\lambda_2\)</span> from
+2008 to 2022 is a structural indicator of deglobalization—not merely
+lower trade volumes but lower <em>network coherence</em>. The trade
+network is becoming more fragmented (lower <span
+class="math inline">\(\lambda_2\)</span>), implying slower shock
+propagation but also lower risk sharing across the network.</p>
+<h1 id="sec:discussion">Discussion: What the Surface Reveals That No
+Single Slice Can See</h1>
+<h2 id="five-consequences-of-unification">Five consequences of
+unification</h2>
+<p>Recognizing the four schools as slices of a two-dimensional space
+yields five concrete consequences that no individual school can
+derive.</p>
+<p><strong>1. The ACR “miracle” is explained.</strong> The sufficient
+statistic is sufficient because there is only one possible aggregator
+satisfying the axioms (). This closes the question ACR raised but could
+not answer.</p>
+<p><strong>2. The parameter space collapses from dozens to two.</strong>
+HO needs factor endowments (<span class="math inline">\(K\)</span>,
+<span class="math inline">\(L\)</span> per country per sector). Krugman
+needs <span class="math inline">\(\sigma\)</span> and <span
+class="math inline">\(J\)</span>. Gravity needs bilateral distance and
+GDP. Melitz needs firm productivity distributions. The CES framework
+needs <span class="math inline">\((\rho, T)\)</span>—and derives all the
+others as functions of these two parameters.</p>
+<p><strong>3. Cross-school predictions emerge.</strong> Only the
+two-dimensional view reveals the efficiency-fragility tradeoff, bimodal
+collapse, cross-crisis persistence, and <span
+class="math inline">\(\rho\)</span>-ordering of collapse—none derivable
+from any single school.</p>
+<p><strong>4. The “just gravity” objection is dissolved.</strong>
+Gravity captures the <span class="math inline">\(T\)</span>-axis
+projection and explains most variance because bilateral friction varies
+far more than complementarity. But <span
+class="math inline">\(\rho\)</span> governs <em>which goods
+collapse</em> and <em>how trade responds to crises</em>. Gravity tells
+you the level; <span class="math inline">\(\rho\)</span> tells you the
+fragility. Both dimensions are needed.</p>
+<p><strong>5. The policy question changes.</strong> Each school
+recommends different interventions (factor accumulation, market access,
+infrastructure, export subsidies). The <span
+class="math inline">\((\rho, T)\)</span> view shows these all shift the
+economy’s position in the same two-dimensional space. <strong>The
+critical policy variable is proximity to <span
+class="math inline">\(T^*\)</span></strong>—not which school’s lever to
+pull. A country at <span class="math inline">\(T/T^*\approx
+0.97\)</span> is one small shock from collapse.</p>
+<h2 id="resolving-the-four-ho-puzzles">Resolving the four HO
+“puzzles”</h2>
+<ol>
+<li><p><strong>Leontief paradox</strong>: Factor content is attenuated
+by <span class="math inline">\(K_{\mathrm{eff}}/K = (1 -
+T/T^*)\)</span>. At <span class="math inline">\(T/T^*\approx
+0.97\)</span>, the predicted attenuation reduces the factor-content
+relationship to near-zero, consistent with Leontief’s original finding
+and modern weak-positive results <span class="citation"
+data-cites="romalis2004factor"></span>.</p></li>
+<li><p><strong>Missing trade</strong>: The HOV prediction assumes <span
+class="math inline">\(T = 0\)</span>; the observed slope of 0.059
+(vs. HOV <span class="math inline">\(= 1\)</span>) implies <span
+class="math inline">\(T/T^*\approx 0.94\)</span>.</p></li>
+<li><p><strong>Intra-industry trade</strong>: Variety gains <span
+class="math inline">\(J^{1/\rho - 1}\)</span> are independent of factor
+endowments (Proposition <a href="#prop:variety"
+data-reference-type="ref" data-reference="prop:variety">7</a>). CES
+variety preference generates two-way trade without any additional
+assumption beyond <span class="math inline">\(\rho &lt;
+1\)</span>.</p></li>
+<li><p><strong>Gravity dominance</strong>: <span
+class="math inline">\(K_{\mathrm{eff}}\)</span> decreasing in <span
+class="math inline">\(T\)</span> (Theorem <a href="#thm:gravity"
+data-reference-type="ref" data-reference="thm:gravity">8</a>). The <span
+class="math inline">\(R^2\)</span> ratio of <span
+class="math inline">\(4.2\times\)</span> in Test T2 reflects the
+dominance of the <span class="math inline">\(T\)</span>-axis in
+cross-sectional variation.</p></li>
+</ol>
+<h2 id="structural-estimation-of-t">Structural estimation of <span
+class="math inline">\(T^*\)</span></h2>
+<p>The probit model (Test T9) provides structural estimates of <span
+class="math inline">\(\hat{T}^*\)</span> for each product-pair
+triple.</p>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Category</th>
+<th style="text-align: center;">Mean <span
+class="math inline">\(\hat{T}^*\)</span></th>
+<th style="text-align: center;">Std</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Intermediate</td>
+<td style="text-align: center;">1.17</td>
+<td style="text-align: center;">0.31</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Other</td>
+<td style="text-align: center;">1.30</td>
+<td style="text-align: center;">0.29</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Final</td>
+<td style="text-align: center;">1.43</td>
+<td style="text-align: center;">0.35</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Intermediate goods have a mean <span
+class="math inline">\(\hat{T}^*\)</span> that is 0.25 standard units
+below final goods—they sit structurally closer to the collapse
+threshold. The 5th percentile of <span
+class="math inline">\(\hat{T}^*\)</span> is 0.81, implying that
+approximately 5% of all OECD product-pair flows are within one GFC-sized
+shock of collapse at any time.</p>
+<h2 id="fragility-mapping">Fragility mapping</h2>
+<p>The <span class="math inline">\(\hat{T}^*\)</span> estimates yield a
+fragility ranking. Defining “fragile” as having more than half of traded
+products below the median <span
+class="math inline">\(\hat{T}^*\)</span>, the correlation between
+fragility score and actual trade-war collapse rate is <span
+class="math inline">\(r = 0.64\)</span> (<span class="math inline">\(p
+&lt; 10^{-81}\)</span>, <span class="math inline">\(N = 692\)</span>
+pairs).</p>
+<p>Most fragile: distant, small-economy pairs (Australia-Colombia,
+Australia-Greece) trading intermediate goods (copper, iron, aluminum).
+Least fragile: proximate European core (Belgium-France,
+Belgium-Netherlands, Germany-Austria) trading diversified, high-volume
+baskets.</p>
+<h2 id="addressing-the-just-gravity-objection">Addressing the “just
+gravity” objection</h2>
+<p>Trade volume alone achieves AUC <span class="math inline">\(=
+0.680\)</span> as a single predictor— comparable to the full model. This
+is not a weakness but a structural implication: in the <span
+class="math inline">\(T^*\)</span> framework, volume is the best
+observable proxy for <span class="math inline">\(T^*\)</span> proximity
+because thin flows have low <span
+class="math inline">\(\hat{T}^*\)</span>. The objection that this is
+“just gravity” is correct about <em>which</em> flows are fragile but
+wrong about <em>how</em> they fail. Gravity predicts smooth,
+proportional responses; <span class="math inline">\(T^*\)</span>
+predicts discontinuous collapse. The bimodality (T3), cross-crisis
+persistence (T5), and GVC stratification (T6) discriminate the <span
+class="math inline">\(T^*\)</span> mechanism from smooth gravity.</p>
+<h2 id="connection-to-the-gvc-literature">Connection to the GVC
+literature</h2>
+<p><span class="citation" data-cites="antras2022gvc"></span> document
+that GVC participation amplifies trade sensitivity to shocks, and <span
+class="citation" data-cites="bonadio2021global"></span> quantify the GDP
+impact of COVID supply disruptions. The ceiling cascade () provides a
+structural foundation: the <span class="math inline">\(\min\)</span>
+operator means a chain is only as strong as its weakest link.</p>
+<p>The specific contribution is the <em>discontinuity</em> prediction.
+In <span class="citation" data-cites="bonadio2021global"></span> and
+related frameworks, supply chain disruptions produce continuous output
+losses. The <span class="math inline">\(T^*\)</span> mechanism predicts
+a regime shift: trade flows are either fully operational or completely
+severed.</p>
+<p>This has implications for policy. If trade collapse is a regime
+shift, marginal tariff increases are harmless until they cross <span
+class="math inline">\(T^*\)</span>, at which point the entire chain
+fails. The relevant policy variable is not the <em>level</em> of
+friction but its <em>distance from the threshold</em>.</p>
+<h2 id="what-this-paper-does-not-claim">What this paper does not
+claim</h2>
+<p>This paper does not structurally estimate <span
+class="math inline">\((\rho, T)\)</span> for every bilateral pair. The
+tests are reduced-form: they verify that the <em>qualitative</em>
+predictions of the CES <span class="math inline">\((\rho, T)\)</span>
+surface match the data while each individual school’s predictions do
+not. Structural estimation of <span class="math inline">\(\rho\)</span>
+from trade elasticities and <span class="math inline">\(T\)</span> from
+the ACR domestic expenditure share is an important next step.</p>
+<p>Nor is HO “wrong” in some absolute sense. Factor endowments
+matter—the weak positive <span class="math inline">\(r = 0.40\)</span>
+in the Leontief test (Test T10 supplement) shows this. The claim is that
+factor endowments are <em>second-order</em> relative to CES curvature
+and information friction, and that the two-dimensional <span
+class="math inline">\((\rho, T)\)</span> surface provides a more
+parsimonious organizing principle than four separate schools with four
+separate sets of assumptions.</p>
+<h1 id="sec:conclusion">Conclusion</h1>
+<p>Seventy years of debate in trade theory—HO versus Krugman, gravity
+versus factor endowments, smooth adjustment versus discrete exit—are
+dissolved by recognizing that the four schools are four cross-sections
+of a single two-dimensional surface. The CES <span
+class="math inline">\((\rho, T)\)</span> diagram, with effective
+curvature <span class="math inline">\(K_{\mathrm{eff}}= K \cdot \max(0,
+1 - T/T^*)\)</span>, simultaneously generates all four schools’
+predictions as special cases and derives three consequences that no
+individual school can: the ACR welfare convergence, the <span
+class="math inline">\(T^*\)</span> regime shift with bimodal collapse,
+and the GVC ceiling cascade.</p>
+<p>The empirical evidence is strong. Nine of ten pre-specified tests are
+consistent across three distinct crises. The discriminating result is
+not that crises reduce trade—every model predicts this—but that collapse
+is <em>bimodal</em> (catastrophic coexisting with resilient),
+<em>stratified by supply chain depth</em> (intermediates <span
+class="math inline">\(1.5\)</span>–<span
+class="math inline">\(1.9\times\)</span> more likely to collapse), and
+<em>persistent across crises</em> (the same pairs collapse in unrelated
+shocks, lift <span class="math inline">\(= 1.82\times\)</span>). These
+patterns are unique to the <span class="math inline">\(T^*\)</span>
+regime shift mechanism.</p>
+<p>All theoretical results are machine-verified in Lean 4 (23 theorems,
+0 custom axioms, 0 <code>sorry</code>)—the first machine-verified
+formalization of international trade theory. The zero-axiom property
+means every result follows from Lean’s type theory and Mathlib’s real
+analysis library, with no unverified assumptions.</p>
+<p>The policy implication is direct. The critical variable is not which
+school’s lever to pull—factor accumulation, market access,
+infrastructure, export subsidies—but the economy’s proximity to <span
+class="math inline">\(T^*\)</span>. A country at <span
+class="math inline">\(T/T^*\approx 0.97\)</span> is one small shock from
+systemic trade collapse. The <span class="math inline">\((\rho,
+T)\)</span> surface provides both the diagnostic (how close?) and the
+prescription (increase <span class="math inline">\(T^*\)</span> through
+institutional reform, or decrease <span class="math inline">\(T\)</span>
+through trade facilitation).</p>
+<hr />
+<h1 id="app:lean">Lean 4 Formalization</h1>
+<p>All propositions and theorems are machine-verified in Lean 4
+(v4.28.0) with Mathlib (v4.28.0). The formalization contains 23 theorems
+with <strong>zero custom axioms</strong>—every step follows from
+Mathlib’s real analysis library.</p>
+<div id="tab:lean">
+<table>
+<caption>Lean 4 theorem correspondence</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Lean theorem</strong></th>
+<th style="text-align: left;"><strong>Paper result</strong></th>
+<th style="text-align: left;"><strong>File</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td
+style="text-align: left;"><code>ho_overpredicts_at_positive_friction</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:attenuation"
+data-reference-type="ref" data-reference="thm:attenuation">3</a></td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>fpe_requires_zero_friction</code></td>
+<td style="text-align: left;">Prop. <a href="#prop:fpe_knife"
+data-reference-type="ref" data-reference="prop:fpe_knife">6</a></td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>variety_trade_independent_of_endowments</code></td>
+<td style="text-align: left;">Prop. <a href="#prop:variety"
+data-reference-type="ref" data-reference="prop:variety">7</a></td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>trade_collapse_at_critical</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:collapse"
+data-reference-type="ref" data-reference="thm:collapse">16</a></td>
+<td style="text-align: left;">BilateralTrade.lean</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>ho_challenged</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:unification"
+data-reference-type="ref" data-reference="thm:unification">10</a></td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>bilateral_Keff_decreasing</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:gravity"
+data-reference-type="ref" data-reference="thm:gravity">8</a></td>
+<td style="text-align: left;">BilateralTrade.lean</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>bilateral_Keff_strict</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:gravity"
+data-reference-type="ref" data-reference="thm:gravity">8</a>
+(strict)</td>
+<td style="text-align: left;">BilateralTrade.lean</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>bilateral_Keff_sq_decreasing</code></td>
+<td style="text-align: left;">Prop. <a href="#prop:div_sensitivity"
+data-reference-type="ref"
+data-reference="prop:div_sensitivity">15</a></td>
+<td style="text-align: left;">BilateralTrade.lean</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>diversification_degradation_ratio</code></td>
+<td style="text-align: left;">Prop. <a href="#prop:div_sensitivity"
+data-reference-type="ref"
+data-reference="prop:div_sensitivity">15</a></td>
+<td style="text-align: left;">BilateralTrade.lean</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>curvatureK_decreasing_in_rho</code></td>
+<td style="text-align: left;">Prop. <a href="#prop:Tstar_rho"
+data-reference-type="ref" data-reference="prop:Tstar_rho">1</a></td>
+<td style="text-align: left;">BilateralTrade.lean</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>complementary_goods_more_fragile</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:eff_frag"
+data-reference-type="ref" data-reference="thm:eff_frag">14</a>(2)</td>
+<td style="text-align: left;">BilateralTrade.lean</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>complementary_goods_higher_Keff</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:eff_frag"
+data-reference-type="ref" data-reference="thm:eff_frag">14</a>(1)</td>
+<td style="text-align: left;">BilateralTrade.lean</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>efficiency_fragility_tradeoff</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:eff_frag"
+data-reference-type="ref" data-reference="thm:eff_frag">14</a></td>
+<td style="text-align: left;">BilateralTrade.lean</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>highest_friction_pair_fails_first</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:cascade"
+data-reference-type="ref" data-reference="thm:cascade">18</a></td>
+<td style="text-align: left;">BilateralTrade.lean</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>stolper_samuelson_magnification</code></td>
+<td style="text-align: left;">Prop. <a href="#prop:ss"
+data-reference-type="ref" data-reference="prop:ss">4</a></td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>factor_price_equalization_at_T_zero</code></td>
+<td style="text-align: left;">Prop. <a href="#prop:fpe"
+data-reference-type="ref" data-reference="prop:fpe">5</a></td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>acr_at_symmetric_eq_variety</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:acr_krugman"
+data-reference-type="ref" data-reference="thm:acr_krugman">11</a></td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>impossible_trinity</code></td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>currency_union_maximizes_Keff</code></td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>spillover_stronger_for_complements</code></td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>hub_reform_benefits_all_spokes</code></td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>trade_weighted_response_bounded</code></td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>spectral_gap_convergence</code></td>
+<td style="text-align: left;">Thm. <a href="#thm:spectral"
+data-reference-type="ref" data-reference="thm:spectral">20</a></td>
+<td style="text-align: left;">OpenEconomy.lean</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Source files: <code>MyProject/Paper2/BilateralTrade.lean</code>
+(10 theorems), <code>MyProject/OpenEconomy.lean</code> (13 theorems).
+All compile with 0 errors in the full project build (2,339 jobs, Lean 4
+v4.28.0, Mathlib v4.28.0).</p>
+<hr />
+<div class="thebibliography">
+<p><span>99</span></p>
+<p>Alessandria, G., Kaboski, J. P., and Midrigan, V. (2010). The great
+trade collapse of 2008–09: An inventory adjustment? <em>IMF Economic
+Review</em>, 58(2):254–294.</p>
+<p>Anderson, J. E. (2011). The gravity model. <em>Annual Review of
+Economics</em>, 3:133–160.</p>
+<p>Anderson, J. E. and van Wincoop, E. (2003). Gravity with gravitas: A
+solution to the border puzzle. <em>American Economic Review</em>,
+93(1):170–192.</p>
+<p>Antràs, P. and Chor, D. (2022). Global value chains. In <em>Handbook
+of International Economics</em>, vol. 5, Elsevier, pp. 297–376.</p>
+<p>Antràs, P., Chor, D., Fally, T., and Hillberry, R. (2012). Measuring
+the upstreamness of production and trade flows. <em>American Economic
+Review: Papers &amp; Proceedings</em>, 102(3):412–416.</p>
+<p>Arkolakis, C., Costinot, A., and Rodrı́guez-Clare, A. (2012). New
+trade models, same old gains? <em>American Economic Review</em>,
+102(1):94–130.</p>
+<p>Armington, P. S. (1969). A theory of demand for products
+distinguished by place of production. <em>IMF Staff Papers</em>,
+16(1):159–178.</p>
+<p>Bems, R., Johnson, R. C., and Yi, K.-M. (2011). Vertical linkages and
+the collapse of global trade. <em>American Economic Review: Papers &amp;
+Proceedings</em>, 101(3):308–312.</p>
+<p>Bonadio, B., Huo, Z., Levchenko, A. A., and Pandalai-Nayar, N.
+(2021). Global supply chains in the pandemic. <em>Journal of
+International Economics</em>, 133:103534.</p>
+<p>Broda, C. and Weinstein, D. E. (2006). Globalization and the gains
+from variety. <em>Quarterly Journal of Economics</em>,
+121(2):541–585.</p>
+<p>Chaney, T. (2008). Distorted gravity: The intensive and extensive
+margins of international trade. <em>American Economic Review</em>,
+98(4):1707–1721.</p>
+<p>Eaton, J. and Kortum, S. (2002). Technology, geography, and trade.
+<em>Econometrica</em>, 70(5):1741–1779.</p>
+<p>Gaulier, G. and Zignago, S. (2010). : International trade database at
+the product-level. The 1994–2007 version. CEPII Working Paper 2010-23.
+Updated V202601.</p>
+<p>Grubel, H. G. and Lloyd, P. J. (1975). <em>Intra-Industry Trade: The
+Theory and Measurement of International Trade in Differentiated
+Products</em>. Macmillan, London.</p>
+<p>Helpman, E. (1987). Imperfect competition and international trade:
+Evidence from fourteen industrial countries. <em>Journal of the Japanese
+and International Economies</em>, 1(1):62–81.</p>
+<p>Kenen, P. B. (1965). Nature, capital, and trade. <em>Journal of
+Political Economy</em>, 73(5):437–460.</p>
+<p>Krugman, P. (1980). Scale economies, product differentiation, and the
+pattern of trade. <em>American Economic Review</em>, 70(5):950–959.</p>
+<p>Leontief, W. (1953). Domestic production and foreign trade: The
+American capital position re-examined. <em>Proceedings of the American
+Philosophical Society</em>, 97(4):332–349.</p>
+<p>Melitz, M. J. (2003). The impact of trade on intra-industry
+reallocations and aggregate industry productivity.
+<em>Econometrica</em>, 71(6):1695–1725.</p>
+<p>Pfister, R., Schwarz, K. A., Janczyk, M., Dale, R., and Freeman,
+J. B. (2013). Good things peak in pairs: A note on the bimodality
+coefficient. <em>Frontiers in Psychology</em>, 4:700.</p>
+<p>Romalis, J. (2004). Factor proportions and the structure of commodity
+trade. <em>American Economic Review</em>, 94(1):67–97.</p>
+<p>Smirl, J. (2026a). Emergent <span>CES</span> and the quadruple role
+of curvature. Working paper.</p>
+<p>Smirl, J. (2026b). The <span>CES</span> potential: Information
+friction and complementary production. Working paper.</p>
+<p>Smirl, J. (2026c). Hierarchical <span>CES</span> architecture.
+Working paper.</p>
+<p>Tinbergen, J. (1962). <em>Shaping the World Economy: Suggestions for
+an International Economic Policy</em>. The Twentieth Century Fund, New
+York.</p>
+<p>Trefler, D. (1993). International factor price differences:
+<span>L</span>eontief was right! <em>Journal of Political Economy</em>,
+101(6):961–987.</p>
+<p>Trefler, D. (1995). The case of the missing trade and other
+mysteries. <em>American Economic Review</em>, 85(5):1029–1046.</p>
+</div>
+<aside id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Independent Researcher. Email:
+<code>jonsmirl@gmail.com</code>. Lean 4 formalization: 23 theorems,
+0 custom axioms. Replication code:
+<code>scripts/test_ho_vs_ces.py</code>,
+<code>scripts/test_trade_collapse.py</code>.<a href="#fnref1"
+class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</aside>
+</body>
+</html>

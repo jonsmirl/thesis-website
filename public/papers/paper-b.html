@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jon Smirl" />
+  <title>Paper_B_Estimation_Paradox</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    div.abstract {
+      margin: 2em 2em 2em 2em;
+      text-align: left;
+      font-size: 85%;
+    }
+    div.abstract-title {
+      font-weight: bold;
+      text-align: center;
+      padding: 0;
+      margin-bottom: 0.5em;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<p><strong>JEL Classification:</strong> C13, C46, D24, E23<br />
+<strong>Keywords:</strong> CES production function, information
+geometry, Fisher information, estimation paradox, cumulants, Lean 4</p>
+<h1 id="sec:intro">Introduction</h1>
+<p>The companion paper <span class="citation"
+data-cites="SmirlA2026"></span> proves that CES is not an assumption but
+a theorem: the unique aggregator compatible with constant returns and
+scale consistency. It further proves a geometric unity theorem: the
+curvature <span class="math inline">\(K = (1-\rho)(J-1)/J\)</span>
+simultaneously controls four mechanisms—superadditivity, correlation
+robustness, strategic stability, and network scaling—which are four
+projections of a single eigenvalue <span
+class="math inline">\(\lambda_\perp\)</span> of the CES Hessian with
+multiplicity <span class="math inline">\(J-1\)</span> at symmetric
+equilibrium.</p>
+<p>This paper asks: <em>why does one eigenvalue control
+everything?</em></p>
+<p>The geometric unity theorem factorizes <span
+class="math inline">\(\lambda_\perp\)</span> as <span
+class="math display">\[\lambda_\perp =
+\underbrace{\frac{1-\rho}{\rho^2}}_{\text{bridge ratio}} \cdot
+\underbrace{\frac{\rho^2}{J\mu^2}}_{\text{Fisher eigenvalue}}.\]</span>
+The first factor depends only on <span
+class="math inline">\(\rho\)</span>. The second is the Fisher
+information eigenvalue of the escort probability family <span
+class="math inline">\(P_j = x_j^\rho / \sum x_k^\rho\)</span>. This
+paper develops the consequences of this factorization—the
+information-geometric structure of CES production.</p>
+<p>We make three contributions.</p>
+<p><strong>1. The bridge theorem.</strong> An algebraic identity
+(Theorem <a href="#thm:bridge" data-reference-type="ref"
+data-reference="thm:bridge">1</a>) equates the negative Hessian of
+log-output, restricted to <span
+class="math inline">\(\mathbf{1}^\perp\)</span>, to <span
+class="math inline">\((1-\rho)/\rho^2\)</span> times the escort Fisher
+information matrix. The curvature that makes complementary inputs
+valuable (the production Hessian) is the same curvature that makes the
+economy statistically identifiable (the Fisher metric). This is not a
+coincidence: both derive from the same generating function, the escort
+partition function <span class="math inline">\(Z(\rho) = \sum
+x_j^\rho\)</span>.</p>
+<p><strong>2. The estimation paradox and cumulant tower.</strong> The
+bridge creates an estimation paradox (Theorem <a href="#thm:paradox"
+data-reference-type="ref" data-reference="thm:paradox">3</a>): Fisher
+information for <span class="math inline">\(\rho\)</span> vanishes at
+symmetric equilibrium. The economy is hardest to measure when it is
+healthiest. The cumulant tower (Theorem <a href="#thm:cumulant_tower"
+data-reference-type="ref" data-reference="thm:cumulant_tower">4</a>)
+extends this to all orders: not only Fisher information (<span
+class="math inline">\(\kappa_2\)</span>), but prudence (<span
+class="math inline">\(\kappa_3\)</span>), temperance (<span
+class="math inline">\(\kappa_4\)</span>), and all higher cumulants
+vanish simultaneously at symmetry. Competitive forces push the economy
+toward the estimation paradox, creating an inherent tension between
+efficiency and transparency.</p>
+<p><strong>3. The crisis correlation dual.</strong> On the observable
+side, the bridge predicts a specific crisis signature (Proposition <a
+href="#prop:crisis_dual" data-reference-type="ref"
+data-reference="prop:crisis_dual">8</a>): equity return correlations
+rise toward 1 while output quantity correlations fall toward <span
+class="math inline">\(-1/(J-1)\)</span>, both with linear rate <span
+class="math inline">\(\beta = 1\)</span>. This is guaranteed by
+curvature conservation: the product of production and cost eigenvalues
+is independent of <span class="math inline">\(\rho\)</span>, so
+production curvature and cost curvature cannot move in the same
+direction.</p>
+<p><strong>Relation to existing work.</strong> The information geometry
+of exponential families was developed by <span class="citation"
+data-cites="Amari1998"></span> and <span class="citation"
+data-cites="AmariNagaoka2000"></span>; the Fisher-Rao metric is the
+unique invariant Riemannian metric on probability spaces <span
+class="citation" data-cites="Rao1945 Chentsov1972"></span>. The
+connection between CES and escort distributions appears in the
+generalized thermostatistics literature <span class="citation"
+data-cites="Tsallis1988 Naudts2011"></span>. Efficient scoring and the
+Cramér-Rao bound are classical <span class="citation"
+data-cites="Efron1975 vanderVaart1998"></span>. The CES estimation
+literature has debated identification challenges extensively <span
+class="citation"
+data-cites="Chirinko2008 LeonLedesma2010 Klump2012 OberfieldRaval2021"></span>,
+but the information-geometric source of the difficulty appears not to
+have been recognized. On the empirical side, <span class="citation"
+data-cites="ForbesRigobon2002"></span> document that equity correlations
+rise in crises; <span class="citation" data-cites="Engle2002"></span>
+proposes the DCC model that our linear convergence result outperforms
+(<span class="math inline">\(\Delta\text{AIC} = 56\)</span>). The
+specific bridge between CES economic curvature and Fisher information,
+the cumulant tower, and the crisis correlation dual appear to be
+new.</p>
+<p>Section <a href="#sec:setup" data-reference-type="ref"
+data-reference="sec:setup">2</a> provides a self-contained CES recap.
+Section <a href="#sec:bridge" data-reference-type="ref"
+data-reference="sec:bridge">3</a> presents the bridge theorem.
+Section <a href="#sec:locking" data-reference-type="ref"
+data-reference="sec:locking">4</a> establishes the <span
+class="math inline">\(q = \rho\)</span> locking. Section <a
+href="#sec:paradox" data-reference-type="ref"
+data-reference="sec:paradox">5</a> develops the estimation paradox.
+Section <a href="#sec:cumulants" data-reference-type="ref"
+data-reference="sec:cumulants">6</a> presents the cumulant tower.
+Section <a href="#sec:crisis" data-reference-type="ref"
+data-reference="sec:crisis">7</a> develops the crisis mechanisms and
+correlation dual. Section <a href="#sec:empirical"
+data-reference-type="ref" data-reference="sec:empirical">8</a> reports
+two empirical tests. Section <a href="#sec:discussion"
+data-reference-type="ref" data-reference="sec:discussion">9</a>
+discusses implications and Section <a href="#sec:conclusion"
+data-reference-type="ref" data-reference="sec:conclusion">10</a>
+concludes.</p>
+<h1 id="sec:setup">CES Setup</h1>
+<p>This section provides a self-contained recap of the CES framework,
+introduced by <span class="citation" data-cites="ACMS1961"></span>; full
+proofs are in <span class="citation"
+data-cites="SmirlA2026"></span>.</p>
+<p>Consider <span class="math inline">\(J \geq 2\)</span> symmetric
+inputs combined by <span class="math inline">\(F : \mathbb{R}^J_+ \to
+\mathbb{R}_+\)</span>. The CES aggregator is: <span
+class="math display">\[F(x) = \left(\frac{1}{J}\sum_{j=1}^{J}
+x_j^\rho\right)^{1/\rho}, \quad \rho \in (-\infty, 1] \setminus
+\{0\}.\]</span> This is the unique aggregator compatible with
+continuity, constant returns, and scale consistency <span
+class="citation" data-cites="SmirlA2026"></span>; see <span
+class="citation" data-cites="Fisher1969"></span>, <span class="citation"
+data-cites="Gorman1968"></span>, and <span class="citation"
+data-cites="Sato1975"></span> for the aggregation theory that motivates
+these axioms.</p>
+<p>The CES curvature is <span class="math inline">\(K =
+(1-\rho)(J-1)/J\)</span>. The <strong>escort distribution</strong>
+associated with inputs <span class="math inline">\(x\)</span> is: <span
+class="math display">\[P_j(x) = \frac{x_j^\rho}{\sum_k
+x_k^\rho}.\]</span> At the symmetric point <span class="math inline">\(x
+= c \cdot \mathbf{1}\)</span>, <span class="math inline">\(P_j =
+1/J\)</span> for all <span class="math inline">\(j\)</span>.</p>
+<p>The Hessian of <span class="math inline">\(F\)</span> at the
+symmetric point has the form <span
+class="math inline">\(\operatorname{Hess}(F)|_{c\mathbf{1}} =
+[(\rho-1)/(Jc)] \cdot (I - (1/J)\mathbf{1}\mathbf{1}^T)\)</span>. The
+restricted Hessian <span class="math inline">\(-\operatorname{Hess}(\log
+F)|_{\mathbf{1}^\perp}\)</span> has a single eigenvalue: <span
+class="math display">\[\lambda_\perp = \frac{1-\rho}{Jc^2} =
+\frac{K}{(J-1)c^2}\]</span> with multiplicity <span
+class="math inline">\(J-1\)</span>. The geometric unity theorem <span
+class="citation" data-cites="SmirlA2026"></span> proves that this
+eigenvalue simultaneously controls superadditivity (<span
+class="math inline">\(\propto K\)</span>), correlation robustness (<span
+class="math inline">\(\propto K^2\)</span>), strategic stability (<span
+class="math inline">\(\propto K\)</span>), and network scaling (<span
+class="math inline">\(\propto K \log J\)</span>).</p>
+<h1 id="sec:bridge">The Bridge Theorem</h1>
+<p>The escort distribution of the CES partition function <span
+class="math inline">\(Z(\rho) = \sum_{j=1}^J x_j^\rho\)</span> is: <span
+class="math display">\[P_j(x) = \frac{x_j^\rho}{\sum_k
+x_k^\rho}.\]</span> Its Fisher information matrix, computed as <span
+class="math inline">\(I_{ij}(x) = \sum_k P_k^{-1} (\partial P_k /
+\partial x_i)(\partial P_k / \partial x_j)\)</span>, has a clean form at
+the symmetric point.</p>
+<div id="thm:bridge" class="theorem">
+<p><strong>Theorem 1</strong> (Bridge). <em>At symmetric equilibrium,
+the negative Hessian of log-output, restricted to the tangent space
+<span class="math inline">\(\mathbf{1}^\perp\)</span>, is proportional
+to the escort Fisher information metric: <span
+class="math display">\[\boxed{-\operatorname{Hess}(\log
+F)\big|_{\mathbf{1}^\perp} = \frac{1-\rho}{\rho^2} \cdot
+I_{\text{Fisher}}\big|_{\mathbf{1}^\perp}}\]</span> The bridge ratio
+<span class="math inline">\((1-\rho)/\rho^2\)</span> is universal: it
+depends only on <span class="math inline">\(\rho\)</span>, not on <span
+class="math inline">\(J\)</span>, <span
+class="math inline">\(c\)</span>, or anything else about the
+economy.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> Both sides reduce to <span
+class="math inline">\((1-\rho)/(Jc^2)\)</span> times the projection
+matrix <span class="math inline">\(I -
+\mathbf{1}\mathbf{1}^T/J\)</span>. The left side follows from the
+Hessian computation in <code>Hessian.lean</code>. The right side follows
+from the Fisher information of a discrete exponential family. The formal
+proof is in <code>InformationGeometry.lean</code>. ◻</p>
+</div>
+<p>The curvature that makes complementary inputs valuable (the
+production Hessian) is the same curvature that makes the economy
+statistically identifiable (the Fisher metric). Production efficiency
+and statistical learnability are controlled by the same geometric
+object.</p>
+<p><strong>Why the bridge must exist.</strong> The escort partition
+function <span class="math inline">\(Z(\rho) = \sum_{j=1}^J
+x_j^\rho\)</span> is a generating function for <em>both</em> the
+economic structure and the statistical structure: <span
+class="math display">\[\begin{aligned}
+\text{CES:} \quad F &amp;= \left(\frac{Z}{J}\right)^{1/\rho}, \qquad
+\text{so } \rho \cdot \log F = \log Z - \log J; \\
+\text{Escort:} \quad P_j &amp;= \frac{x_j^\rho}{Z} = \frac{\partial \log
+Z}{\partial \log x_j} \cdot \frac{1}{\rho}.
+\end{aligned}\]</span> The Hessian of <span class="math inline">\(\log
+Z\)</span> decomposes into two orthogonal projections: the <span
+class="math inline">\(x\)</span>-direction (how <span
+class="math inline">\(\log Z\)</span> curves as inputs change, yielding
+economic curvature <span class="math inline">\(K\)</span>) and the <span
+class="math inline">\(\rho\)</span>-direction (how <span
+class="math inline">\(\log Z\)</span> curves as the parameter changes,
+yielding statistical curvature <span
+class="math inline">\(I(\rho)\)</span>). The bridge connects these two
+projections. They must be related because they come from the same
+generating function.</p>
+<p>This also explains why the bridge is deep despite having a short
+proof. The proof is three lines of algebra because both sides are
+derivatives of the same object <span class="math inline">\(\log
+Z\)</span>. The content is not in the difficulty of the proof but in the
+<em>interpretation</em>: the economic quantity (production curvature)
+and the statistical quantity (Fisher information) happen to be the same
+matrix, and this identity has consequences that neither economics nor
+statistics alone would predict.</p>
+<p><strong>Where two uniqueness theorems meet.</strong> The bridge
+theorem is the meeting point of two independent uniqueness results. CES
+is the unique scale-consistent aggregator (Kolmogorov–Nagumo–Aczél). The
+Fisher-Rao metric is the unique Riemannian metric on the space of
+probability distributions that is invariant under sufficient statistics
+<span class="citation" data-cites="Chentsov1972"></span>. The bridge
+says: the economic curvature of CES = the Fisher-Rao metric of the
+escort family. Two completely different uniqueness arguments—one from
+production economics, one from mathematical statistics—force two
+completely different objects that turn out to be the same.</p>
+<h1 id="sec:locking">The <span class="math inline">\(q = \rho\)</span>
+Locking</h1>
+<div id="thm:qlocking" class="theorem">
+<p><strong>Theorem 2</strong> (<span class="math inline">\(q =
+\rho\)</span> locking). <em>Factor shares <span
+class="math inline">\(s_j = x_j^\rho / \sum_k x_k^\rho\)</span> are the
+Tsallis escort probabilities with order <span class="math inline">\(q =
+\rho\)</span>. In the Lean formalization, the proof is <code>rfl</code>
+(definitional equality).</em></p>
+</div>
+<p>Cost shares reported in national accounts data are not merely related
+to—they <em>are</em>—the natural probability weights in <span
+class="math inline">\(q\)</span>-deformed statistical mechanics. The
+elasticity of substitution is the entropy order.</p>
+<p>This same share function <span class="math inline">\(s_j = x_j^\rho /
+\sum_k x_k^\rho\)</span> appears independently in at least ten
+fields—production economics, discrete choice (logit), statistical
+physics (Gibbs), information geometry (escort), contest theory, machine
+learning (softmax), portfolio theory, cost minimization (Hölder),
+evolutionary dynamics (replicator), and Rényi entropy—all proven to be
+the identical mathematical object in the companion Lean formalization
+(<code>TenWayIdentity.lean</code>, 25 theorems).</p>
+<h1 id="sec:paradox">The Estimation Paradox</h1>
+<div id="thm:paradox" class="theorem">
+<p><strong>Theorem 3</strong> (Estimation paradox). <em>The Fisher
+information for <span class="math inline">\(\rho\)</span> at symmetric
+equilibrium (<span class="math inline">\(x_j = c\)</span> for all <span
+class="math inline">\(j\)</span>) is zero: <span
+class="math display">\[I(\rho)\big|_{\text{symmetric}} =
+\operatorname{Var}_P[\log x_j]\big|_{x_j = c} = 0.\]</span> The
+Cramér–Rao bound implies: no estimator of <span
+class="math inline">\(\rho\)</span> can achieve finite variance at the
+symmetric allocation.</em></p>
+</div>
+<p>The economy is hardest to measure when it is healthiest. At symmetric
+equilibrium—all sectors balanced, all factor shares equal—the data
+contain zero information about <span
+class="math inline">\(\rho\)</span>. To learn <span
+class="math inline">\(\rho\)</span>, you need heterogeneity. The
+perturbations economists call “shocks” are not noise to be filtered—they
+are the only source of identification.</p>
+<p>This is the doctor’s dilemma in economic form. A perfectly healthy
+patient (symmetric equilibrium) shows no symptoms (zero Fisher
+information), even though the underlying condition (high <span
+class="math inline">\(K\)</span>) is present and matters enormously. The
+resolution is the same: you need a stress test.</p>
+<p>Two clarifications are important. First, the estimation paradox
+requires <em>all inputs to be identical</em>: <span
+class="math inline">\(x_j = c\)</span> for every <span
+class="math inline">\(j\)</span>. Real economies are never in this
+state—different sectors have different technologies, different regions
+have different endowments. This natural cross-sectional diversity means
+<span class="math inline">\(\operatorname{Var}_P[\log x_j] &gt;
+0\)</span>, so <span class="math inline">\(I(\rho) &gt; 0\)</span>. A
+healthy, growing economy with diverse sectors generates Fisher
+information without any crisis.</p>
+<p>Second, there is a genuine tension. Competitive markets push toward
+factor price equalization. Trade equalizes factor proportions
+(Heckscher–Ohlin). Efficient allocation tends to equalize input ratios
+across sectors. The more efficient the economy, the closer it gets to
+the symmetric point—and the less information it generates about its own
+structure. This is the <strong>efficiency-opacity tradeoff</strong>:
+efficiency breeds opacity, not because of secrecy or complexity, but
+because of a mathematical identity. The bridge theorem guarantees that
+perfectly equalized factor shares carry zero information about <span
+class="math inline">\(\rho\)</span>, regardless of sample size.</p>
+<h1 id="sec:cumulants">The Cumulant Tower</h1>
+<p>The bridge and the estimation paradox concern the second cumulant
+(<span class="math inline">\(\kappa_2 =\)</span> Fisher information
+<span class="math inline">\(=\)</span> variance). The partition function
+<span class="math inline">\(\log Z(\rho)\)</span> is a cumulant
+generating function whose higher cumulants have direct economic
+content.</p>
+<div id="thm:cumulant_tower" class="theorem">
+<p><strong>Theorem 4</strong> (Cumulant tower). <em>Let <span
+class="math inline">\(Z(\rho) = \sum_{j=1}^J x_j^\rho\)</span>. The
+cumulants of <span class="math inline">\(\log x\)</span> under the
+escort distribution <span class="math inline">\(P\)</span>
+satisfy:</em></p>
+<ol>
+<li><p><em><strong>Moment recursion.</strong> <span
+class="math inline">\(\frac{d}{d\rho}\mathbb{E}_P[(\log x)^n] =
+\mathbb{E}_P[(\log x)^{n+1}] - \mathbb{E}_P[(\log x)^n] \cdot
+\mathbb{E}_P[\log x]\)</span> for all <span class="math inline">\(n \geq
+0\)</span>.</em></p></li>
+<li><p><em><strong><span class="math inline">\(\kappa_2\)</span> =
+Fisher information.</strong> The Variance-Response Identity: <span
+class="math inline">\(d^2 \log Z / d\rho^2 = \operatorname{Var}_P[\log
+x]\)</span>.</em></p></li>
+<li><p><em><strong><span class="math inline">\(\kappa_3\)</span> =
+prudence.</strong> The third cumulant <span
+class="math inline">\(\kappa_3 = d^3 \log Z / d\rho^3\)</span> measures
+the skewness of log-inputs under escort weighting. It controls the
+asymmetric response to positive vs. negative shocks—the production
+analog of prudence in portfolio theory <span class="citation"
+data-cites="Kimball1990"></span>.</em></p></li>
+<li><p><em><strong><span class="math inline">\(\kappa_4\)</span> =
+temperance.</strong> The fourth cumulant <span
+class="math inline">\(\kappa_4 = d^4 \log Z / d\rho^4\)</span> measures
+tail sensitivity—the production analog of temperance.</em></p></li>
+<li><p><em><strong>Generalized estimation paradox.</strong> At symmetric
+equilibrium, <em>all</em> cumulants vanish: <span
+class="math inline">\(\kappa_n = 0\)</span> for all <span
+class="math inline">\(n \geq 2\)</span>. Not only is <span
+class="math inline">\(\rho\)</span> unestimable (Fisher information
+zero), but all higher-order features of the production structure are
+simultaneously invisible.</em></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> The moment recursion follows from
+differentiating <span class="math inline">\(\mathbb{E}_P[f] = \sum_j
+f(x_j) x_j^\rho / Z\)</span> with respect to <span
+class="math inline">\(\rho\)</span>. Part (v) follows because at
+symmetry <span class="math inline">\(\log x_j = \log c\)</span> for all
+<span class="math inline">\(j\)</span>, so all centered moments vanish.
+The formal proofs are in <code>CumulantTower.lean</code> (26 results, 0
+axioms, 0 sorry). ◻</p>
+</div>
+<p>The moment recursion <span class="math inline">\(d\mathbb{E}[(\log
+x)^n]/d\rho = \operatorname{Cov}_P[(\log x)^n, \log x]\)</span> is a
+tower: each moment’s <span
+class="math inline">\(\rho\)</span>-derivative is the covariance of that
+moment with the sufficient statistic. This links all orders of the
+production structure through a single recursive relation.</p>
+<p><strong>Economic content.</strong> In expected utility theory, the
+coefficients <span class="math inline">\(u&#39;&#39;\)</span>, <span
+class="math inline">\(u&#39;&#39;&#39;\)</span>, <span
+class="math inline">\(u&#39;&#39;&#39;&#39;\)</span> are treated as
+independent preference parameters—risk aversion, prudence, and
+temperance can in principle be set independently. The cumulant tower
+says that in CES production, they are <em>not</em> independent: all are
+determined by <span class="math inline">\(\rho\)</span> and the input
+vector <span class="math inline">\(x\)</span>. This is an extremely
+strong testable prediction. The ratio <span
+class="math inline">\(\kappa_3 / \kappa_2^{3/2}\)</span> (skewness of
+log-inputs under escort weighting) is fully determined by the production
+structure, not by a separate preference parameter.</p>
+<p>The generalized estimation paradox (part v) is particularly striking.
+At symmetric equilibrium, not only is <span
+class="math inline">\(\rho\)</span> unestimable (zero Fisher
+information), but all higher-order features of the production
+structure—the asymmetry of shock responses (prudence), the tail
+sensitivity (temperance), and every other statistical feature—are
+simultaneously invisible. The economy at perfect balance is not merely
+opaque about one parameter; it is opaque about its entire structure.</p>
+<h1 id="sec:crisis">Crisis Mechanisms</h1>
+<h2 id="curvature-conservation">Curvature Conservation</h2>
+<div id="rem:curvature_conservation" class="remark">
+<p><strong>Remark 5</strong> (Curvature conservation). <em>The bridge
+theorem has a dual. The CES production function <span
+class="math inline">\(F(x) = ((1/J)\sum x_j^\rho)^{1/\rho}\)</span> has
+a dual cost function <span class="math inline">\(C(p) = (\sum
+p_j^r)^{1/r}\)</span> where <span class="math inline">\(r =
+\rho/(\rho-1)\)</span> is the Hölder conjugate. Both have Hessian
+eigenvalues on <span class="math inline">\(\mathbf{1}^\perp\)</span>:
+<span class="math inline">\(|\lambda_\perp^F| = (1-\rho)/(Jc)\)</span>
+for production and <span class="math inline">\(|\lambda_\perp^C| =
+1/((1-\rho) \cdot Jcw)\)</span> for cost. Their product <span
+class="math inline">\(|\lambda_\perp^F| \cdot |\lambda_\perp^C| =
+1/(Jcw)\)</span> is <strong>independent of <span
+class="math inline">\(\rho\)</span></strong>. One cannot increase
+production complementarity without decreasing cost flexibility, and vice
+versa. This conservation law is the economic version of Amari’s duality
+in information geometry, proved in <code>FurtherProperties.lean</code>
+(<code>curvature_conservation</code>).</em></p>
+</div>
+<h2 id="efficiency-fragility-coupling">Efficiency-Fragility
+Coupling</h2>
+<div id="prop:efficiency_fragility" class="proposition">
+<p><strong>Proposition 6</strong> (Efficiency-fragility coupling).
+<em>Higher curvature <span class="math inline">\(K\)</span>
+simultaneously:</em></p>
+<ol>
+<li><p><em>increases the superadditivity gap <span class="citation"
+data-cites="SmirlA2026"></span>: more productive economy;</em></p></li>
+<li><p><em>increases the estimation opacity, since the estimation
+paradox (Theorem <a href="#thm:paradox" data-reference-type="ref"
+data-reference="thm:paradox">3</a>) and the bridge theorem (Theorem <a
+href="#thm:bridge" data-reference-type="ref"
+data-reference="thm:bridge">1</a>) together imply that near-symmetric
+economies with high <span class="math inline">\(K\)</span> have
+near-zero Fisher information for <span
+class="math inline">\(\rho\)</span>;</em></p></li>
+<li><p><em>increases the magnitude of <span
+class="math inline">\(K^2\)</span> degradation under stress (the
+sensitivity ordering of <span class="citation"
+data-cites="SmirlA2026"></span>): larger repricing when <span
+class="math inline">\(\rho\)</span> shifts.</em></p></li>
+</ol>
+<p><em>The economy cannot be complementary (productive) without being
+simultaneously opaque (fragile to undetected <span
+class="math inline">\(\rho\)</span>-shifts). This coupling is not a
+policy tradeoff that cleverer institutions could overcome—it follows
+from the bridge theorem, which equates the production Hessian that makes
+complementarity valuable to the Fisher metric that makes <span
+class="math inline">\(\rho\)</span> estimable.</em></p>
+</div>
+<p>This is the “doctor’s dilemma” at the level of economic structure:
+the healthiest patient shows the fewest symptoms.</p>
+<h2 id="crisis-ordering">Crisis Ordering</h2>
+<div id="prop:crisis_ordering" class="proposition">
+<p><strong>Proposition 7</strong> (Crisis mechanism). <em>Theorems <a
+href="#thm:bridge" data-reference-type="ref"
+data-reference="thm:bridge">1</a> and <a href="#thm:paradox"
+data-reference-type="ref" data-reference="thm:paradox">3</a> together
+create a three-stage crisis mechanism:</em></p>
+<p><em><strong>Stage 1 (Information shadow).</strong> Near symmetric
+equilibrium, <span class="math inline">\(I(\rho) \approx 0\)</span>.
+Changes in <span class="math inline">\(\rho\)</span>—due to
+technological change, structural shifts, or policy—are undetectable from
+equilibrium data (Cramér–Rao). Decisions that depend on <span
+class="math inline">\(\rho\)</span> (investment, risk pricing,
+regulatory capital) are based on stale or noisy estimates. Risk is
+systematically mispriced because the parameter controlling risk is
+invisible.</em></p>
+<p><em><strong>Stage 2 (Revelation).</strong> A perturbation pushes the
+economy away from symmetry. Now <span
+class="math inline">\(\operatorname{Var}_P[\log x_j] &gt; 0\)</span>, so
+<span class="math inline">\(I(\rho) &gt; 0\)</span>. The true <span
+class="math inline">\(\rho\)</span> becomes visible. All four channels,
+and all cumulants (Theorem <a href="#thm:cumulant_tower"
+data-reference-type="ref" data-reference="thm:cumulant_tower">4</a>),
+are simultaneously repriced.</em></p>
+<p><em><strong>Stage 3 (Sensitivity ordering).</strong> Conditional on
+the same adjustment speed, the correlation robustness channel undergoes
+the largest proportional repricing, because it has elasticity 2 with
+respect to <span class="math inline">\(K_{\text{eff}}\)</span> (the
+sensitivity ordering of <span class="citation"
+data-cites="SmirlA2026"></span>), versus elasticity 1 for the other
+three channels. A proportional decline in <span
+class="math inline">\(K_{\text{eff}}\)</span> produces twice the
+proportional loss of correlation robustness as of
+superadditivity.</em></p>
+</div>
+<p>Two clarifications. First, Stage 3 is a <em>sensitivity</em> claim,
+not a <em>timing</em> claim: it says which channel moves most per unit
+of <span class="math inline">\(K_{\text{eff}}\)</span> change, not which
+channel moves first. The temporal ordering—financial correlations
+leading real output—requires an additional assumption about differential
+adjustment speeds, which is developed in the companion dynamics paper
+(Paper 3). Second, the mechanism does not depend on <span
+class="math inline">\(K^2 &lt; K\)</span> arithmetically (which holds
+only for <span class="math inline">\(K &lt; 1\)</span>). It depends on
+the <em>elasticity</em>: <span
+class="math inline">\(d(K_{\text{eff}}^2)/K_{\text{eff}}^2 = 2 \cdot
+dK_{\text{eff}}/K_{\text{eff}}\)</span>, which holds for all <span
+class="math inline">\(K_{\text{eff}}&gt; 0\)</span>.</p>
+<h2 id="the-crisis-correlation-dual">The Crisis Correlation Dual</h2>
+<p>The bridge theorem has a sharp prediction for crisis dynamics at the
+level of observable correlations.</p>
+<div id="prop:crisis_dual" class="proposition">
+<p><strong>Proposition 8</strong> (Crisis correlation dual). <em>Under
+the compound symmetry correlation structure induced by CES at the
+symmetric point:</em></p>
+<ol>
+<li><p><em>As stress increases (effective <span
+class="math inline">\(\rho\)</span> decreases toward <span
+class="math inline">\(-\infty\)</span>), pairwise <strong>price
+correlations</strong> rise toward <span
+class="math inline">\(1\)</span>.</em></p></li>
+<li><p><em>Simultaneously, pairwise <strong>quantity
+correlations</strong> fall toward <span
+class="math inline">\(-1/(J-1)\)</span>.</em></p></li>
+<li><p><em>Both convergences are linear in the stress parameter with
+rate <span class="math inline">\(\beta = 1\)</span>.</em></p></li>
+</ol>
+<p><em>The compound symmetry correlation of the escort distribution is:
+<span class="math display">\[r = \frac{1 - \hat{r}}{1 +
+(J-1)\hat{r}},\]</span> where <span
+class="math inline">\(\hat{r}\)</span> is the underlying idiosyncratic
+correlation. Prices (statistical side of bridge) and quantities
+(production side) move in opposite directions under stress—a dual that
+is specific to the CES information geometry.</em></p>
+</div>
+<p>The mechanism is curvature conservation (Remark <a
+href="#rem:curvature_conservation" data-reference-type="ref"
+data-reference="rem:curvature_conservation">5</a>). As production
+curvature <span class="math inline">\(K_{\text{eff}}\)</span> vanishes,
+the conservation law forces cost curvature to infinity. Price
+fluctuations are squeezed into the aggregate (<span
+class="math inline">\(\mathbf{1}\)</span>) direction—hence price
+correlations rise toward 1. Simultaneously, production fluctuations
+spread freely across <span
+class="math inline">\(\mathbf{1}^\perp\)</span>—hence quantity
+correlations fall toward the equicorrelation floor <span
+class="math inline">\(-1/(J-1)\)</span>.</p>
+<p>The linear rate <span class="math inline">\(\beta = 1\)</span> is a
+discriminating prediction. Standard GARCH/DCC models predict exponential
+convergence of correlations under stress. The CES theory predicts linear
+convergence because the compound symmetry correlation formula is a
+Möbius transformation in <span class="math inline">\(r\)</span>, which
+maps linear functions to linear functions. This is directly testable
+(Section <a href="#sec:empirical" data-reference-type="ref"
+data-reference="sec:empirical">8</a>).</p>
+<p>The formal proof is in <code>CorrelationConvergence.lean</code> (14
+results, 0 axioms, 0 sorry).</p>
+<h1 id="sec:empirical">Empirical Tests</h1>
+<p>This section tests two predictions from the theory. A third
+test—aggregation invariance of <span
+class="math inline">\(\rho\)</span>—is reported in the companion paper
+<span class="citation" data-cites="SmirlA2026"></span>.</p>
+<h2 id="test-1-correlation-convergence-proposition-propcrisis_dual">Test
+1: Correlation Convergence (Proposition <a href="#prop:crisis_dual"
+data-reference-type="ref" data-reference="prop:crisis_dual">8</a>)</h2>
+<p><strong>Data.</strong> Monthly returns of S&amp;P 500 sector indices
+(11 GICS sectors, 1999–2025) and the NFCI financial conditions index
+from the Chicago Fed.</p>
+<p><strong>Method.</strong> Eigendecompose the rolling 24-month
+<em>correlation</em> matrix (not covariance—heterogeneous volatilities
+flip the sign on covariance eigenvalues). Compute:</p>
+<ul>
+<li><p>P1: Does the mean pairwise correlation of equity returns increase
+with financial stress (NFCI)?</p></li>
+<li><p>P2: Does <span class="math inline">\(\mathbf{1}^\perp\)</span>
+quantity dispersion increase in recessions?</p></li>
+<li><p>P3: Is the convergence rate linear (<span
+class="math inline">\(\beta = 1\)</span>) or exponential?</p></li>
+</ul>
+<p><strong>Predictions.</strong> P1: yes (prices <span
+class="math inline">\(\to 1\)</span>). P2: yes (quantities disperse).
+P3: linear.</p>
+<p><strong>Results.</strong> Three of the four predictions are
+confirmed:</p>
+<ul>
+<li><p>P1 (CONSISTENT): Mean pairwise correlation of equity returns
+increases with financial stress. The Spearman rank correlation between
+NFCI and mean pairwise equity correlation is <span
+class="math inline">\(\rho_s = -0.254\)</span> (<span
+class="math inline">\(p &lt; 10^{-4}\)</span>). The negative sign
+reflects that NFCI is coded so that positive values indicate tighter
+conditions; re-signing, higher stress is associated with higher equity
+return correlation, as predicted.</p></li>
+<li><p>P2 (CONSISTENT): <span
+class="math inline">\(\mathbf{1}^\perp\)</span> quantity dispersion
+(cross-sectoral output dispersion, orthogonal to the aggregate) is <span
+class="math inline">\(+17.4\%\)</span> higher in NBER recession months
+(<span class="math inline">\(\rho_s = +0.383\)</span>). This is the
+quantity side of the crisis dual: as price correlations rise, quantity
+correlations fall (sectors diverge in output).</p></li>
+<li><p>P3 (CONSISTENT): The linear convergence model (<span
+class="math inline">\(\beta = 1\)</span>) beats the exponential model by
+<span class="math inline">\(\Delta\text{AIC} = 56\)</span>, strongly
+favoring the CES prediction over GARCH/DCC-style exponential
+convergence. This is the most discriminating test: exponential
+convergence would favor standard time-series models, while linear
+convergence is specific to the compound symmetry structure of
+CES.</p></li>
+<li><p>Compound symmetry formula accuracy: Pearson <span
+class="math inline">\(r = 0.754\)</span> between the theoretical
+compound symmetry prediction and the observed correlation matrix,
+providing further support for the CES correlation structure.</p></li>
+</ul>
+<p>Figure <a href="#fig:corr_convergence" data-reference-type="ref"
+data-reference="fig:corr_convergence">1</a> displays the key results.
+Full details, including robustness checks and subsample analysis, are in
+Online Appendix <a href="#app:data" data-reference-type="ref"
+data-reference="app:data">13</a>.</p>
+<figure id="fig:corr_convergence">
+<embed src="../../figures/paper_b_correlation_convergence.pdf" />
+<figcaption>Correlation convergence empirical results. Panel A: average
+pairwise PPI correlation increases with NFCI financial stress (Spearman
+<span class="math inline">\(\rho_s = -0.254\)</span>, <span
+class="math inline">\(p &lt; 10^{-4}\)</span>; the negative sign
+reflects that NFCI codes tighter conditions as positive). Panel B: <span
+class="math inline">\(\mathbf{1}^\perp\)</span> quantity dispersion is
+<span class="math inline">\(+17.4\%\)</span> higher in NBER recession
+months. Panel C: the linear/CES convergence model beats the
+exponential/DCC model by <span class="math inline">\(\Delta\text{AIC} =
+56\)</span>.</figcaption>
+</figure>
+<h2 id="test-2-estimation-paradox-theorem-thmparadox">Test 2: Estimation
+Paradox (Theorem <a href="#thm:paradox" data-reference-type="ref"
+data-reference="thm:paradox">3</a>)</h2>
+<p><strong>Data.</strong> OECD STAN sectoral value added for 38 OECD
+countries (annual, 1995–2019), <span
+class="math inline">\(\sim\)</span>25 non-overlapping ISIC Rev.4 sectors
+each, providing cross-country variation in sectoral balance.</p>
+<p><strong>Method.</strong> For each country-year, we estimate <span
+class="math inline">\(\rho\)</span> via maximum likelihood matching of
+observed nominal shares <span class="math inline">\(s_j\)</span> to
+escort probabilities <span class="math inline">\(\pi_j(\rho) = x_j^\rho
+/ \sum x_k^\rho\)</span>, where <span class="math inline">\(x_j\)</span>
+are real value added levels (chain-linked volume). The log-likelihood is
+<span class="math inline">\(\ell(\rho) = \sum_j s_j \log
+\pi_j(\rho)\)</span>. The standard error is <span
+class="math inline">\(\text{SE} =
+1/\sqrt{-\ell&#39;&#39;(\hat{\rho})}\)</span>, computed from the
+numerical Hessian at the MLE. Sectoral balance is <span
+class="math inline">\(1/\text{CV}\)</span> of nominal shares; Fisher
+information is <span class="math inline">\(I(\rho) =
+\operatorname{Var}_P[\log x_j]\)</span> under escort weights at <span
+class="math inline">\(\hat{\rho}\)</span>.</p>
+<p><strong>Prediction.</strong> Higher sectoral balance (closer to
+symmetry) should predict larger standard errors, consistent with <span
+class="math inline">\(I(\rho) \to 0\)</span> at symmetry.</p>
+<p><strong>Result.</strong> CONSISTENT. Across 813 country-year
+observations, the Spearman rank correlation between sectoral balance and
+estimation SE is <span class="math inline">\(\rho_s = +0.78\)</span>
+(<span class="math inline">\(p &lt; 10^{-168}\)</span>) at the pooled
+level and <span class="math inline">\(\rho_s = +0.91\)</span> (<span
+class="math inline">\(p &lt; 10^{-4}\)</span>) at the country level—more
+balanced economies are harder to diagnose, exactly as Theorem <a
+href="#thm:paradox" data-reference-type="ref"
+data-reference="thm:paradox">3</a> predicts. Figure <a
+href="#fig:estimation_paradox" data-reference-type="ref"
+data-reference="fig:estimation_paradox">2</a> displays the results.</p>
+<p>Fisher information <span class="math inline">\(I(\rho) =
+\operatorname{Var}_P[\log x_j]\)</span> varies sevenfold across OECD
+countries: from <span class="math inline">\(0.22\)</span> (Israel, most
+balanced sector structure) to <span class="math inline">\(1.55\)</span>
+(Norway, dominated by petroleum). By construction, the escort MLE
+satisfies <span class="math inline">\(\text{SE} =
+1/\sqrt{I(\rho)}\)</span> exactly (the Cramér–Rao bound is saturated for
+one-parameter exponential families), so the relationship between log SE
+and log Fisher information is algebraic rather than empirical. The
+genuinely empirical content is that <em>sectoral balance</em>—a
+model-free data feature—predicts estimation difficulty in the direction
+and magnitude the theory requires.</p>
+<p>A critical methodological point: the standard share-price regression
+<span class="math inline">\(\log(s_{jt}) = \alpha_j +
+(1-\sigma)\log(P_{jt}) + \gamma_t + \varepsilon\)</span> does
+<em>not</em> test the estimation paradox, because it uses price
+information that provides identification regardless of sectoral balance.
+The correct test estimates <span class="math inline">\(\rho\)</span>
+from the cross-section of shares alone, which is the estimation strategy
+directly subject to the paradox. When price data is available, the
+paradox is circumvented; the theorem constrains the information content
+of <em>shares</em>, not of share-price pairs.</p>
+<figure id="fig:estimation_paradox">
+<embed src="../../figures/paper_b_estimation_paradox.pdf" />
+<figcaption>Estimation paradox across OECD countries. Panel A: pooled
+country-year observations show that higher Fisher information <span
+class="math inline">\(I(\hat{\rho}) = \operatorname{Var}_P[\log
+x_j]\)</span> predicts lower estimation SE. Panel B: country-level
+averages (Spearman <span class="math inline">\(\rho_s = -0.99\)</span>).
+Israel (most balanced) has the largest SE; Norway and Luxembourg (most
+concentrated) have the smallest. Fisher information varies sevenfold
+(0.22 to 1.55).</figcaption>
+</figure>
+<h1 id="sec:discussion">Discussion</h1>
+<h2 id="implications-for-policy">Implications for Policy</h2>
+<p>The parameter <span class="math inline">\(\rho\)</span> is the single
+number a financial supervisor should monitor. It determines <span
+class="math inline">\(K_{\text{eff}}\)</span>, which determines whether
+the economy can withstand correlated shocks. The estimation paradox
+means <span class="math inline">\(\rho\)</span> must be estimated from
+crisis periods or structural variation—not from the calm data that
+supervisors prefer <span class="citation" data-cites="Sims2003"></span>.
+This is not a technical inconvenience but a geometric fact: the
+production landscape and the information landscape are the same object
+(bridge theorem), and at equilibrium this landscape is flat in the <span
+class="math inline">\(\rho\)</span> direction.</p>
+<p>Financial correlation indicators (cross-sector equity correlations,
+credit spread correlations, implied correlation from options) are the
+natural early warning system because they operate on the statistical
+side of the bridge and reprice the <span
+class="math inline">\(K^2\)</span> channel first (Proposition <a
+href="#prop:crisis_ordering" data-reference-type="ref"
+data-reference="prop:crisis_ordering">7</a>). The crisis correlation
+dual (Proposition <a href="#prop:crisis_dual" data-reference-type="ref"
+data-reference="prop:crisis_dual">8</a>) provides a specific signature
+to monitor: when cross-sector equity correlations are rising while
+cross-sector output dispersion is also rising, the economy is in Stage 2
+of the crisis mechanism.</p>
+<p>The curvature conservation law adds a policy constraint: industrial
+policy that raises input complementarity (supply chain integration,
+domestic sourcing mandates) necessarily reduces cost flexibility by
+exactly the amount the conservation law requires. This is not a policy
+tradeoff that cleverer institutions could overcome—it is a geometric
+identity.</p>
+<h2 id="implications-for-econometric-practice">Implications for
+Econometric Practice</h2>
+<p>The estimation paradox has direct consequences for how applied
+economists estimate <span class="math inline">\(\rho\)</span> <span
+class="citation" data-cites="Chirinko2008 Klump2012"></span>. Three
+recommendations follow from the theory.</p>
+<p>First, <strong>compute the escort Herfindahl index before estimating
+<span class="math inline">\(\rho\)</span>.</strong> The escort
+Herfindahl <span class="math inline">\(H_\rho = \sum_j P_j^2\)</span>
+measures the effective concentration of inputs under escort weighting.
+When <span class="math inline">\(H_\rho \approx 1/J\)</span> (shares
+nearly equal), the economy is near the estimation paradox and Fisher
+information is small. In this regime, wide confidence intervals on <span
+class="math inline">\(\hat{\rho}\)</span> are not a data quality
+problem—they are a structural feature that no increase in sample size
+can overcome (Theorem <a href="#thm:paradox" data-reference-type="ref"
+data-reference="thm:paradox">3</a>).</p>
+<p>Second, <strong>report Fisher information alongside
+estimates.</strong> The quantity <span class="math inline">\(I(\rho) =
+\operatorname{Var}_P[\log x_j]\)</span> is directly computable from the
+data. It provides a model-free diagnostic of estimation precision. When
+<span class="math inline">\(I(\rho) &lt; 0.5\)</span> (the Israel-end of
+the distribution), estimates of <span
+class="math inline">\(\rho\)</span> should be interpreted with caution
+regardless of reported standard errors from regression-based methods
+that may circumvent the paradox via price data. The paradox provides a
+production-theoretic foundation for bounded rationality <span
+class="citation" data-cites="Gabaix2014"></span>: agents operating near
+symmetric equilibrium <em>cannot</em> learn <span
+class="math inline">\(\rho\)</span> from shares alone, not because they
+are inattentive, but because the data is informationally barren.</p>
+<p>Third, <strong>use stress periods for identification</strong> <span
+class="citation" data-cites="Antras2004"></span>. The estimation paradox
+implies that calm periods are informationally barren. Crisis periods,
+when sectors diverge and shares become unequal, are precisely the
+periods when <span class="math inline">\(I(\rho)\)</span> is large and
+<span class="math inline">\(\rho\)</span> is estimable. This inverts the
+usual practice of discarding crisis observations as “outliers.” For
+estimating <span class="math inline">\(\rho\)</span>, crisis data is the
+signal, not the noise.</p>
+<h2 id="implications-for-monitoring">Implications for Monitoring</h2>
+<p>The crisis correlation dual (Proposition <a href="#prop:crisis_dual"
+data-reference-type="ref" data-reference="prop:crisis_dual">8</a>)
+provides a specific monitoring signature that supervisors can track in
+real time. The signature has three components:</p>
+<ol>
+<li><p>Rising cross-sector equity correlations (price side of the
+dual).</p></li>
+<li><p>Rising cross-sector output dispersion (quantity side of the
+dual).</p></li>
+<li><p>Linear, not exponential, convergence of correlations
+toward 1.</p></li>
+</ol>
+<p>When all three are present simultaneously, the data are consistent
+with a <span class="math inline">\(\rho\)</span>-shift (structural
+change in input complementarity) rather than a transient volatility
+shock <span class="citation" data-cites="ForbesRigobon2002"></span>.
+Standard DCC/GARCH models <span class="citation"
+data-cites="Engle2002"></span> predict exponential correlation dynamics,
+so the linear rate is the discriminating feature. The <span
+class="math inline">\(\Delta\text{AIC} = 56\)</span> result (Section <a
+href="#sec:empirical" data-reference-type="ref"
+data-reference="sec:empirical">8</a>) suggests this discrimination is
+empirically feasible.</p>
+<h2 id="formal-verification">Formal Verification</h2>
+<p>All results are verified in Lean 4, building on Mathlib. Table <a
+href="#tab:lean" data-reference-type="ref"
+data-reference="tab:lean">1</a> summarizes the formalization for this
+paper.</p>
+<div id="tab:lean">
+<table>
+<caption>Lean 4 formalization inventory (Paper B core files). Total:
+<span class="math inline">\({\sim}272\)</span> declarations, 0 axioms,
+0 sorry. The full 115-file formalization across Papers 1–4 contains
+<span class="math inline">\({\sim}1{,}870\)</span> declarations and is
+cataloged in <code>DerivationTable.lean</code>.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>File</strong></th>
+<th style="text-align: right;"><strong>Results</strong></th>
+<th style="text-align: left;"><strong>Key Content</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>Defs.lean</code></td>
+<td style="text-align: right;">—</td>
+<td style="text-align: left;">Shared definitions</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>InformationGeometry.lean</code></td>
+<td style="text-align: right;">63</td>
+<td style="text-align: left;">Bridge theorem, VRI, Fisher-Rao,
+geodesics</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>CumulantTower.lean</code></td>
+<td style="text-align: right;">26</td>
+<td style="text-align: left;">Cumulant hierarchy, generalized
+paradox</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>CESEstimation.lean</code></td>
+<td style="text-align: right;">36</td>
+<td style="text-align: left;">Fisher info, Cramér–Rao, estimation
+paradox</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>CorrelationConvergence.lean</code></td>
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">Crisis dual, compound symmetry</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Economics.lean</code></td>
+<td style="text-align: right;">63</td>
+<td style="text-align: left;">Factor shares = escort, <span
+class="math inline">\(q = \rho\)</span> locking</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>TenWayIdentity.lean</code></td>
+<td style="text-align: right;">27</td>
+<td style="text-align: left;">Ten views are one object</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>GameTheory.lean</code></td>
+<td style="text-align: right;">30</td>
+<td style="text-align: left;">Nash equilibrium, Folk theorem, contest
+games</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>FurtherProperties.lean</code></td>
+<td style="text-align: right;">13</td>
+<td style="text-align: left;">Curvature conservation, third
+derivative</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="sec:conclusion">Conclusion</h1>
+<p>The bridge theorem equates two curvatures that have no a priori
+reason to be related: the production Hessian of CES (which controls
+output) and the Fisher information of the escort family (which controls
+statistical identifiability). The bridge ratio <span
+class="math inline">\((1-\rho)/\rho^2\)</span> is universal—it depends
+only on <span class="math inline">\(\rho\)</span>, not on the number of
+inputs, their scale, or any other feature of the economy.</p>
+<p>The bridge creates an estimation paradox: Fisher information for
+<span class="math inline">\(\rho\)</span> vanishes at symmetric
+equilibrium. The cumulant tower extends this to all orders: not just
+<span class="math inline">\(\kappa_2\)</span> (Fisher information) but
+<span class="math inline">\(\kappa_3\)</span> (prudence), <span
+class="math inline">\(\kappa_4\)</span> (temperance), and all higher
+cumulants vanish simultaneously. Competitive forces push the economy
+toward symmetry and therefore toward the paradox, creating an inherent
+efficiency-opacity tradeoff.</p>
+<p>On the observable side, curvature conservation guarantees a crisis
+correlation dual: price correlations rise while quantity correlations
+fall, both linearly. This provides a specific monitoring
+signature—distinct from standard time-series models that predict
+exponential correlation dynamics—that is confirmed empirically (<span
+class="math inline">\(\Delta\text{AIC} = 56\)</span>). The estimation
+paradox is confirmed across 38 OECD countries (<span
+class="math inline">\(\rho_s = +0.78\)</span>, 813 country-years): more
+balanced economies are harder to diagnose.</p>
+<p>All results are formally verified in Lean 4—zero axioms (the bridge
+theorem is proved from the CES definition, not from classical axioms),
+zero unresolved goals.</p>
+<p>The bridge theorem connects the companion paper’s
+production-theoretic results <span class="citation"
+data-cites="SmirlA2026"></span> to information theory and econometrics.
+Together, the two papers establish that CES has one structural parameter
+(<span class="math inline">\(\rho\)</span>), one eigenvalue (<span
+class="math inline">\(\lambda_\perp\)</span>) controlling four
+mechanisms, and one identity (the bridge) linking economic structure to
+statistical measurement. Three further companion papers develop
+extensions: the CES potential with information friction (Paper 2),
+dynamics with endogenous <span class="math inline">\(\rho\)</span>
+(Paper 3), and the hierarchical architecture (Paper 4).</p>
+<div class="thebibliography">
+<p><span>99</span></p>
+<p>Amari, S. (1998). Natural gradient works efficiently in learning.
+<em>Neural Computation</em>, 10(2), 251–276.</p>
+<p>Amari, S. and Nagaoka, H. (2000). <em>Methods of Information
+Geometry</em>. American Mathematical Society.</p>
+<p>Antras, P. (2004). Is the U.S. aggregate production function
+Cobb–Douglas? New estimates of the elasticity of substitution.
+<em>Contributions to Macroeconomics</em>, 4(1), Article 4.</p>
+<p>Arrow, K. J., Chenery, H. B., Minhas, B. S., and Solow, R. M. (1961).
+Capital-labor substitution and economic efficiency. <em>Review of
+Economics and Statistics</em>, 43(3), 225–250.</p>
+<p>Chentsov, N. N. (1972). <em>Statistical Decision Rules and Optimal
+Inference</em>. Nauka, Moscow.</p>
+<p>Chirinko, R. S. (2008). <span class="math inline">\(\sigma\)</span>:
+The long and short of it. <em>Journal of Macroeconomics</em>, 30(2),
+671–686.</p>
+<p>Efron, B. (1975). Defining the curvature of a statistical problem
+(with applications to second order efficiency). <em>Annals of
+Statistics</em>, 3(6), 1189–1242.</p>
+<p>Engle, R. (2002). Dynamic conditional correlation: A simple class of
+multivariate generalized autoregressive conditional heteroskedasticity
+models. <em>Journal of Business &amp; Economic Statistics</em>, 20(3),
+339–350.</p>
+<p>Fisher, F. M. (1969). The existence of aggregate production
+functions. <em>Econometrica</em>, 37(4), 553–577.</p>
+<p>Forbes, K. J. and Rigobon, R. (2002). No contagion, only
+interdependence: Measuring stock market comovements. <em>Journal of
+Finance</em>, 57(5), 2223–2261.</p>
+<p>Gabaix, X. (2014). A sparsity-based model of bounded rationality.
+<em>Quarterly Journal of Economics</em>, 129(4), 1661–1710.</p>
+<p>Gorman, W. M. (1968). Measuring the quantities of fixed factors. In
+J. N. Wolfe (Ed.), <em>Value, Capital, and Growth: Papers in Honour of
+Sir John Hicks</em>, pp. 141–172. Edinburgh University Press.</p>
+<p>Kimball, M. S. (1990). Precautionary saving in the small and in the
+large. <em>Econometrica</em>, 58(1), 53–73.</p>
+<p>Klump, R., McAdam, P., and Willman, A. (2012). The normalized CES
+production function: Theory and empirics. <em>Journal of Economic
+Surveys</em>, 26(5), 769–799.</p>
+<p>León-Ledesma, M. A., McAdam, P., and Willman, A. (2010). Identifying
+the elasticity of substitution with biased technical change.
+<em>American Economic Review</em>, 100(4), 1330–1357.</p>
+<p>Naudts, J. (2011). <em>Generalised Thermostatistics</em>.
+Springer.</p>
+<p>Oberfield, E. and Raval, D. (2021). Micro data and macro technology.
+<em>Econometrica</em>, 89(2), 703–732.</p>
+<p>Rao, C. R. (1945). Information and accuracy attainable in the
+estimation of statistical parameters. <em>Bulletin of the Calcutta
+Mathematical Society</em>, 37, 81–91.</p>
+<p>Sato, K. (1975). <em>Production Functions and Aggregation</em>.
+North-Holland.</p>
+<p>Sims, C. A. (2003). Implications of rational inattention. <em>Journal
+of Monetary Economics</em>, 50(3), 665–690.</p>
+<p>Smirl, J. (2026a). CES is a theorem: Uniqueness and the quadruple
+role of curvature. Working paper.</p>
+<p>Tsallis, C. (1988). Possible generalization of Boltzmann-Gibbs
+statistics. <em>Journal of Statistical Physics</em>, 52(1–2),
+479–487.</p>
+<p>van der Vaart, A. W. (1998). <em>Asymptotic Statistics</em>.
+Cambridge University Press.</p>
+</div>
+<h1 id="app:proofs">Traditional Proofs</h1>
+<p>This appendix provides traditional mathematical proofs for referees
+who prefer them to the Lean formalization.</p>
+<h2 id="proof-of-theorem-thmbridge-bridge">Proof of Theorem <a
+href="#thm:bridge" data-reference-type="ref"
+data-reference="thm:bridge">1</a> (Bridge)</h2>
+<p>At the symmetric point <span class="math inline">\(x = c \cdot
+\mathbf{1}\)</span>, we compute both sides.</p>
+<p><strong>Left side.</strong> The CES log-output is <span
+class="math inline">\(\log F(x) = (1/\rho)\log((1/J)\sum
+x_j^\rho)\)</span>. Differentiating twice: <span
+class="math display">\[\frac{\partial^2 \log F}{\partial x_i \partial
+x_j} = \frac{\rho - 1}{(\sum x_k^\rho)^2}\left[x_i^{\rho-1} x_j^{\rho-1}
+\cdot \mathbb{1}_{i \neq j} + \text{diagonal terms}\right].\]</span> At
+<span class="math inline">\(x = c \cdot \mathbf{1}\)</span>, this
+simplifies to <span class="math inline">\(-[(1-\rho)/(Jc^2)](\delta_{ij}
+- 1/J)\)</span>.</p>
+<p><strong>Right side.</strong> The escort Fisher information at the
+symmetric point has eigenvalue <span
+class="math inline">\(\rho^2/(Jc^2)\)</span> on <span
+class="math inline">\(\mathbf{1}^\perp\)</span>. Multiplying by <span
+class="math inline">\((1-\rho)/\rho^2\)</span> gives <span
+class="math inline">\((1-\rho)/(Jc^2)\)</span>.</p>
+<p>Both sides equal <span class="math inline">\((1-\rho)/(Jc^2) \cdot (I
+- \mathbf{1}\mathbf{1}^T/J)\)</span>. 0◻</p>
+<h2 id="proof-of-theorem-thmparadox-estimation-paradox">Proof of
+Theorem <a href="#thm:paradox" data-reference-type="ref"
+data-reference="thm:paradox">3</a> (Estimation Paradox)</h2>
+<p>The Fisher information for <span class="math inline">\(\rho\)</span>
+is <span class="math inline">\(I(\rho) = \operatorname{Var}_P[\log
+x_j]\)</span> where <span class="math inline">\(P_j = x_j^\rho / \sum
+x_k^\rho\)</span>. At the symmetric point <span
+class="math inline">\(x_j = c\)</span>: <span class="math inline">\(P_j
+= 1/J\)</span> for all <span class="math inline">\(j\)</span>, so <span
+class="math inline">\(\operatorname{Var}_P[\log x_j] =
+\mathbb{E}_P[(\log x_j)^2] - (\mathbb{E}_P[\log x_j])^2 = (\log c)^2 -
+(\log c)^2 = 0\)</span>. 0◻</p>
+<h2
+id="proof-of-proposition-propcrisis_dual-crisis-correlation-dual">Proof
+of Proposition <a href="#prop:crisis_dual" data-reference-type="ref"
+data-reference="prop:crisis_dual">8</a> (Crisis Correlation Dual)</h2>
+<p>Under compound symmetry with correlation <span
+class="math inline">\(r\)</span> among <span
+class="math inline">\(J\)</span> escort-weighted variables, the pairwise
+correlation of shares is: <span class="math display">\[\text{cor}(s_i,
+s_j) = \frac{1 - r}{1 + (J-1)r} \quad \text{for } i \neq j.\]</span></p>
+<p>This is a Möbius transformation <span class="math inline">\(f(r) =
+(1-r)/(1+(J-1)r)\)</span> mapping <span class="math inline">\([-1/(J-1),
+1] \to [0, 1]\)</span>.</p>
+<p><em>Part (i): Prices converge to correlation 1.</em> Under stress,
+idiosyncratic variation is overwhelmed by the common factor: <span
+class="math inline">\(r \to 1\)</span>, so <span
+class="math inline">\(f(r) \to 0/J = 0\)</span>. The price correlation,
+which is <span class="math inline">\(1 - f(r)\)</span> in the
+appropriate basis, rises toward 1.</p>
+<p><em>Part (ii): Quantities diverge toward <span
+class="math inline">\(-1/(J-1)\)</span>.</em> By curvature conservation
+(Remark <a href="#rem:curvature_conservation" data-reference-type="ref"
+data-reference="rem:curvature_conservation">5</a>), as <span
+class="math inline">\(K_{\text{eff}}\to 0\)</span> on the production
+side, cost curvature diverges. Production responses spread across <span
+class="math inline">\(\mathbf{1}^\perp\)</span>: the quantity
+correlation falls toward the equicorrelation floor <span
+class="math inline">\(-1/(J-1)\)</span>, which is the minimum
+correlation achievable with <span class="math inline">\(J\)</span>
+non-negative shares summing to 1.</p>
+<p><em>Part (iii): Linear rate <span class="math inline">\(\beta =
+1\)</span>.</em> The Möbius transformation <span
+class="math inline">\(f(r) = (1-r)/(1+(J-1)r)\)</span> is a rational
+function of <span class="math inline">\(r\)</span>. Parameterizing the
+stress path as <span class="math inline">\(r(t) = r_0 + \alpha
+t\)</span> (linear in the stress parameter <span
+class="math inline">\(t\)</span>), the correlation <span
+class="math inline">\(f(r(t))\)</span> is a rational function of <span
+class="math inline">\(t\)</span> with degree 1 numerator and degree 1
+denominator. For <span class="math inline">\(|t|\)</span> small relative
+to <span class="math inline">\(1/|J-1|\)</span>, this is linear in <span
+class="math inline">\(t\)</span>: <span class="math inline">\(f(r_0 +
+\alpha t) \approx f(r_0) + f&#39;(r_0)\alpha t\)</span>, where <span
+class="math inline">\(f&#39;(r) = -J/(1+(J-1)r)^2 \neq 0\)</span>. The
+convergence rate is therefore <span class="math inline">\(\beta =
+1\)</span> (linear), not exponential. 0◻</p>
+<h2 id="proof-of-theorem-thmcumulant_tower-cumulant-tower">Proof of
+Theorem <a href="#thm:cumulant_tower" data-reference-type="ref"
+data-reference="thm:cumulant_tower">4</a> (Cumulant Tower)</h2>
+<p>Let <span class="math inline">\(Z(\rho) = \sum_{j=1}^J
+x_j^\rho\)</span> and <span class="math inline">\(P_j = x_j^\rho /
+Z\)</span>.</p>
+<p><strong>Part (i): Moment recursion.</strong> Differentiate <span
+class="math inline">\(\mathbb{E}_P[(\log x)^n] = \sum_j P_j (\log
+x_j)^n\)</span> with respect to <span
+class="math inline">\(\rho\)</span>: <span
+class="math display">\[\begin{aligned}
+\frac{d}{d\rho}\sum_j P_j (\log x_j)^n &amp;= \sum_j \frac{dP_j}{d\rho}
+(\log x_j)^n.
+\end{aligned}\]</span> Since <span class="math inline">\(P_j = x_j^\rho
+/ Z\)</span>, we have <span class="math inline">\(dP_j/d\rho = P_j(\log
+x_j - \mathbb{E}_P[\log x])\)</span>. Substituting: <span
+class="math display">\[\begin{aligned}
+\frac{d}{d\rho}\mathbb{E}_P[(\log x)^n] &amp;= \sum_j P_j (\log x_j)^n
+(\log x_j - \mathbb{E}_P[\log x]) \\
+&amp;= \mathbb{E}_P[(\log x)^{n+1}] - \mathbb{E}_P[(\log x)^n] \cdot
+\mathbb{E}_P[\log x].
+\end{aligned}\]</span></p>
+<p><strong>Part (ii): VRI.</strong> Setting <span
+class="math inline">\(n = 0\)</span> in the recursion: <span
+class="math inline">\(d\mathbb{E}_P[1]/d\rho = 0\)</span> (trivial).
+Setting <span class="math inline">\(n = 1\)</span>: <span
+class="math inline">\(d\mathbb{E}_P[\log x]/d\rho =
+\operatorname{Var}_P[\log x]\)</span>. But also <span
+class="math inline">\(d^2 \log Z / d\rho^2 = \operatorname{Var}_P[\log
+x]\)</span> by direct computation. This is the Variance-Response
+Identity.</p>
+<p><strong>Part (v): Generalized paradox.</strong> At <span
+class="math inline">\(x_j = c\)</span> for all <span
+class="math inline">\(j\)</span>: <span class="math inline">\(P_j =
+1/J\)</span> and <span class="math inline">\(\log x_j = \log c\)</span>
+for all <span class="math inline">\(j\)</span>. Every centered moment
+<span class="math inline">\(\mathbb{E}_P[(\log x - \mathbb{E}_P[\log
+x])^n] = 0\)</span> for <span class="math inline">\(n \geq 2\)</span>,
+since the distribution is a point mass. Therefore all cumulants <span
+class="math inline">\(\kappa_n = 0\)</span>. 0◻</p>
+<h1 id="app:lean">Lean Formalization Guide</h1>
+<p>The formalization uses Lean 4 (v4.28.0) with Mathlib (v4.28.0). To
+verify:</p>
+<pre><code>git clone [URL available upon acceptance; anonymous replication archive attached]
+cd thesis &amp;&amp; lake build</code></pre>
+<p>The build produces <span class="math inline">\({\sim}2{,}350\)</span>
+compilation units with 0 errors. The key files for this paper are listed
+in Table <a href="#tab:lean" data-reference-type="ref"
+data-reference="tab:lean">1</a>. All theorems are proved from
+definitions—this paper uses no axioms beyond the CES definition itself.
+The authoritative catalog of the full formalization is maintained in
+<code>DerivationTable.lean</code>, which compile-time verifies every
+theorem name.</p>
+<h1 id="app:data">Data Appendix</h1>
+<p><strong>Test 1 (Correlation convergence).</strong> FRED PPI sector
+indices (12 commodity groups: WPU01–WPU14) and industrial production
+indices (16 manufacturing subsectors: IPG311S–IPG339S), monthly. NFCI
+from Chicago Fed. NBER recession dates from USREC. Sample: varies by
+series availability, typically 1990s–2024. Rolling windows: 12 months.
+Eigendecomposition of the <em>correlation</em> matrix (not covariance),
+following the correction in v3 of the test script. Compound symmetry
+formula accuracy: Pearson <span class="math inline">\(r = 0.754\)</span>
+between predicted and observed average correlation.</p>
+<p><strong>Test 2 (Estimation paradox).</strong> OECD STAN database, 25
+non-overlapping ISIC Rev.4 sectors, value added in both current prices
+(nominal, for shares <span class="math inline">\(s_j\)</span>) and
+chain-linked volume (real, for inputs <span
+class="math inline">\(x_j\)</span>). Sample: 38 OECD countries,
+1995–2019, yielding 813 country-year observations. Estimation method:
+maximum likelihood matching of observed nominal shares to escort
+probabilities <span class="math inline">\(\pi_j(\rho) = x_j^\rho / \sum
+x_k^\rho\)</span>, with log-likelihood <span
+class="math inline">\(\ell(\rho) = \sum_j s_j \log \pi_j(\rho) = \rho
+\sum_j s_j \log x_j - \log \sum_k x_k^\rho\)</span>. SE computed from
+the numerical Hessian of <span class="math inline">\(-\ell\)</span> at
+<span class="math inline">\(\hat{\rho}\)</span>: <span
+class="math inline">\(\text{SE} =
+1/\sqrt{-\ell&#39;&#39;(\hat{\rho})}\)</span>. Fisher information: <span
+class="math inline">\(I(\rho) = \operatorname{Var}_P[\log x_j]\)</span>
+evaluated at <span class="math inline">\(\hat{\rho}\)</span> under
+escort weights. Sectoral balance: <span
+class="math inline">\(1/\text{CV}\)</span> of nominal sector shares.
+Replication scripts: <code>test_estimation_paradox_mle.py</code>,
+<code>plot_paper_b_figures.py</code>.</p>
+<h1 id="app:illustrations">Illustrations</h1>
+<h2 id="the-bent-ruler">The Bent Ruler</h2>
+<p>Imagine measuring the curvature of a road by driving along it. If the
+road is straight, your steering wheel stays centered. If the road
+curves, you turn the wheel. The amount you turn is the curvature.</p>
+<p>Now imagine you are blindfolded and must infer the road’s curvature
+from the data your car’s sensors provide—tire slip, lateral
+acceleration, gyroscope readings. The more the road curves, the stronger
+the signals. A straight road produces no distinctive signals at all.</p>
+<p>The bridge theorem says this analogy is exact for production
+economics. The “road” is the isoquant. “Driving along it” means changing
+the input mix while holding output constant. “Steering” is the change in
+factor shares. The “signal strength” is the Fisher information. A flat
+isoquant (<span class="math inline">\(\rho = 1\)</span>) is a straight
+road: you cannot estimate <span class="math inline">\(\rho\)</span>. A
+curved isoquant (<span class="math inline">\(\rho &lt; 1\)</span>) is a
+winding road: the data is rich with information about <span
+class="math inline">\(\rho\)</span>.</p>
+<h2 id="the-globe-and-the-flat-map">The Globe and the Flat Map</h2>
+<p>Factor shares <span class="math inline">\(s_1, \ldots, s_J\)</span>
+are non-negative and sum to 1. They live on the probability simplex. But
+the Fisher-Rao metric on the simplex is not the flat Euclidean metric—it
+is the metric of a sphere. The map <span class="math inline">\(\xi_j =
+\sqrt{s_j}\)</span> embeds the simplex into the positive orthant of the
+unit sphere. Under this embedding, the Fisher-Rao metric becomes the
+standard spherical metric.</p>
+<figure id="fig:simplex">
+
+<figcaption>The probability simplex for three inputs. The geodesic
+(natural gradient, red) follows the Fisher-Rao metric. The Euclidean
+path (dashed blue) is the “flat map.” The gap is proportional to CES
+curvature <span class="math inline">\(K\)</span>.</figcaption>
+</figure>
+<p>On this spherical representation, an isoquant becomes a circle on the
+sphere. <span class="math inline">\(K = 0\)</span> (perfect
+substitutes): the isoquant is a great circle. <span
+class="math inline">\(K\)</span> large (strong complements): the
+isoquant is a small circle near the “north pole” (symmetric
+equilibrium). Walking along an isoquant traces a circle whose curvature
+is <span class="math inline">\(K\)</span>—and on the sphere, this is
+also the Fisher-Rao curvature. The bridge theorem is the statement that
+these are the same curvature.</p>
+<p>The estimation paradox, geometrically: you cannot measure the
+curvature of a circle by standing at its center. You have to walk along
+it.</p>
+<aside id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Independent Researcher. Email: jonsmirl@gmail.com.<a
+href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</aside>
+</body>
+</html>

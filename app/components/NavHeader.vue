@@ -3,9 +3,9 @@
     <div class="nav-inner">
       <NuxtLink to="/" class="logo">CES Formalization</NuxtLink>
       <nav>
+        <NuxtLink to="/papers">Papers</NuxtLink>
         <NuxtLink to="/theorems">Theorems</NuxtLink>
         <NuxtLink to="/tests">Tests</NuxtLink>
-        <NuxtLink to="/papers">Papers</NuxtLink>
       </nav>
       <div class="user-bar">
         <span class="email">{{ user?.email }}</span>

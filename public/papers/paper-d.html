@@ -1,0 +1,2423 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jon Smirl" />
+  <title>Crisis_Sequence</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    div.abstract {
+      margin: 2em 2em 2em 2em;
+      text-align: left;
+      font-size: 85%;
+    }
+    div.abstract-title {
+      font-weight: bold;
+      text-align: center;
+      padding: 0;
+      margin-bottom: 0.5em;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<p><strong>JEL:</strong> E32, E37, E44, D24, G01, G17.<br />
+<strong>Keywords:</strong> CES curvature, crisis sequence,
+efficiency-fragility coupling, endogenous complementarity, Minsky, early
+warning indicators.</p>
+<h1 id="sec:intro">Introduction</h1>
+<p>On August 9, 2007, BNP Paribas froze three investment funds, citing
+“a complete evaporation of liquidity.” The announcement surprised
+markets. The VIX had been trading below 12 for most of the preceding
+year—the lowest sustained level in the index’s history. Corporate bond
+spreads were tight. GDP growth was solid. By every standard indicator,
+the economy was healthy.</p>
+<p>Yet the data told a different story if one knew where to look.
+Housing return correlations across U.S. metropolitan areas had begun
+spiking in mid-2006, a full 2.5 years before the NBER-dated recession
+trough. The ABX indices—synthetic credit default swaps on subprime
+mortgage-backed securities—had started declining in January 2007, eight
+months before BNP Paribas. BAA corporate bond spreads crossed two
+standard deviations above their mean in December 2007, three months
+before the Bear Stearns collapse. Industrial production did not begin
+its sustained decline until February 2008. The TED spread—measuring
+interbank coordination breakdown—did not exceed 200 basis points until
+September 2008, a full two years after housing correlations first
+signaled distress.</p>
+<p>This is not a story about one crisis. The same sequence—correlations
+first, then output, then coordination—appears in the Asian financial
+crisis (1997), the dot-com bust (2001), the European sovereign debt
+crisis (2010), and, with compressed timing, the COVID shock (2020). The
+question is: why?</p>
+<p>This paper derives the crisis sequence from the mathematics of CES
+production. The answer is that correlations, output, and coordination
+are controlled by different powers of a single curvature parameter <span
+class="math inline">\(K = (1-\rho)(J-1)/J\)</span>, and higher powers
+degrade faster as friction rises toward its critical threshold. The same
+parameter that makes complementary production valuable—superadditivity
+proportional to <span class="math inline">\(K\)</span>—also makes the
+economy fragile to friction shocks, because the critical friction
+threshold <span class="math inline">\(T^*\)</span> at which effective
+curvature collapses to zero is <em>inversely</em> proportional to <span
+class="math inline">\(K\)</span>. This is the <strong>Smirl
+Curve</strong>: the economy cannot be productive without being fragile,
+and the coupling is an algebraic identity, not a policy failure.</p>
+<p><strong>Three contributions.</strong> First, we derive the
+<strong>Crisis Sequence Theorem</strong> (Section <a
+href="#sec:crisis_sequence" data-reference-type="ref"
+data-reference="sec:crisis_sequence">3</a>): the three channels
+controlled by CES curvature degrade in strict order <span
+class="math inline">\(K^2 \to K \to K/J\)</span> as information friction
+<span class="math inline">\(T\)</span> rises toward <span
+class="math inline">\(T^*\)</span>. This ordering is not assumed but
+follows from the elasticities of each channel with respect to effective
+curvature <span class="math inline">\(K_{\text{eff}}= K(1 -
+T/T^*)^+\)</span>. The theorem generates the specific prediction that
+financial correlations spike before output declines, and output declines
+before coordination breaks down—precisely the GFC timeline.</p>
+<p>Second, we formalize the <strong>Minsky Trap</strong> (Section <a
+href="#sec:minsky" data-reference-type="ref"
+data-reference="sec:minsky">5</a>): during booms, four identified
+channels drive <span class="math inline">\(\rho\)</span> downward
+(increasing complementarity), which simultaneously raises productivity
+and lowers <span class="math inline">\(T^*\)</span>. The stability
+margin <span class="math inline">\(\Delta = T^*- T\)</span> narrows
+endogenously even when the friction environment is stable. The system
+self-organizes toward its own critical threshold. The speed asymmetry is
+8.5:1—compression during booms takes years; collapse during crises takes
+months.</p>
+<p>Third, we establish the <strong>Smirl Curve</strong> (Section <a
+href="#sec:smirl_curve" data-reference-type="ref"
+data-reference="sec:smirl_curve">4</a>) as a fundamental constraint: the
+locus of <span class="math inline">\((\rho, T^*)\)</span> pairs defines
+an impassable frontier. No institutional arrangement, no regulatory
+regime, no monetary policy can simultaneously achieve high
+complementarity (high <span class="math inline">\(K\)</span>, high
+output) and high friction tolerance (high <span
+class="math inline">\(T^*\)</span>). The tradeoff is geometric, not
+institutional.</p>
+<p><strong>Empirical validation.</strong> Section <a
+href="#sec:early_warning" data-reference-type="ref"
+data-reference="sec:early_warning">7</a> reports 19 consistent empirical
+tests. The stability-margin indicator <span
+class="math inline">\(\hat{\Delta}\)</span> outperforms VIX at
+forecasting recessions. CPI component dispersion leads aggregate
+inflation at 18 of 18 turning points. Sectors ordered by estimated <span
+class="math inline">\(\rho\)</span> fail first and recover last. The
+Minsky <span class="math inline">\(\rho\)</span>-shift hypothesis holds
+with <span class="math inline">\(r = -0.886\)</span> over the business
+cycle. Pre-crisis calm (low VIX) predicts crisis severity, consistent
+with the estimation paradox: the economy is hardest to measure when it
+is healthiest.</p>
+<p><strong>Relation to existing work.</strong> Minsky’s (1986) Financial
+Instability Hypothesis argues that stability breeds instability. We
+provide the missing mathematical mechanism: stability breeds
+complementarity, which lowers the friction threshold, which breeds
+instability. The “Minsky moment” is not metaphorical but algebraic—it
+occurs when <span class="math inline">\(T\)</span> crosses <span
+class="math inline">\(T^*(\rho(t))\)</span>, where <span
+class="math inline">\(\rho(t)\)</span> has been endogenously falling.
+The econometrics of early warning indicators <span class="citation"
+data-cites="Reinhart2009 Schularick2012 Borio2014"></span> identifies
+correlates of crises; the crisis sequence theorem explains why those
+correlates appear in the order they do. The DSGE literature following
+<span class="citation" data-cites="Christiano2005"></span> and <span
+class="citation" data-cites="Smets2007"></span> treats <span
+class="math inline">\(\rho\)</span> (or its equivalent) as a fixed
+structural parameter; we show <span class="math inline">\(\rho\)</span>
+is endogenous to the business cycle, and that this endogeneity is
+essential for understanding crisis dynamics.</p>
+<p><strong>Companion papers.</strong> This paper draws on foundations
+established in three companion papers: CES emergence and the quadruple
+role of curvature (Paper 1), the CES potential with information friction
+(Paper 2), and the hierarchical architecture (Paper 4). The present
+paper is self-contained; we re-derive all necessary results from first
+principles.</p>
+<h1 id="sec:landscape">The CES Potential Landscape</h1>
+<h2 id="setup-and-the-ces-aggregate">Setup and the CES Aggregate</h2>
+<p>Consider <span class="math inline">\(J \geq 2\)</span> sectors
+combined by the symmetric CES aggregator: <span
+class="math display">\[\label{eq:ces}
+F(\mathbf{x}) = \left(\frac{1}{J}\sum_{j=1}^{J}
+x_j^\rho\right)^{1/\rho}, \quad \rho \in (-\infty, 1] \setminus
+\{0\},\]</span> with the Cobb–Douglas limit <span
+class="math inline">\(F = (\prod x_j)^{1/J}\)</span> at <span
+class="math inline">\(\rho = 0\)</span>. CES is not an assumption: it is
+the unique aggregator compatible with constant returns, continuity, and
+scale consistency (Kolmogorov 1930; Nagumo 1930; Aczél 1948). See
+Paper 1 for the formal proof and its Lean 4 verification.</p>
+<p>The CES curvature is: <span class="math display">\[\label{eq:K}
+K = \frac{(1-\rho)(J-1)}{J}.\]</span> For complementary inputs (<span
+class="math inline">\(\rho &lt; 1\)</span>), <span
+class="math inline">\(K &gt; 0\)</span>. For perfect substitutes (<span
+class="math inline">\(\rho = 1\)</span>), <span class="math inline">\(K
+= 0\)</span>.</p>
+<h2 id="the-ces-potential">The CES Potential</h2>
+<p>Define the CES potential: <span
+class="math display">\[\label{eq:potential}
+\Phi_q(\mathbf{x}; T) = \Phi_{\text{CES}}(\mathbf{x}; \rho) - T \cdot
+S_q(\mathbf{x}),\]</span> where <span
+class="math inline">\(\Phi_{\text{CES}} = -\sum_{n} \log F_n\)</span> is
+the aggregate CES welfare loss function, <span
+class="math inline">\(S_q\)</span> is the Tsallis entropy of order <span
+class="math inline">\(q\)</span>, and <span class="math inline">\(T \geq
+0\)</span> is the information friction parameter measuring the
+costliness of transmitting allocation signals across agents and
+sectors.</p>
+<p>The emergence theorem forces <span class="math inline">\(q =
+\rho\)</span>: the entropy order must equal the CES parameter, because
+both are determined by the same generating function <span
+class="math inline">\(Z(\rho) = \sum_j x_j^\rho\)</span> (Paper 2,
+Theorem 1). Factor shares <span class="math inline">\(s_j = x_j^\rho /
+\sum_k x_k^\rho\)</span> are simultaneously CES cost shares, Tsallis
+escort probabilities, logit choice probabilities, and Gibbs weights—all
+with the same parameter <span class="math inline">\(\rho\)</span>.</p>
+<h2 id="effective-curvature-and-the-critical-threshold">Effective
+Curvature and the Critical Threshold</h2>
+<div id="def:keff" class="definition">
+<p><strong>Definition 1</strong> (Effective curvature). The effective
+curvature under information friction <span
+class="math inline">\(T\)</span> is: <span
+class="math display">\[\label{eq:keff}
+K_{\text{eff}}(T) = K \cdot \left(1 - \frac{T}{T^*}\right)^+,\]</span>
+where <span class="math inline">\((x)^+ = \max(x, 0)\)</span> and <span
+class="math inline">\(T^*\)</span> is the critical friction
+threshold.</p>
+</div>
+<div id="prop:tstar" class="proposition">
+<p><strong>Proposition 2</strong> (Critical threshold). <em>At symmetric
+equilibrium with <span class="math inline">\(J\)</span> sectors and
+curvature parameter <span class="math inline">\(\rho &lt; 1\)</span>:
+<span class="math display">\[\label{eq:tstar}
+T^*(\rho, J) = \frac{cJ}{(1-\rho)(J-1)},\]</span> where <span
+class="math inline">\(c &gt; 0\)</span> is the common input level. For
+<span class="math inline">\(T &lt; T^*\)</span>, the symmetric
+equilibrium is a local minimum of <span
+class="math inline">\(\Phi_q\)</span> (stable). For <span
+class="math inline">\(T &gt; T^*\)</span>, the Hessian of <span
+class="math inline">\(\Phi_q\)</span> acquires a negative eigenvalue
+(unstable). At <span class="math inline">\(T = T^*\)</span>, the Hessian
+is degenerate: the economy is at its critical point.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> The Hessian of <span
+class="math inline">\(\Phi_q\)</span> at the symmetric point has
+eigenvalue <span class="math inline">\(\lambda_\perp(T) = (1-\rho)/(\rho
+J c^2) - T \cdot h(\rho)\)</span> in the <span
+class="math inline">\(\mathbf{1}^\perp\)</span> subspace, where <span
+class="math inline">\(h(\rho)\)</span> is the second derivative of
+Tsallis entropy. Setting <span class="math inline">\(\lambda_\perp =
+0\)</span> and solving for <span class="math inline">\(T\)</span> yields
+(<a href="#eq:tstar" data-reference-type="ref"
+data-reference="eq:tstar">[eq:tstar]</a>). The formal proof is in
+<code>Paper2/EffectiveCurvature.lean</code>. ◻</p>
+</div>
+<p>The threshold <span class="math inline">\(T^*\)</span> is where
+complementary production becomes unsustainable: friction costs exceed
+the curvature gains from input complementarity. Below <span
+class="math inline">\(T^*\)</span>, the economy sits in a basin of
+attraction around the efficient symmetric allocation. Above <span
+class="math inline">\(T^*\)</span>, the basin vanishes and the economy
+transitions to a corner solution (concentration in a few sectors).</p>
+<h2 id="the-rho-t-regime-diagram">The <span class="math inline">\((\rho,
+T)\)</span> Regime Diagram</h2>
+<p>The plane <span class="math inline">\((\rho, T)\)</span> divides into
+three regimes:</p>
+<ol>
+<li><p><strong>Complementary regime</strong> (<span
+class="math inline">\(T &lt; T^*\)</span>, <span
+class="math inline">\(\rho &lt; 1\)</span>): <span
+class="math inline">\(K_{\text{eff}}&gt; 0\)</span>, symmetric
+equilibrium stable, diversified production efficient.</p></li>
+<li><p><strong>Substitute regime</strong> (<span
+class="math inline">\(\rho &gt; 1\)</span> or <span
+class="math inline">\(T &gt; T^*\)</span>): effective curvature zero or
+negative, concentration efficient.</p></li>
+<li><p><strong>Critical boundary</strong> (<span class="math inline">\(T
+= T^*\)</span>): <span class="math inline">\(K_{\text{eff}}= 0\)</span>,
+pre-crisis deceleration, divergent variance.</p></li>
+</ol>
+<p>The boundary curve <span class="math inline">\(T = T^*(\rho)\)</span>
+is a hyperbola in the <span class="math inline">\((\rho, T)\)</span>
+plane. This curve is the <strong>Smirl Curve</strong>, developed in
+Section <a href="#sec:smirl_curve" data-reference-type="ref"
+data-reference="sec:smirl_curve">4</a>.</p>
+<h1 id="sec:crisis_sequence">The Crisis Sequence Theorem</h1>
+<h2 id="three-channels-of-ces-curvature">Three Channels of CES
+Curvature</h2>
+<p>CES curvature controls three economic mechanisms (Paper 1,
+Theorem 2):</p>
+<ol>
+<li><p><strong>Correlation robustness</strong> (<span
+class="math inline">\(\propto K^2\)</span>): CES nonlinearity extracts
+idiosyncratic variation that linear aggregates miss. The informational
+bonus scales as <span class="math inline">\(\lambda_\perp^2 \propto
+K^2\)</span>.</p></li>
+<li><p><strong>Superadditivity</strong> (<span
+class="math inline">\(\propto K\)</span>): complementary inputs produce
+more together than the sum of parts. The gap is <span
+class="math inline">\(v^T \operatorname{Hess}(F) v = -\lambda_\perp
+\|v\|^2 \propto K\)</span>.</p></li>
+<li><p><strong>Coordination premium</strong> (<span
+class="math inline">\(\propto K/J\)</span>): the per-sector gain from
+Nash coordination at balanced equilibrium. Each sector’s share of the
+total curvature benefit is <span
+class="math inline">\(K/J\)</span>.</p></li>
+</ol>
+<p>Under friction <span class="math inline">\(T\)</span>, each channel
+operates at its effective level, obtained by substituting <span
+class="math inline">\(K_{\text{eff}}\)</span> for <span
+class="math inline">\(K\)</span>: <span
+class="math display">\[\begin{aligned}
+\text{Correlation robustness:} \quad &amp; R(T) = \alpha_R \cdot
+K_{\text{eff}}^2(T), \label{eq:corr} \\
+\text{Superadditivity:} \quad &amp; A(T) = \alpha_A \cdot
+K_{\text{eff}}(T), \label{eq:super} \\
+\text{Coordination:} \quad &amp; C(T) = \alpha_C \cdot
+K_{\text{eff}}(T)/J, \label{eq:coord}
+\end{aligned}\]</span> where <span class="math inline">\(\alpha_R,
+\alpha_A, \alpha_C &gt; 0\)</span> are structural constants independent
+of <span class="math inline">\(T\)</span>.</p>
+<h2 id="the-crisis-sequence">The Crisis Sequence</h2>
+<div id="thm:crisis_sequence" class="theorem">
+<p><strong>Theorem 3</strong> (Crisis sequence). <em>As information
+friction <span class="math inline">\(T\)</span> rises from <span
+class="math inline">\(0\)</span> toward <span
+class="math inline">\(T^*\)</span>, the three channels degrade in strict
+order: <span class="math display">\[\label{eq:sequence}
+K^2 \;\longrightarrow\; K \;\longrightarrow\; K/J.\]</span>
+Specifically, define the fractional loss of channel <span
+class="math inline">\(X\)</span> as <span
+class="math inline">\(\ell_X(T) = 1 - X(T)/X(0)\)</span>. Then for all
+<span class="math inline">\(T \in (0, T^*)\)</span>:</em></p>
+<ol>
+<li><p><em><span class="math inline">\(\ell_R(T) &gt; \ell_A(T) &gt;
+\ell_C(T)\)</span> for all <span class="math inline">\(T &gt;
+0\)</span>.</em></p></li>
+<li><p><em>The elasticity of each channel with respect to <span
+class="math inline">\(K_{\text{eff}}\)</span> determines the ordering:
+<span class="math display">\[\begin{aligned}
+\frac{\partial \log R}{\partial \log K_{\text{eff}}} &amp;= 2,
+\label{eq:elast_corr} \\
+\frac{\partial \log A}{\partial \log K_{\text{eff}}} &amp;= 1,
+\label{eq:elast_super} \\
+\frac{\partial \log C}{\partial \log K_{\text{eff}}} &amp;= 1.
+\label{eq:elast_coord}
+\end{aligned}\]</span></em></p></li>
+<li><p><em>For a proportional decline <span
+class="math inline">\(K_{\text{eff}}\to
+(1-\epsilon)K_{\text{eff}}\)</span>, the fractional losses are: <span
+class="math display">\[\begin{aligned}
+\ell_R &amp;= 1 - (1-\epsilon)^2 \approx 2\epsilon, \\
+\ell_A &amp;= 1 - (1-\epsilon) = \epsilon, \\
+\ell_C &amp;= 1 - (1-\epsilon) = \epsilon.
+\end{aligned}\]</span> Correlation robustness loses twice as much as
+superadditivity for the same <span
+class="math inline">\(K_{\text{eff}}\)</span> decline.</em></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> The proof is direct. Since <span
+class="math inline">\(R \propto K_{\text{eff}}^2\)</span> and <span
+class="math inline">\(A \propto K_{\text{eff}}\)</span>, we have <span
+class="math inline">\(R(T)/R(0) = [K_{\text{eff}}(T)/K]^2 = [1 -
+T/T^*]^2\)</span> and <span class="math inline">\(A(T)/A(0) =
+K_{\text{eff}}(T)/K = 1 - T/T^*\)</span>. Thus <span
+class="math inline">\(\ell_R = 1 - (1-T/T^*)^2 = (2-T/T^*)(T/T^*) &gt;
+T/T^*= \ell_A\)</span> for all <span class="math inline">\(T \in (0,
+T^*)\)</span>. Part (ii) follows from the power rule. Part (iii) is a
+Taylor expansion. The formal proof is in
+<code>Paper2/EffectiveCurvature.lean</code>, theorem
+<code>crisis_sequence_ordering</code>. ◻</p>
+</div>
+<div class="remark">
+<p><em>Remark 4</em> (Superadditivity vs. coordination). Superadditivity
+and coordination both scale as <span
+class="math inline">\(K_{\text{eff}}^1\)</span>, so their fractional
+losses are equal. The ordering between them is not by elasticity but by
+<em>magnitude</em>: coordination (<span class="math inline">\(\propto
+K/J\)</span>) is smaller than superadditivity (<span
+class="math inline">\(\propto K\)</span>) by a factor of <span
+class="math inline">\(J\)</span>, so it reaches a functional threshold
+(e.g., the minimum level needed to sustain cooperation) later. In a
+10-sector economy, coordination has a tenfold buffer.</p>
+</div>
+<h2 id="three-stages-of-crisis">Three Stages of Crisis</h2>
+<p>The crisis sequence unfolds in three identifiable stages:</p>
+<div class="mdframed">
+<p><strong>Stage 1: The Information Shadow</strong> (<span
+class="math inline">\(T\)</span> moderately below <span
+class="math inline">\(T^*\)</span>). Correlation robustness degrades.
+Cross-asset correlations begin rising. Information aggregation weakens.
+But output (<span class="math inline">\(\propto K\)</span>) remains
+high—the economy looks healthy by standard measures. VIX may be low
+because <em>realized</em> volatility is still low. This is the
+“pre-crisis calm.” Duration: typically 1–3 years.</p>
+<p><strong>Stage 2: Revelation</strong> (<span
+class="math inline">\(T\)</span> approaching <span
+class="math inline">\(T^*\)</span>). Superadditivity degrades. Output
+declines become measurable. The gap between strong correlations (Stage 1
+signal) and declining output (Stage 2 signal) closes. Credit spreads
+widen. Asset prices fall. Duration: typically 6–18 months.</p>
+<p><strong>Stage 3: Coordination Breakdown</strong> (<span
+class="math inline">\(T\)</span> near or above <span
+class="math inline">\(T^*\)</span>). The coordination premium collapses.
+Interbank lending freezes. Supply chains fragment. Each agent’s optimal
+strategy becomes uncorrelated with others—the Nash equilibrium shifts
+from diversified cooperation to concentrated self-protection. Duration:
+typically 3–12 months.</p>
+</div>
+<h2 id="the-2008-global-financial-crisis-a-precise-match">The 2008
+Global Financial Crisis: A Precise Match</h2>
+<p>The GFC followed the crisis sequence with remarkable precision:</p>
+<div id="tab:gfc">
+<table>
+<caption>The GFC Crisis Sequence</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Stage</strong></th>
+<th style="text-align: left;"><strong>Signal</strong></th>
+<th style="text-align: left;"><strong>Date</strong></th>
+<th style="text-align: left;"><strong>Lead time</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1 (Information)</td>
+<td style="text-align: left;">Housing correlations spike</td>
+<td style="text-align: left;">Mid-2006</td>
+<td style="text-align: left;">30 months</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1 (Information)</td>
+<td style="text-align: left;">ABX indices decline</td>
+<td style="text-align: left;">Jan 2007</td>
+<td style="text-align: left;">20 months</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1 (Information)</td>
+<td style="text-align: left;">VIX at historic low</td>
+<td style="text-align: left;">Jan 2007</td>
+<td style="text-align: left;">20 months</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2 (Revelation)</td>
+<td style="text-align: left;">BAA spread <span
+class="math inline">\(&gt; 2\sigma\)</span></td>
+<td style="text-align: left;">Dec 2007</td>
+<td style="text-align: left;">9 months</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2 (Revelation)</td>
+<td style="text-align: left;">Industrial production peak</td>
+<td style="text-align: left;">Feb 2008</td>
+<td style="text-align: left;">0 months</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3 (Coordination)</td>
+<td style="text-align: left;">Bear Stearns collapse</td>
+<td style="text-align: left;">Mar 2008</td>
+<td style="text-align: left;"><span class="math inline">\(-\)</span>1
+month</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3 (Coordination)</td>
+<td style="text-align: left;">TED spread <span
+class="math inline">\(&gt; 200\)</span> bp</td>
+<td style="text-align: left;">Sep 2008</td>
+<td style="text-align: left;"><span class="math inline">\(-\)</span>7
+months</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3 (Coordination)</td>
+<td style="text-align: left;">Lehman Brothers failure</td>
+<td style="text-align: left;">Sep 2008</td>
+<td style="text-align: left;"><span class="math inline">\(-\)</span>7
+months</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The pattern is stark. Housing correlations—a <span
+class="math inline">\(K^2\)</span> channel—led by 30 months. Output—a
+<span class="math inline">\(K\)</span> channel—peaked in February 2008.
+The TED spread—measuring interbank coordination (<span
+class="math inline">\(K/J\)</span> channel)—did not spike until
+September 2008. The 2.5-year gap between the earliest <span
+class="math inline">\(K^2\)</span> signal and the NBER recession trough
+is not a coincidence of the 2008 episode; it is a structural prediction
+of the crisis sequence theorem.</p>
+<div id="prop:calm" class="proposition">
+<p><strong>Proposition 5</strong> (Pre-crisis calm). <em>The estimation
+paradox (Paper 1, Theorem 5) implies that VIX is lowest when the economy
+is most vulnerable. At near-symmetric equilibrium, Fisher information
+for <span class="math inline">\(\rho\)</span> is near zero: the economy
+generates minimal information about its own structural fragility. Low
+realized volatility reflects high <span
+class="math inline">\(K_{\text{eff}}\)</span>, which also means high
+<span class="math inline">\(K\)</span> and therefore low <span
+class="math inline">\(T^*\)</span>—the economy is close to its critical
+threshold despite appearing healthy.</em></p>
+</div>
+<p>The GFC confirms this: VIX traded below 12 for most of 2006–07, the
+lowest sustained level since the index’s creation in 1993. The
+pre-crisis calm was not a failure of the VIX to measure risk; it was the
+VIX doing exactly what it should—measuring <em>current</em> volatility
+in a near-symmetric economy. The crisis sequence theorem says that
+current volatility is precisely the wrong object to monitor.</p>
+<h1 id="sec:smirl_curve">The Smirl Curve: Efficiency-Fragility
+Coupling</h1>
+<h2 id="the-identity">The Identity</h2>
+<p>The critical friction threshold <span
+class="math inline">\(T^*\)</span> and the CES output gain <span
+class="math inline">\(G\)</span> are both functions of <span
+class="math inline">\(\rho\)</span>: <span
+class="math display">\[\begin{aligned}
+T^*(\rho) &amp;= \frac{cJ}{(1-\rho)(J-1)}, \label{eq:tstar_rho} \\
+G(\rho) &amp;= J^{1/\rho - 1} \cdot c, \label{eq:gain_rho}
+\end{aligned}\]</span> where <span
+class="math inline">\(G(\rho)\)</span> is the symmetric CES aggregate
+normalized by the linear aggregate <span class="math inline">\(Jc/J =
+c\)</span>, measuring the <em>superadditivity gain</em> from
+complementary production.</p>
+<div id="thm:smirl" class="theorem">
+<p><strong>Theorem 6</strong> (The Smirl Curve). <em>The functions <span
+class="math inline">\(G(\rho)\)</span> and <span
+class="math inline">\(T^*(\rho)\)</span> move in opposite
+directions:</em></p>
+<ol>
+<li><p><em><span class="math inline">\(G&#39;(\rho) &lt; 0\)</span> for
+<span class="math inline">\(\rho &lt; 1\)</span>: higher complementarity
+(lower <span class="math inline">\(\rho\)</span>) increases
+output.</em></p></li>
+<li><p><em><span class="math inline">\(T^*&#39;(\rho) &gt; 0\)</span>
+for <span class="math inline">\(\rho &lt; 1\)</span>: higher
+complementarity (lower <span class="math inline">\(\rho\)</span>) lowers
+the friction threshold.</em></p></li>
+<li><p><em>No escape: there exists no pair <span
+class="math inline">\((\rho, T)\)</span> in the complementary regime
+(<span class="math inline">\(\rho &lt; 1\)</span>) that achieves both
+<span class="math inline">\(G &gt; G_0\)</span> and <span
+class="math inline">\(T^*&gt; T_0^*\)</span> for any constants <span
+class="math inline">\(G_0 &gt; c\)</span> and <span
+class="math inline">\(T_0^* &gt; cJ/(J-1)\)</span>.</em></p></li>
+</ol>
+<p><em>The efficiency-fragility coupling is an algebraic identity, not a
+contingent empirical relationship.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Part (i): <span class="math inline">\(G(\rho) =
+J^{1/\rho - 1}\)</span>, so <span class="math inline">\(\log G = (1/\rho
+- 1)\log J\)</span>. Thus <span class="math inline">\(d(\log G)/d\rho =
+-(\log J)/\rho^2 &lt; 0\)</span>.</p>
+<p>Part (ii): <span class="math inline">\(T^*=
+cJ/[(1-\rho)(J-1)]\)</span>, so <span class="math inline">\(dT^*/d\rho =
+cJ/[(1-\rho)^2(J-1)] &gt; 0\)</span> for <span
+class="math inline">\(\rho &lt; 1\)</span>.</p>
+<p>Part (iii): Since <span class="math inline">\(G\)</span> is strictly
+decreasing and <span class="math inline">\(T^*\)</span> is strictly
+increasing in <span class="math inline">\(\rho\)</span>, the locus <span
+class="math inline">\(\{(G(\rho), T^*(\rho)) : \rho &lt; 1\}\)</span> is
+a monotonically decreasing curve in the <span class="math inline">\((G,
+T^*)\)</span> plane. Any point above and to the right of this curve is
+infeasible. The formal proof is in
+<code>Paper2/EffectiveCurvature.lean</code>, theorem
+<code>efficiency_fragility_coupling</code>. ◻</p>
+</div>
+<figure id="fig:smirl">
+
+<figcaption>The Smirl Curve. Higher output gain (moving right) requires
+lower friction threshold (moving down). The shaded region above the
+curve is infeasible. Every economy sits on or below the curve. The
+U.S. economy in 2006 was close to its friction threshold—high gains, low
+margin.</figcaption>
+</figure>
+<h2 id="interpretation">Interpretation</h2>
+<p>The Smirl Curve says something precise and uncomfortable: the same
+structural feature that makes complementary production valuable—the
+curvature of CES isoquants—is the feature that makes the economy fragile
+to information friction. There is no way to separate the benefits of
+complementarity from its risks. An economy that achieves high
+superadditivity gains <em>necessarily</em> operates closer to its
+critical threshold.</p>
+<p>This is not the usual efficiency-stability tradeoff that policy might
+ameliorate. Regulation can affect the level of friction <span
+class="math inline">\(T\)</span>, but it cannot change the position of
+<span class="math inline">\(T^*(\rho)\)</span>, which is determined by
+the technology of production. The only way to increase <span
+class="math inline">\(T^*\)</span> is to reduce complementarity—that is,
+to accept lower output.</p>
+<div id="cor:calm_severity" class="corollary">
+<p><strong>Corollary 7</strong> (Why pre-crisis calm predicts severity).
+<em>Economies with high <span class="math inline">\(K\)</span> (strong
+complements) have both higher output and lower <span
+class="math inline">\(T^*\)</span>. They also have higher pre-crisis
+<span class="math inline">\(K_{\text{eff}}\)</span>, which produces
+lower pre-crisis volatility (the estimation paradox). Therefore: low VIX
+<span class="math inline">\(\Rightarrow\)</span> high <span
+class="math inline">\(K\)</span> <span
+class="math inline">\(\Rightarrow\)</span> low <span
+class="math inline">\(T^*\)</span> <span
+class="math inline">\(\Rightarrow\)</span> severe crisis when friction
+rises. Pre-crisis calm predicts crisis severity.</em></p>
+</div>
+<p>This resolves the “volatility paradox” noted by <span
+class="citation" data-cites="Brunnermeier2014"></span> and others: why
+do the worst crises follow the calmest periods? The answer is that calm
+and severity are both consequences of high complementarity—two faces of
+the Smirl Curve.</p>
+<h1 id="sec:minsky">The Minsky Trap: Endogenous Narrowing of the
+Stability Margin</h1>
+<h2 id="the-stability-margin">The Stability Margin</h2>
+<div id="def:margin" class="definition">
+<p><strong>Definition 8</strong> (Stability margin). The stability
+margin at time <span class="math inline">\(t\)</span> is: <span
+class="math display">\[\label{eq:margin}
+\Delta(t) = T^*(\rho(t)) - T(t).\]</span> The economy is in the
+complementary regime if and only if <span class="math inline">\(\Delta
+&gt; 0\)</span>.</p>
+</div>
+<p>The stability margin combines two moving parts: the friction
+threshold <span class="math inline">\(T^*\)</span>, which depends on the
+endogenous complementarity parameter <span
+class="math inline">\(\rho(t)\)</span>, and the information friction
+<span class="math inline">\(T(t)\)</span>, which depends on
+institutional quality, financial innovation, and macroeconomic
+conditions.</p>
+<h2 id="endogenous-complementarity-four-channels">Endogenous
+Complementarity: Four Channels</h2>
+<p>During economic expansions, four identified channels drive <span
+class="math inline">\(\rho\)</span> downward (increasing
+complementarity):</p>
+<div class="mdframed">
+<p><strong>Channel 1: Technology adoption.</strong> Firms adopt
+complementary technologies during booms—ERP systems, integrated supply
+chains, just-in-time inventory—that increase the interdependence of
+inputs. Each technology choice makes the production function more
+complementary (lowers <span class="math inline">\(\rho\)</span>).
+Timescale: <span class="math inline">\(\tau_1 \sim\)</span> 1–5
+years.</p>
+<p><strong>Channel 2: Supply chain integration.</strong> Expanding firms
+deepen supplier relationships, increasing specificity and reducing
+substitutability. The number of single-source components rises during
+booms as firms optimize for cost rather than resilience. Timescale:
+<span class="math inline">\(\tau_2 \sim\)</span> 2–7 years.</p>
+<p><strong>Channel 3: Financial innovation.</strong> New financial
+products—structured securities, complex derivatives, correlated
+lending—create tighter coupling between financial intermediaries.
+Financial complementarity rises during credit expansions. This is the
+Minsky channel proper. Timescale: <span class="math inline">\(\tau_3
+\sim\)</span> 3–10 years.</p>
+<p><strong>Channel 4: Entry/exit composition.</strong> During booms,
+high-complementarity firms (manufacturing, construction, integrated
+services) expand disproportionately. Low-complementarity firms
+(commodities, simple services) lose relative share. The composition
+effect lowers the economy-wide <span class="math inline">\(\rho\)</span>
+even if each firm’s <span class="math inline">\(\rho\)</span> is
+unchanged. Timescale: <span class="math inline">\(\tau_4 \sim\)</span>
+5–15 years.</p>
+</div>
+<div id="prop:endo_rho" class="proposition">
+<p><strong>Proposition 9</strong> (Endogenous <span
+class="math inline">\(\rho\)</span> dynamics). <em>Let <span
+class="math inline">\(\rho(t)\)</span> evolve according to the
+four-channel model: <span class="math display">\[\label{eq:rho_dot}
+\dot{\rho}(t) = -\sum_{i=1}^{4} \frac{\gamma_i}{\tau_i} \cdot g_i(Y(t),
+K_{\text{eff}}(t)),\]</span> where <span class="math inline">\(\gamma_i
+&gt; 0\)</span> are channel weights, <span
+class="math inline">\(\tau_i\)</span> are adjustment timescales, and
+<span class="math inline">\(g_i &gt; 0\)</span> during expansions (<span
+class="math inline">\(Y &gt; \bar{Y}\)</span>, <span
+class="math inline">\(K_{\text{eff}}&gt; 0\)</span>). Each channel
+function <span class="math inline">\(g_i\)</span> depends on output
+<span class="math inline">\(Y\)</span> or effective curvature <span
+class="math inline">\(K_{\text{eff}}\)</span> through economic
+mechanisms:</em></p>
+<ul>
+<li><p><em><span class="math inline">\(g_1 = (Y/\bar{Y} - 1)^+\)</span>:
+technology adoption accelerates when output exceeds trend.</em></p></li>
+<li><p><em><span class="math inline">\(g_2 = K_{\text{eff}}/
+K_0\)</span>: supply chain integration deepens when curvature is
+high.</em></p></li>
+<li><p><em><span class="math inline">\(g_3 = (\dot{C}/C)^+\)</span>:
+financial innovation scales with credit growth.</em></p></li>
+<li><p><em><span class="math inline">\(g_4 = (Y/\bar{Y} - 1)^+ \cdot
+(1-\rho)\)</span>: composition effect is amplified by existing
+complementarity.</em></p></li>
+</ul>
+<p><em>The formal statement and proof of well-posedness are in
+<code>Paper3/EndogenousRho.lean</code>.</em></p>
+</div>
+<h2 id="the-minsky-trap-theorem">The Minsky Trap Theorem</h2>
+<div id="thm:minsky" class="theorem">
+<p><strong>Theorem 10</strong> (Minsky Trap). <em>Under endogenous <span
+class="math inline">\(\rho\)</span> dynamics with stable friction (<span
+class="math inline">\(\dot{T} = 0\)</span> or <span
+class="math inline">\(\dot{T}\)</span> small):</em></p>
+<ol>
+<li><p><em><strong>Narrowing stability margin.</strong> During booms,
+<span class="math inline">\(\dot{\rho} &lt; 0\)</span> (complementarity
+increases), which implies <span class="math inline">\(\dot{T^*} &lt;
+0\)</span> (threshold falls). Therefore: <span
+class="math display">\[\label{eq:minsky}
+\frac{d\Delta}{dt}\bigg|_{\dot{T}=0} = \frac{dT^*}{d\rho} \cdot
+\dot{\rho} &lt; 0.\]</span> The stability margin narrows during every
+boom, even if friction is constant.</em></p></li>
+<li><p><em><strong>Inevitability.</strong> If the boom persists long
+enough and <span class="math inline">\(\dot{\rho}\)</span> is bounded
+below by some <span class="math inline">\(-\bar{\gamma} &lt; 0\)</span>,
+then <span class="math inline">\(T^*(t)\)</span> crosses <span
+class="math inline">\(T\)</span> in finite time: <span
+class="math display">\[t_{\text{crisis}} \leq
+\frac{\Delta(0)}{\bar{\gamma} \cdot
+|dT^*/d\rho|}.\]</span></em></p></li>
+<li><p><em><strong>Speed asymmetry.</strong> The compression rate during
+booms is governed by the slow channels (<span
+class="math inline">\(\tau_i \sim\)</span> years). The collapse rate at
+the critical threshold is governed by the eigenvalue gap of the Hessian,
+which diverges as <span class="math inline">\(T \to T^*\)</span>. The
+empirical speed ratio is: <span
+class="math display">\[\label{eq:asymmetry}
+\frac{\tau_{\text{compression}}}{\tau_{\text{collapse}}} \approx
+8.5.\]</span></em></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> Part (i): <span
+class="math inline">\(dT^*/d\rho = cJ/[(1-\rho)^2(J-1)] &gt; 0\)</span>
+and <span class="math inline">\(\dot{\rho} &lt; 0\)</span> during booms,
+so <span class="math inline">\(d\Delta/dt|_{\dot{T}=0} =
+(dT^*/d\rho)\dot{\rho} &lt; 0\)</span>.</p>
+<p>Part (ii): Since <span class="math inline">\(T^*\)</span> is a
+monotonic function of <span class="math inline">\(\rho\)</span> and
+<span class="math inline">\(\rho\)</span> decreases at rate bounded
+below, <span class="math inline">\(T^*\)</span> decreases at a bounded
+rate, so it reaches <span class="math inline">\(T\)</span> in bounded
+time.</p>
+<p>Part (iii): The relaxation eigenvalue of the Hessian at symmetric
+equilibrium is <span class="math inline">\(\lambda_\perp(T) \propto (1 -
+T/T^*)\)</span>, which vanishes as <span class="math inline">\(T \to
+T^*\)</span>. The relaxation time <span
+class="math inline">\(\tau_{\text{relax}} = 1/\lambda_\perp \to
+\infty\)</span> as <span class="math inline">\(T \to T^*\)</span>
+(pre-crisis deceleration). But the <em>collapse</em> occurs via the
+Kramers escape mechanism: once <span class="math inline">\(T\)</span>
+crosses <span class="math inline">\(T^*\)</span>, the previously stable
+basin becomes a saddle, and the descent time scales as the inverse of
+the (now negative) eigenvalue, which is <span
+class="math inline">\(O(\epsilon)\)</span> where <span
+class="math inline">\(\epsilon = (T - T^*)/T^*\)</span>. The speed ratio
+<span
+class="math inline">\(\tau_{\text{compression}}/\tau_{\text{collapse}}\)</span>
+is calibrated at 8.5:1 from U.S. business cycle data (NBER expansion
+duration / contraction duration <span
+class="math inline">\(\approx\)</span> 58 months / 6.8 months <span
+class="math inline">\(= 8.5\)</span>). The formal statement is in
+<code>Paper3/BusinessCycles.lean</code>, theorem
+<code>minsky_margin_narrowing</code>. ◻</p>
+</div>
+<div class="remark">
+<p><em>Remark 11</em> (Minsky without metaphor). Minsky’s (1986)
+“stability breeds instability” becomes a theorem: stability (high <span
+class="math inline">\(K_{\text{eff}}\)</span>) incentivizes
+complementarity (<span class="math inline">\(\dot{\rho} &lt;
+0\)</span>), which lowers <span class="math inline">\(T^*\)</span>
+(breeds instability). The “Minsky moment” is the crossing <span
+class="math inline">\(T = T^*(\rho(t))\)</span>, occurring at a
+determinate time given initial conditions. The four channels identify
+the economic mechanisms that Minsky described verbally: speculative
+finance (Channel 3), position-making (Channels 1–2), and the weight of
+the past (Channel 4).</p>
+</div>
+<h2 id="empirical-evidence-the-minsky-rho-shift">Empirical Evidence: The
+Minsky <span class="math inline">\(\rho\)</span>-Shift</h2>
+<p>If complementarity increases during booms and decreases during busts,
+estimated <span class="math inline">\(\rho\)</span> should be
+countercyclical.</p>
+<div id="tab:minsky">
+<table>
+<caption>Minsky <span class="math inline">\(\rho\)</span>-Shift:
+Estimated Complementarity over the Business Cycle</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Measure</strong></th>
+<th style="text-align: center;"><strong>Window</strong></th>
+<th style="text-align: center;"><strong>Correlation with output
+gap</strong></th>
+<th style="text-align: center;"><strong><span
+class="math inline">\(p\)</span>-value</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Rolling <span
+class="math inline">\(\hat{\rho}\)</span> (PPI sectors)</td>
+<td style="text-align: center;">12-month</td>
+<td style="text-align: center;"><span class="math inline">\(r =
+-0.886\)</span></td>
+<td style="text-align: center;">0.009</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rolling <span
+class="math inline">\(\hat{\rho}\)</span> (PPI sectors)</td>
+<td style="text-align: center;">24-month</td>
+<td style="text-align: center;"><span class="math inline">\(r =
+-0.714\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(&lt;
+0.05\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Countercyclical <span
+class="math inline">\(\rho\)</span> (Kendall <span
+class="math inline">\(\tau\)</span>)</td>
+<td style="text-align: center;">Full sample</td>
+<td style="text-align: center;"><span class="math inline">\(\tau =
+-0.168\)</span> to <span class="math inline">\(-0.313\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(&lt;
+0.05\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The 12-month rolling estimates show strong countercyclical behavior:
+<span class="math inline">\(\hat{\rho}\)</span> falls (complementarity
+rises) during expansions and rises (complementarity falls) during
+contractions, with <span class="math inline">\(r = -0.886\)</span>
+(<span class="math inline">\(p = 0.009\)</span>, <span
+class="math inline">\(N = 6\)</span> complete cycles). The speed
+asymmetry is 8.5:1, matching the NBER expansion/contraction duration
+ratio.</p>
+<h1 id="sec:rho_ordering"><span
+class="math inline">\(\rho\)</span>-Ordering: Which Sectors Collapse
+First</h1>
+<div id="thm:rho_ordering" class="theorem">
+<p><strong>Theorem 12</strong> (<span
+class="math inline">\(\rho\)</span>-Ordering). <em>In a multi-sector
+economy where each sector <span class="math inline">\(n\)</span> has CES
+parameter <span class="math inline">\(\rho_n\)</span>, the sectors with
+the lowest <span class="math inline">\(\rho_n\)</span> (highest
+complementarity) reach their critical thresholds first during an
+aggregate friction increase. Equivalently, defining the sector-specific
+stability margin <span class="math inline">\(\Delta_n = T_n^* -
+T\)</span>: <span class="math display">\[\rho_n &lt; \rho_m \implies
+\Delta_n &lt; \Delta_m.\]</span> Complementary sectors fail first and,
+by the same logic applied in reverse, recover last.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> Since <span class="math inline">\(T_n^* = c_n
+J_n / [(1-\rho_n)(J_n - 1)]\)</span> is increasing in <span
+class="math inline">\(\rho_n\)</span> (for fixed <span
+class="math inline">\(c_n, J_n\)</span>), lower <span
+class="math inline">\(\rho_n\)</span> implies lower <span
+class="math inline">\(T_n^*\)</span> implies smaller <span
+class="math inline">\(\Delta_n\)</span>. During recovery, frictions
+decrease but complementarity channels operate asymmetrically: high-<span
+class="math inline">\(\rho\)</span> sectors (with larger <span
+class="math inline">\(\Delta\)</span>) re-enter the complementary regime
+first. The formal proof is in <code>Paper3/BusinessCycles.lean</code>,
+theorem <code>rho_ordering</code>. ◻</p>
+</div>
+<p><strong>Empirical test.</strong> Using NAICS 2-digit industrial
+production indices and sector-level CES estimates from the OECD STAN
+database:</p>
+<div id="tab:ordering">
+<table>
+<caption><span class="math inline">\(\rho\)</span>-Ordering Regression:
+Recession Entry Timing on Estimated <span
+class="math inline">\(\hat{\rho}\)</span></caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Variable</strong></th>
+<th style="text-align: center;"><strong>Coefficient</strong></th>
+<th style="text-align: center;"><strong>Std. Error</strong></th>
+<th style="text-align: center;"><strong><span
+class="math inline">\(p\)</span>-value</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(\hat{\rho}_n\)</span> (sector CES estimate)</td>
+<td style="text-align: center;"><span
+class="math inline">\(-14.65\)</span></td>
+<td style="text-align: center;">4.02</td>
+<td style="text-align: center;">0.001</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Constant</td>
+<td style="text-align: center;">2.31</td>
+<td style="text-align: center;">0.89</td>
+<td style="text-align: center;">0.015</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(N\)</span></td>
+<td style="text-align: center;">42</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span
+class="math inline">\(R^2\)</span></td>
+<td style="text-align: center;">0.25</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The coefficient <span class="math inline">\(\beta_1 = -14.65\)</span>
+(<span class="math inline">\(p = 0.001\)</span>) confirms that sectors
+with lower <span class="math inline">\(\hat{\rho}\)</span> (more
+complementary) enter recession earlier. A one-unit decrease in <span
+class="math inline">\(\rho\)</span> is associated with a 14.65-month
+earlier recession entry. The most complementary sectors (construction,
+durable manufacturing) entered the GFC recession 6–9 months before the
+least complementary (utilities, nondurable consumer goods).</p>
+<div id="prop:amplitude" class="proposition">
+<p><strong>Proposition 13</strong> (Cycle amplitude ordering).
+<em>Sectors with lower <span class="math inline">\(\sigma\)</span>
+(elasticity of substitution, <span class="math inline">\(\sigma =
+1/(1-\rho)\)</span>) exhibit larger cyclical amplitude: <span
+class="math display">\[\operatorname{Corr}(\text{amplitude}_n, \sigma_n)
+= -0.65, \quad p = 0.016.\]</span> This follows from the Smirl Curve:
+low-<span class="math inline">\(\sigma\)</span> sectors have higher
+<span class="math inline">\(K\)</span> and therefore both higher gains
+and larger losses when <span
+class="math inline">\(K_{\text{eff}}\)</span> fluctuates.</em></p>
+</div>
+<h1 id="sec:early_warning">Early Warning: The Stability Margin as
+Leading Indicator</h1>
+<h2 id="variance-response-identity">Variance-Response Identity</h2>
+<p>The Variance-Response Identity (VRI) connects cross-sectional
+variance to the CES potential landscape: <span
+class="math display">\[\label{eq:vri}
+\Sigma = T \cdot (\nabla^2 \Phi)^{-1},\]</span> where <span
+class="math inline">\(\Sigma\)</span> is the covariance matrix of
+sectoral allocations and <span class="math inline">\(\nabla^2
+\Phi\)</span> is the Hessian of the CES potential. At the symmetric
+point, this simplifies to: <span
+class="math display">\[\operatorname{Var}[x_j] =
+\frac{T}{\lambda_\perp(T)} = \frac{T \cdot T^*}{\lambda_\perp^{(0)}
+\cdot (T^*- T)},\]</span> where <span
+class="math inline">\(\lambda_\perp^{(0)}\)</span> is the zero-friction
+eigenvalue.</p>
+<div id="prop:early_warning" class="proposition">
+<p><strong>Proposition 14</strong> (Pre-crisis deceleration and
+divergence). <em>As <span class="math inline">\(T \to T^*\)</span> from
+below:</em></p>
+<ol>
+<li><p><em>The AR(1) coefficient <span class="math inline">\(\phi \to
+1\)</span> at rate <span class="math inline">\((1 -
+T/T^*)^{-1}\)</span>.</em></p></li>
+<li><p><em>Cross-sectional variance <span class="math inline">\(\to
+\infty\)</span> at rate <span class="math inline">\((1 -
+T/T^*)^{-1}\)</span>.</em></p></li>
+<li><p><em>Both signals appear simultaneously, with identical divergence
+rates.</em></p></li>
+</ol>
+<p><em>The divergence rate is <span class="math inline">\((1 -
+T/T^*)^{-1} = (T^*/\Delta)\)</span>, so both signals strengthen as the
+stability margin narrows.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> The eigenvalue <span
+class="math inline">\(\lambda_\perp(T) = \lambda_\perp^{(0)}(1 -
+T/T^*)\)</span> vanishes at <span class="math inline">\(T^*\)</span>, so
+<span class="math inline">\(1/\lambda_\perp \propto 1/\Delta\)</span>.
+The AR(1) coefficient of the Ornstein–Uhlenbeck approximation is <span
+class="math inline">\(\phi = e^{-\lambda_\perp \cdot \delta t} \approx 1
+- \lambda_\perp \cdot \delta t \to 1\)</span>. The stationary variance
+is <span class="math inline">\(\sigma^2/(2\lambda_\perp) \to
+\infty\)</span>. The formal proof is in
+<code>Paper3/FluctuationResponse.lean</code>, theorem
+<code>early_warning_divergence</code>. ◻</p>
+</div>
+<h2 id="the-stability-margin-indicator">The Stability Margin
+Indicator</h2>
+<p>We construct the empirical stability margin <span
+class="math inline">\(\hat{\Delta}\)</span> as follows:</p>
+<ol>
+<li><p>Estimate rolling <span class="math inline">\(\hat{\rho}\)</span>
+from sectoral production data using the escort probability matching
+method.</p></li>
+<li><p>Compute <span
+class="math inline">\(\hat{T}^*(\hat{\rho})\)</span> using equation (<a
+href="#eq:tstar" data-reference-type="ref"
+data-reference="eq:tstar">[eq:tstar]</a>).</p></li>
+<li><p>Estimate current friction <span
+class="math inline">\(\hat{T}\)</span> from the VRI: <span
+class="math inline">\(\hat{T} = \hat{\Sigma} \cdot
+\hat{\lambda}_\perp\)</span>, where <span
+class="math inline">\(\hat{\Sigma}\)</span> is the cross-sectional
+variance and <span class="math inline">\(\hat{\lambda}_\perp\)</span> is
+the Hessian eigenvalue at <span
+class="math inline">\(\hat{\rho}\)</span>.</p></li>
+<li><p>The stability margin is <span class="math inline">\(\hat{\Delta}
+= \hat{T}^* - \hat{T}\)</span>.</p></li>
+</ol>
+<div id="tab:auc">
+<table>
+<caption>Recession Forecasting: Area Under ROC Curve at Various
+Horizons</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th colspan="5" style="text-align: center;"><strong>Forecast horizon
+(quarters)</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span>2-6</span>
+<strong>Indicator</strong></td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Stability margin <span
+class="math inline">\(\hat{\Delta}\)</span></td>
+<td style="text-align: center;">0.71</td>
+<td style="text-align: center;">0.74</td>
+<td style="text-align: center;">0.76</td>
+<td style="text-align: center;">0.78</td>
+<td style="text-align: center;">0.72</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VIX</td>
+<td style="text-align: center;">0.73</td>
+<td style="text-align: center;">0.70</td>
+<td style="text-align: center;">0.68</td>
+<td style="text-align: center;">0.66</td>
+<td style="text-align: center;">0.60</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Term spread</td>
+<td style="text-align: center;">0.68</td>
+<td style="text-align: center;">0.72</td>
+<td style="text-align: center;">0.75</td>
+<td style="text-align: center;">0.74</td>
+<td style="text-align: center;">0.69</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">BAA spread</td>
+<td style="text-align: center;">0.70</td>
+<td style="text-align: center;">0.71</td>
+<td style="text-align: center;">0.69</td>
+<td style="text-align: center;">0.67</td>
+<td style="text-align: center;">0.63</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The stability margin <span
+class="math inline">\(\hat{\Delta}\)</span> dominates all standard
+indicators at the 8-quarter (2-year) horizon (AUC <span
+class="math inline">\(= 0.78\)</span> vs. 0.66 for VIX). Importantly,
+the advantage of <span class="math inline">\(\hat{\Delta}\)</span>
+<em>increases</em> with the forecast horizon, while VIX deteriorates.
+This is exactly what the crisis sequence theorem predicts: correlations
+(which <span class="math inline">\(\hat{\Delta}\)</span> incorporates
+via the VRI) signal distress years before volatility (which VIX
+measures).</p>
+<p>In a probit regression forecasting NBER recession onset at the
+8-quarter horizon: <span
+class="math display">\[\Pr(\text{recession}_{t+8} = 1) = \Phi(\beta_0 +
+\beta_1 \hat{\Delta}_t + \beta_2 \text{VIX}_t + \beta_3
+\text{TermSpread}_t),\]</span> the coefficient on <span
+class="math inline">\(\hat{\Delta}\)</span> is significant at <span
+class="math inline">\(p = 0.0003\)</span> beyond the term spread and
+VIX, confirming that the stability margin contains independent
+recession-forecasting information.</p>
+<h2 id="cpi-dispersion-as-early-warning">CPI Dispersion as Early
+Warning</h2>
+<p>A direct corollary of the VRI and the crisis sequence is that price
+dispersion—the cross-sectional standard deviation of CPI component
+inflation rates—should lead aggregate inflation.</p>
+<div id="prop:cpi" class="proposition">
+<p><strong>Proposition 15</strong> (CPI dispersion leads inflation).
+<em>Under the two-world economy framework, where prices adjust faster
+than quantities:</em></p>
+<ol>
+<li><p><em>Price dispersion rises when <span
+class="math inline">\(K_{\text{eff}}\)</span> falls (friction
+increases).</em></p></li>
+<li><p><em>Aggregate price changes follow with a lag determined by the
+timescale gap.</em></p></li>
+<li><p><em>CPI component dispersion should therefore lead aggregate CPI
+at turning points.</em></p></li>
+</ol>
+</div>
+<p><strong>Empirical result.</strong> Using BLS CPI components
+(expenditure categories), the cross-sectional standard deviation of
+monthly inflation rates leads aggregate CPI inflation at 18 of 18
+identified turning points (100%), with a median lead of 12 months and a
+range of 6–24 months.</p>
+<h2 id="correlation-convergence">Correlation Convergence</h2>
+<div id="prop:convergence" class="proposition">
+<p><strong>Proposition 16</strong> (Correlation convergence under
+stress). <em>As <span class="math inline">\(K_{\text{eff}}\to
+0\)</span>:</em></p>
+<ol>
+<li><p><em>Asset return correlations converge toward 1 (prices become
+uniform).</em></p></li>
+<li><p><em>Output quantity correlations converge toward <span
+class="math inline">\(-1/(J-1)\)</span> (quantities become
+anti-correlated).</em></p></li>
+<li><p><em>The convergence rate is linear (<span
+class="math inline">\(\beta = 1\)</span>) in the stress
+parameter.</em></p></li>
+</ol>
+<p><em>This is the “crisis dual”: prices converge while quantities
+diverge.</em></p>
+</div>
+<p><strong>Empirical results.</strong> Using S&amp;P 500 GICS sector
+indices (11 sectors, 1999–2025):</p>
+<ul>
+<li><p>Mean pairwise correlation: <span
+class="math inline">\(\bar{r}_{\text{recession}} = 0.62\)</span>
+vs. <span class="math inline">\(\bar{r}_{\text{expansion}} =
+0.23\)</span> (<span class="math inline">\(p &lt;
+10^{-4}\)</span>).</p></li>
+<li><p>Correlation with NFCI stress index: <span
+class="math inline">\(r_{\text{corr}} = -0.254\)</span> (<span
+class="math inline">\(p &lt; 10^{-4}\)</span>)—rising stress reduces
+<span class="math inline">\(K_{\text{eff}}\)</span>, which reduces the
+denominator in the compound symmetry formula, increasing
+correlations.</p></li>
+<li><p>Linearity test: linear model <span
+class="math inline">\(\text{AIC} = -2481\)</span>; exponential model
+<span class="math inline">\(\text{AIC} = -2425\)</span>; <span
+class="math inline">\(\Delta\text{AIC} = 56\)</span> in favor of linear
+(<span class="math inline">\(\beta = 1\)</span>), confirming the
+theoretical prediction.</p></li>
+<li><p>Sectoral comovement gradient: <span class="math inline">\(R^2 =
+0.51\)</span>, <span class="math inline">\(p = 0.047\)</span>—more
+complementary sectors (lower <span
+class="math inline">\(\hat{\rho}\)</span>) show larger correlation
+increases during stress.</p></li>
+</ul>
+<h1 id="sec:temporal">Temporal Ordering Rules</h1>
+<p>The two-world economy framework—prices adjust on fast timescales,
+quantities on slow timescales—combined with the crisis sequence theorem
+generates six temporal ordering rules.</p>
+<h2 id="the-two-world-economy">The Two-World Economy</h2>
+<div id="def:twoworld" class="definition">
+<p><strong>Definition 17</strong> (Two-world economy). In a multi-sector
+economy with CES structure, define:</p>
+<ul>
+<li><p><strong>Price world</strong>: allocations governed by the dual
+CES potential (cost function), with adjustment timescale <span
+class="math inline">\(\tau_P\)</span>.</p></li>
+<li><p><strong>Quantity world</strong>: allocations governed by the
+primal CES potential (production function), with adjustment timescale
+<span class="math inline">\(\tau_Q \gg \tau_P\)</span>.</p></li>
+</ul>
+<p>The timescale gap <span class="math inline">\(\tau_Q / \tau_P \gg
+1\)</span> reflects the fact that prices clear continuously while
+physical production adjusts with inertia.</p>
+</div>
+<h2 id="six-ordering-rules">Six Ordering Rules</h2>
+<div id="thm:temporal" class="theorem">
+<p><strong>Theorem 18</strong> (Temporal ordering rules). <em>The CES
+two-world framework implies six temporal ordering rules:</em></p>
+<ol>
+<li><p><em><strong>Price leads quantity.</strong> Price-world indicators
+lead quantity-world indicators by the timescale gap <span
+class="math inline">\(\tau_Q - \tau_P\)</span>.</em></p></li>
+<li><p><em><strong>Correlation leads volatility.</strong>
+Cross-sectional correlation (<span class="math inline">\(K^2\)</span>
+channel) leads realized volatility (<span
+class="math inline">\(K\)</span> channel) by the elasticity
+gap.</em></p></li>
+<li><p><em><strong>Flow leads stock.</strong> Flow variables (new
+orders, building permits) lead stock variables (inventories, employment)
+by the stock adjustment lag.</em></p></li>
+<li><p><em><strong>Administered prices lag market prices.</strong>
+Prices set by administrative process (wages, regulated prices) adjust
+slower than market-determined prices (commodity prices, financial asset
+prices).</em></p></li>
+<li><p><em><strong>Financial leads real.</strong> Financial prices
+(asset prices, credit spreads) lead real variables (output, employment)
+because financial markets clear faster than goods and labor
+markets.</em></p></li>
+<li><p><em><strong>Diffusion leads amplitude.</strong> The number of
+sectors affected (diffusion) leads the magnitude of the aggregate change
+(amplitude) because the crisis sequence crosses sectors
+sequentially.</em></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> Rules (R1), (R4), and (R5) follow from the
+timescale separation <span class="math inline">\(\tau_P \ll
+\tau_Q\)</span>, which gives prices a head start. Rule (R2) follows from
+the crisis sequence theorem (Theorem <a href="#thm:crisis_sequence"
+data-reference-type="ref" data-reference="thm:crisis_sequence">3</a>):
+the <span class="math inline">\(K^2\)</span> channel degrades before the
+<span class="math inline">\(K\)</span> channel, and correlation is a
+<span class="math inline">\(K^2\)</span> observable while volatility is
+a <span class="math inline">\(K\)</span> observable. Rule (R3) follows
+from the stock-flow identity: stocks integrate flows, so turning points
+in flows precede turning points in stocks. Rule (R6) follows from <span
+class="math inline">\(\rho\)</span>-ordering (Theorem <a
+href="#thm:rho_ordering" data-reference-type="ref"
+data-reference="thm:rho_ordering">12</a>): sectors cross their
+thresholds sequentially, so the count of affected sectors (diffusion)
+rises before the aggregate effect (amplitude) peaks. The formal proofs
+are in <code>Paper3/TemporalOrdering.lean</code>. ◻</p>
+</div>
+<h2 id="deriving-the-conference-board-indicators">Deriving the
+Conference Board Indicators</h2>
+<p>The Conference Board’s classification of economic indicators into
+Leading (LEI), Coincident (CEI), and Lagging (LAG) is not ad hoc. It
+follows from four of the six temporal ordering rules:</p>
+<div id="tab:cb">
+<table>
+<caption>Conference Board Indicators Derived from Ordering
+Rules</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Indicator</strong></th>
+<th style="text-align: left;"><strong>CB class</strong></th>
+<th style="text-align: left;"><strong>Rule(s)</strong></th>
+<th style="text-align: left;"><strong>Derivation</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td colspan="4" style="text-align: left;"><em>Leading Economic
+Indicators (LEI)</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Stock prices (S&amp;P 500)</td>
+<td style="text-align: left;">LEI</td>
+<td style="text-align: left;">R1, R5</td>
+<td style="text-align: left;">Financial price</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Building permits</td>
+<td style="text-align: left;">LEI</td>
+<td style="text-align: left;">R3</td>
+<td style="text-align: left;">Flow variable</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">New orders (mfg)</td>
+<td style="text-align: left;">LEI</td>
+<td style="text-align: left;">R3</td>
+<td style="text-align: left;">Flow variable</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Initial claims (inverted)</td>
+<td style="text-align: left;">LEI</td>
+<td style="text-align: left;">R3, R6</td>
+<td style="text-align: left;">Flow, diffusion</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yield curve spread</td>
+<td style="text-align: left;">LEI</td>
+<td style="text-align: left;">R5</td>
+<td style="text-align: left;">Financial price</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Credit index</td>
+<td style="text-align: left;">LEI</td>
+<td style="text-align: left;">R2, R5</td>
+<td style="text-align: left;">Correlation, financial</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ISM new orders</td>
+<td style="text-align: left;">LEI</td>
+<td style="text-align: left;">R3</td>
+<td style="text-align: left;">Flow variable</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Consumer expectations</td>
+<td style="text-align: left;">LEI</td>
+<td style="text-align: left;">R1</td>
+<td style="text-align: left;">Price-world (expectations)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Avg weekly hours (mfg)</td>
+<td style="text-align: left;">LEI</td>
+<td style="text-align: left;">R3</td>
+<td style="text-align: left;">Flow (hours before bodies)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Leading credit index</td>
+<td style="text-align: left;">LEI</td>
+<td style="text-align: left;">R2, R5</td>
+<td style="text-align: left;">Correlation, financial</td>
+</tr>
+<tr class="even">
+<td colspan="4" style="text-align: left;"><em>Coincident Economic
+Indicators (CEI)</em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Nonfarm payrolls</td>
+<td style="text-align: left;">CEI</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">Quantity-world stock</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Personal income</td>
+<td style="text-align: left;">CEI</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">Quantity-world flow</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Industrial production</td>
+<td style="text-align: left;">CEI</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">Quantity-world flow</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mfg &amp; trade sales</td>
+<td style="text-align: left;">CEI</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">Quantity-world flow</td>
+</tr>
+<tr class="odd">
+<td colspan="4" style="text-align: left;"><em>Lagging Economic
+Indicators (LAG)</em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Avg duration unemployment</td>
+<td style="text-align: left;">LAG</td>
+<td style="text-align: left;">R4</td>
+<td style="text-align: left;">Administered (sticky)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Inventory/sales ratio</td>
+<td style="text-align: left;">LAG</td>
+<td style="text-align: left;">R3</td>
+<td style="text-align: left;">Stock variable</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Unit labor costs</td>
+<td style="text-align: left;">LAG</td>
+<td style="text-align: left;">R4</td>
+<td style="text-align: left;">Administered price</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Bank prime rate</td>
+<td style="text-align: left;">LAG</td>
+<td style="text-align: left;">R4</td>
+<td style="text-align: left;">Administered price</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Commercial loans</td>
+<td style="text-align: left;">LAG</td>
+<td style="text-align: left;">R3</td>
+<td style="text-align: left;">Stock variable</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CPI services</td>
+<td style="text-align: left;">LAG</td>
+<td style="text-align: left;">R4</td>
+<td style="text-align: left;">Administered price</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Consumer debt/income</td>
+<td style="text-align: left;">LAG</td>
+<td style="text-align: left;">R3</td>
+<td style="text-align: left;">Stock variable</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Every LEI indicator is classified as leading by at least one of
+Rules (R1)–(R6). Every LAG indicator is classified as lagging by
+Rule (R3) (stock variable) or Rule (R4) (administered price). The CEI
+indicators are quantity-world variables with neither a lead (no
+financial/flow advantage) nor a lag (not administered or
+stock-based).</p>
+<div class="remark">
+<p><em>Remark 19</em>. The Conference Board selected these indicators
+empirically over decades of experimentation. The fact that four ordering
+rules—derivable from CES structure and timescale separation—reproduce
+the classification is a nontrivial consistency check. The framework does
+not merely rationalize the existing classification; it predicts
+<em>why</em> certain indicators that were tried and rejected (e.g.,
+money supply M2) failed: M2 is an administered-price hybrid that mixes
+Rules (R4) and (R5), diluting its lead.</p>
+</div>
+<h1 id="sec:duration">Crisis Duration Formula</h1>
+<h2 id="the-duration-theorem">The Duration Theorem</h2>
+<p>Once the economy crosses <span class="math inline">\(T^*\)</span>,
+how long does the crisis last? The answer depends on the mechanism that
+resolves the friction—typically, a learning curve that reduces costs and
+thereby reduces friction.</p>
+<div id="thm:duration" class="theorem">
+<p><strong>Theorem 20</strong> (Crisis duration). <em>In a sector with
+learning-curve exponent <span class="math inline">\(\alpha\)</span>
+(cost declines as cumulative output<span
+class="math inline">\(^{-\alpha}\)</span>) and friction drift rate <span
+class="math inline">\(\epsilon\)</span>: <span
+class="math display">\[\label{eq:duration}
+\tau_{\text{crisis}} = \frac{\Delta\Phi}{\epsilon} +
+\frac{\pi}{\sqrt{\epsilon \cdot \dot{T}}},\]</span> where <span
+class="math inline">\(\Delta\Phi\)</span> is the potential barrier and
+<span class="math inline">\(\dot{T}\)</span> is the rate of friction
+decline. For sectors with geometric dimension <span
+class="math inline">\(d\)</span> and fundamental learning rate <span
+class="math inline">\(\alpha_0 \approx 0.12\)</span>:</em></p>
+<ol>
+<li><p><em>Semiconductors (<span class="math inline">\(d = 2\)</span>,
+<span class="math inline">\(\alpha = d\alpha_0 \approx 0.23\)</span>):
+<span class="math inline">\(\tau \approx 8\)</span> years.</em></p></li>
+<li><p><em>Generic industries (<span class="math inline">\(d =
+1\)</span>, <span class="math inline">\(\alpha \approx 0.12\)</span>):
+<span class="math inline">\(\tau \approx 11\)</span>
+years.</em></p></li>
+<li><p><em>Energy (<span class="math inline">\(d \in (1, 2)\)</span>,
+<span class="math inline">\(\alpha \approx 0.17\)</span>): <span
+class="math inline">\(\tau \approx 9\)</span>–<span
+class="math inline">\(10\)</span> years.</em></p></li>
+</ol>
+<p><em>Duration scales as <span
+class="math inline">\(O(1/\sqrt{\epsilon})\)</span>, where <span
+class="math inline">\(\epsilon\)</span> is the drift rate.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> The dynamics near <span
+class="math inline">\(T^*\)</span> are governed by a delayed-transition
+bifurcation: the friction parameter <span
+class="math inline">\(T(t)\)</span> drifts slowly through <span
+class="math inline">\(T^*\)</span> at rate <span
+class="math inline">\(\epsilon\)</span>, and the system lingers near the
+defunct equilibrium for a time <span
+class="math inline">\(\pi/\sqrt{\epsilon \cdot \dot{T}}\)</span> before
+rapidly transitioning to the new equilibrium. This is the Neishtadt
+(1987) delayed-loss-of-stability result adapted to the CES setting. The
+learning-curve exponent <span class="math inline">\(\alpha = d \cdot
+\alpha_0\)</span> determines <span
+class="math inline">\(\dot{T}\)</span> because faster learning reduces
+friction faster: <span class="math inline">\(\dot{T} \propto -\alpha
+\cdot Q(t)^{-\alpha - 1} \cdot \dot{Q}\)</span>. The formal statement is
+in <code>Paper4/TransitionDynamics.lean</code> (axiom
+<code>transition_duration_scaling</code>; this is a classical GSPT
+result not yet in Mathlib). ◻</p>
+</div>
+<h2 id="calibration-technology-waves">Calibration: Technology Waves</h2>
+<div id="tab:duration">
+<table>
+<caption>Crisis Duration Calibration by Technology Wave</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Wave</strong></th>
+<th style="text-align: center;"><strong>Dimension <span
+class="math inline">\(d\)</span></strong></th>
+<th style="text-align: center;"><strong><span
+class="math inline">\(\alpha = d\alpha_0\)</span></strong></th>
+<th style="text-align: center;"><strong>Predicted <span
+class="math inline">\(\tau\)</span></strong></th>
+<th style="text-align: center;"><strong>Observed <span
+class="math inline">\(\tau\)</span></strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Semiconductor (1970s)</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0.23</td>
+<td style="text-align: center;"><span
+class="math inline">\(\sim\)</span>8 yr</td>
+<td style="text-align: center;">7–9 yr</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PC revolution (1980s)</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0.23</td>
+<td style="text-align: center;"><span
+class="math inline">\(\sim\)</span>8 yr</td>
+<td style="text-align: center;">8 yr</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Internet (2000s)</td>
+<td style="text-align: center;">1.5</td>
+<td style="text-align: center;">0.18</td>
+<td style="text-align: center;"><span
+class="math inline">\(\sim\)</span>9 yr</td>
+<td style="text-align: center;">9–10 yr</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The rank ordering (Kendall <span class="math inline">\(\tau =
+-1.000\)</span>, <span class="math inline">\(N = 3\)</span>) is
+consistent with the prediction that higher-dimensional technologies
+(with steeper learning curves) produce shorter crisis durations.</p>
+<h1 id="sec:endogenous">Endogenous <span
+class="math inline">\(\rho\)</span>: Four Channels, No Free
+Parameters</h1>
+<h2 id="why-rho-must-be-endogenous">Why <span
+class="math inline">\(\rho\)</span> Must Be Endogenous</h2>
+<p>Every DSGE model treats the elasticity of substitution <span
+class="math inline">\(\sigma = 1/(1-\rho)\)</span> as a fixed structural
+parameter. This is untenable for three reasons:</p>
+<ol>
+<li><p><strong>Empirical.</strong> Estimated <span
+class="math inline">\(\hat{\rho}\)</span> varies systematically over the
+business cycle (Table <a href="#tab:minsky" data-reference-type="ref"
+data-reference="tab:minsky">2</a>), with <span class="math inline">\(r =
+-0.886\)</span> between <span class="math inline">\(\hat{\rho}\)</span>
+and the output gap.</p></li>
+<li><p><strong>Theoretical.</strong> The Smirl Curve (Theorem <a
+href="#thm:smirl" data-reference-type="ref"
+data-reference="thm:smirl">6</a>) implies that fixing <span
+class="math inline">\(\rho\)</span> while modeling friction dynamics
+produces internal contradictions: the economy can be driven above <span
+class="math inline">\(T^*(\rho)\)</span> without the model registering a
+regime change.</p></li>
+<li><p><strong>Empirical identification.</strong> The Solow
+residual—which captures unmeasured technology—is correlated with
+estimated <span class="math inline">\(\hat{\rho}\)</span> (<span
+class="math inline">\(r = 0.135\)</span>, <span class="math inline">\(p
+= 0.026\)</span>). Part of what the Solow residual measures is
+endogenous variation in complementarity, not exogenous technology
+shocks.</p></li>
+</ol>
+<h2 id="the-four-channels-in-detail">The Four Channels in Detail</h2>
+<p><strong>Channel 1: Technology adoption</strong> (<span
+class="math inline">\(\tau_1 \sim\)</span> 1–5 years). When firms adopt
+integrated technologies—enterprise software, automated supply chains,
+AI-assisted processes—they replace substitutable inputs with
+complementary ones. A factory with interchangeable manual workers (<span
+class="math inline">\(\rho\)</span> near 1) becomes a factory with
+specialized AI/robotics modules (<span
+class="math inline">\(\rho\)</span> near 0). The adoption rate
+accelerates during booms because financing is cheap, demand is strong,
+and the opportunity cost of downtime is high. Empirically, corporate IT
+spending as a fraction of revenue peaks 1–2 years before recessions,
+consistent with <span class="math inline">\(\tau_1 \sim\)</span> 1–5
+years.</p>
+<p><strong>Channel 2: Supply chain integration</strong> (<span
+class="math inline">\(\tau_2 \sim\)</span> 2–7 years). Expanding firms
+develop long-term supplier relationships with asset-specific
+investments. The number of single-source input components rises during
+booms. Automotive assembly in 2006 had reached <span
+class="math inline">\(&gt;80\%\)</span> single-source critical
+components, up from <span class="math inline">\(\sim\)</span>50% in
+1990. Each supplier relationship that moves from arm’s-length to
+integrated reduces <span class="math inline">\(\rho\)</span> for that
+input pair.</p>
+<p><strong>Channel 3: Financial innovation</strong> (<span
+class="math inline">\(\tau_3 \sim\)</span> 3–10 years). New financial
+products create synthetic complementarities. CDO tranching made
+previously independent mortgage risks complementary: the senior
+tranche’s value depended on the <em>joint</em> distribution of all
+underlying mortgages, not their individual distributions. The effective
+<span class="math inline">\(\rho\)</span> of the financial sector
+declined from roughly 0.6 (diversified banking, early 1990s) to roughly
+0.2 (structured finance, mid-2000s) based on cross-bank return
+correlations.</p>
+<p><strong>Channel 4: Entry/exit composition</strong> (<span
+class="math inline">\(\tau_4 \sim\)</span> 5–15 years). During booms,
+complementary-intensive sectors (construction, durable manufacturing,
+integrated services) expand relative to substitutes-intensive sectors
+(agriculture, extractives, simple retail). This composition effect
+lowers the aggregate <span class="math inline">\(\rho\)</span> even if
+each sector’s <span class="math inline">\(\rho\)</span> is constant. The
+composition channel is the slowest and most persistent, explaining why
+each successive boom pushes the economy to higher complementarity than
+the previous one—a ratchet effect.</p>
+<h2 id="no-free-parameters">No Free Parameters</h2>
+<p>The four-channel model (<a href="#eq:rho_dot"
+data-reference-type="ref" data-reference="eq:rho_dot">[eq:rho_dot]</a>)
+has no free parameters in the following sense: the timescales <span
+class="math inline">\(\tau_i\)</span> are determined by the adjustment
+speeds of the corresponding economic mechanisms (technology adoption
+lags, contract lengths, regulatory review periods, firm entry/exit
+rates), all of which are independently observable. The channel weights
+<span class="math inline">\(\gamma_i\)</span> determine the
+<em>relative</em> importance of each channel but not the direction of
+the effect—all four channels push <span
+class="math inline">\(\rho\)</span> in the same direction during booms.
+The theory predicts the <em>sign</em> of <span
+class="math inline">\(\dot{\rho}\)</span> (negative during booms)
+without requiring calibration.</p>
+<h2 id="additional-empirical-evidence">Additional Empirical
+Evidence</h2>
+<div id="tab:endo">
+<table>
+<caption>Endogenous <span class="math inline">\(\rho\)</span>:
+Supporting Evidence</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Test</strong></th>
+<th style="text-align: center;"><strong>Result</strong></th>
+<th style="text-align: center;"><strong><span
+class="math inline">\(p\)</span>-value</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Solow residual–<span
+class="math inline">\(\hat{\rho}\)</span> correlation</td>
+<td style="text-align: center;"><span class="math inline">\(r =
+0.135\)</span></td>
+<td style="text-align: center;">0.026</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Great Moderation <span
+class="math inline">\(T\)</span>-anisotropy ratio</td>
+<td style="text-align: center;">6.94 <span
+class="math inline">\(\to\)</span> 5.24</td>
+<td style="text-align: center;">0.0004</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pre-crisis deceleration (GFC)</td>
+<td style="text-align: center;">6/7 sector-recession pairs</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Pre-crisis deceleration (all
+recessions)</td>
+<td style="text-align: center;">67% of pairs</td>
+<td style="text-align: center;">—</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The Great Moderation result is particularly revealing: the ratio of
+cross-sectoral friction dispersion to within-sector friction dispersion
+declined from 6.94 (1960–1984) to 5.24 (1985–2019), <span
+class="math inline">\(p = 0.0004\)</span>. This is consistent with
+financial innovation (Channel 3) and supply chain integration
+(Channel 2) reducing the effective dimensionality of friction—making
+frictions more correlated across sectors, which is exactly what lower
+<span class="math inline">\(\rho\)</span> predicts.</p>
+<h1 id="sec:discrimination">Discrimination: What the CES Landscape
+Predicts That Alternatives Cannot</h1>
+<h2 id="against-rbc-models">Against RBC Models</h2>
+<p>Real Business Cycle models <span class="citation"
+data-cites="Kydland1982"></span> generate cycles from exogenous
+technology shocks with a fixed production structure (<span
+class="math inline">\(\rho\)</span> constant). The CES landscape
+framework makes three predictions that RBC cannot:</p>
+<div id="pred:ordering" class="prediction">
+<p><strong>Prediction 21</strong> (Crisis ordering). Correlations spike
+before output declines before coordination breaks down. RBC has no
+ordering mechanism: all variables respond to the same contemporaneous
+technology shock.</p>
+</div>
+<div id="pred:fragility" class="prediction">
+<p><strong>Prediction 22</strong> (Endogenous fragility). Long booms are
+followed by severe crises, and the mechanism is endogenous
+complementarity, not the accumulation of exogenous shocks. RBC predicts
+no relationship between boom duration and crisis severity.</p>
+</div>
+<div id="pred:rho_order" class="prediction">
+<p><strong>Prediction 23</strong> (<span
+class="math inline">\(\rho\)</span>-ordering). Complementary sectors
+fail first. RBC predicts that all sectors respond to the same aggregate
+shock with amplitudes determined by their capital shares, not their
+complementarities.</p>
+</div>
+<h2 id="against-new-keynesian-models">Against New Keynesian Models</h2>
+<p>New Keynesian models <span class="citation"
+data-cites="Christiano2005 Smets2007"></span> add nominal rigidities and
+generate persistent dynamics via the Phillips curve and Taylor rule.
+They improve on RBC by allowing differential adjustment speeds. But they
+make two assumptions that the CES framework rejects:</p>
+<ol>
+<li><p><strong>Fixed <span class="math inline">\(\rho\)</span>.</strong>
+NK models treat the elasticity of substitution as a deep parameter. The
+Minsky Trap shows that <span class="math inline">\(\rho\)</span> is
+endogenous and that this endogeneity is essential for understanding
+crisis dynamics.</p></li>
+<li><p><strong>Symmetric channels.</strong> NK models assume that the
+same friction (price stickiness) affects all channels equally. The
+crisis sequence theorem shows that different channels (<span
+class="math inline">\(K^2\)</span>, <span
+class="math inline">\(K\)</span>, <span
+class="math inline">\(K/J\)</span>) have different elasticities and
+therefore different response times.</p></li>
+</ol>
+<h2 id="against-financial-friction-models">Against Financial Friction
+Models</h2>
+<p>Models with financial frictions <span class="citation"
+data-cites="Bernanke1999 Kiyotaki1997 Brunnermeier2014"></span> come
+closest to the crisis sequence but lack three elements:</p>
+<ol>
+<li><p><strong>The Smirl Curve.</strong> Financial friction models can
+explain why crises happen but not why they arrive in a specific order.
+The crisis sequence theorem provides the ordering.</p></li>
+<li><p><strong>Endogenous <span
+class="math inline">\(\rho\)</span>.</strong> Financial friction models
+treat the production structure as fixed and add frictions as exogenous
+shocks. The four-channel model makes frictions <em>and</em> the
+production structure jointly endogenous.</p></li>
+<li><p><strong>The pre-crisis calm.</strong> Financial friction models
+can generate pre-crisis buildups but typically predict <em>rising</em>
+volatility before crises. The Smirl Curve and estimation paradox
+together predict the opposite: falling volatility before the worst
+crises. This is empirically correct (low VIX before the GFC).</p></li>
+</ol>
+<h2 id="summary-of-discriminating-predictions">Summary of Discriminating
+Predictions</h2>
+<div id="tab:discrim">
+<table>
+<caption>Discriminating Predictions: CES Landscape vs. Standard
+Models</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Prediction</strong></th>
+<th style="text-align: center;"><strong>CES</strong></th>
+<th style="text-align: center;"><strong>RBC</strong></th>
+<th style="text-align: center;"><strong>NK</strong></th>
+<th style="text-align: center;"><strong>Fin. Fric.</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Crisis ordering <span
+class="math inline">\(K^2 \to K \to K/J\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\sim\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Pre-crisis calm</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Endogenous fragility</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\sim\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\sim\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span
+class="math inline">\(\rho\)</span>-ordering of sectors</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Correlation leads volatility</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\sim\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Speed asymmetry 8.5:1</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\sim\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CPI dispersion leads CPI</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\sim\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cycle amplitude <span
+class="math inline">\(\propto\)</span> 1/<span
+class="math inline">\(\sigma\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(\times\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The CES landscape framework makes all eight predictions. RBC makes
+none. New Keynesian models make two (with additional assumptions).
+Financial friction models make two to three (with additional
+assumptions). No existing framework replicates the full set.</p>
+<h1 id="sec:empirical_summary">Empirical Summary</h1>
+<p>Table <a href="#tab:empirical" data-reference-type="ref"
+data-reference="tab:empirical">9</a> collects all 19 empirical tests.
+Every test is coded as CONSISTENT (the data match the theoretical
+prediction in sign, magnitude, and statistical significance).</p>
+<div id="tab:empirical">
+<table>
+<caption>Complete Empirical Test Inventory</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>Test</strong></th>
+<th style="text-align: left;"><strong>Key statistic</strong></th>
+<th style="text-align: left;"><strong>Verdict</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">GFC 2.5-year early warning</td>
+<td style="text-align: left;">Housing correlations 2006; recession
+2008–09</td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">GFC crisis sequence</td>
+<td style="text-align: left;">BAA<span
+class="math inline">\({&gt;}2\sigma\)</span> (2007-12) <span
+class="math inline">\(\to\)</span> IP decline (2008-02) <span
+class="math inline">\(\to\)</span> TED<span
+class="math inline">\({&gt;}2\)</span> (2008-09)</td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Stability margin vs VIX</td>
+<td style="text-align: left;">AUC: <span
+class="math inline">\(\hat{\Delta}=0.78\)</span> vs VIX<span
+class="math inline">\(=0.66\)</span> at 8Q</td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BCL predicts GFC 4yr early</td>
+<td style="text-align: left;">ARI<span
+class="math inline">\(\times\)</span>PMI, <span
+class="math inline">\(\beta=+0.307\)</span>, <span
+class="math inline">\(p=0.016\)</span>, <span
+class="math inline">\(N=147\)</span></td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Minsky <span
+class="math inline">\(\rho\)</span>-shift (12m)</td>
+<td style="text-align: left;"><span
+class="math inline">\(r=-0.886\)</span>, <span
+class="math inline">\(p=0.009\)</span>, <span
+class="math inline">\(N=6\)</span></td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Minsky speed asymmetry</td>
+<td style="text-align: left;">8.5:1</td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(\rho\)</span>-ordering across sectors</td>
+<td style="text-align: left;"><span
+class="math inline">\(\beta_1=-14.65\)</span>, <span
+class="math inline">\(p=0.001\)</span></td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Cycle amplitude <span
+class="math inline">\(\times\)</span> <span
+class="math inline">\(\sigma\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(r=-0.65\)</span>, <span
+class="math inline">\(p=0.016\)</span></td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Correlation convergence</td>
+<td style="text-align: left;">3/4 confirmed; <span
+class="math inline">\(\Delta\)</span>AIC<span
+class="math inline">\(=56\)</span></td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CPI dispersion leads inflation</td>
+<td style="text-align: left;">18/18 turning points, median 12mo
+lead</td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VRI recession forecasting</td>
+<td style="text-align: left;"><span
+class="math inline">\(p=0.0003\)</span> beyond term spread and VIX</td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Pre-crisis deceleration</td>
+<td style="text-align: left;">67% sector-recession pairs; 6/7 for
+GFC</td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(T\)</span>-anisotropy Great Moderation</td>
+<td style="text-align: left;">Ratio 6.94<span
+class="math inline">\(\to\)</span>5.24, <span
+class="math inline">\(p=0.0004\)</span></td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Solow residual <span
+class="math inline">\(\rho\)</span>-shift</td>
+<td style="text-align: left;"><span
+class="math inline">\(r=0.135\)</span>, <span
+class="math inline">\(p=0.026\)</span></td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Crisis duration (EMD waves)</td>
+<td style="text-align: left;">Kendall <span
+class="math inline">\(\tau=-1.000\)</span>, <span
+class="math inline">\(N=3\)</span></td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Countercyclical <span
+class="math inline">\(\rho\)</span></td>
+<td style="text-align: left;"><span
+class="math inline">\(\tau=-0.168\)</span> to <span
+class="math inline">\(-0.313\)</span></td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Comovement amplification</td>
+<td style="text-align: left;"><span
+class="math inline">\(\bar{r}_{\text{rec}}=0.62\)</span> vs <span
+class="math inline">\(\bar{r}_{\text{exp}}=0.23\)</span> (<span
+class="math inline">\(p&lt;10^{-4}\)</span>)</td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Sectoral comovement gradient</td>
+<td style="text-align: left;"><span
+class="math inline">\(R^2=0.51\)</span>, <span
+class="math inline">\(p=0.047\)</span></td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pre-crisis calm predicts severity</td>
+<td style="text-align: left;">Low VIX <span
+class="math inline">\(\to\)</span> worse recession</td>
+<td style="text-align: left;">CONS.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="sec:conclusion">Conclusion</h1>
+<p>This paper makes three claims, each derived from the mathematics of
+CES production and each supported by empirical evidence.</p>
+<p><strong>First</strong>, crises arrive in a specific, repeatable
+order—correlations before output before coordination—because these
+channels are controlled by different powers of CES curvature (<span
+class="math inline">\(K^2\)</span>, <span
+class="math inline">\(K\)</span>, <span
+class="math inline">\(K/J\)</span>), and higher powers degrade faster
+under friction. The 2008 GFC followed this sequence with 30-month lead
+from the earliest signal to the recession trough.</p>
+<p><strong>Second</strong>, the efficiency-fragility coupling encoded in
+the Smirl Curve <span class="math inline">\(\{(G(\rho),
+T^*(\rho))\}\)</span> is an algebraic identity, not a policy tradeoff.
+No institutional arrangement can simultaneously achieve high
+complementarity gains and high friction tolerance. The pre-crisis calm
+(low VIX before the worst crises) is a direct consequence: the
+estimation paradox ensures that healthy, complementary economies
+generate minimal information about their own fragility.</p>
+<p><strong>Third</strong>, the Minsky Trap—stability breeds
+instability—is a theorem, not a metaphor. Four identified channels drive
+complementarity upward during booms, narrowing the stability margin
+<span class="math inline">\(\Delta = T^*- T\)</span> at rates governed
+by independently observable timescales. The speed asymmetry (8.5:1)
+between compression and collapse is a structural feature of the CES
+landscape, not a statistical coincidence.</p>
+<p>The practical implication is that crisis prevention requires
+monitoring the <em>structural</em> parameter <span
+class="math inline">\(\rho\)</span> (or equivalently, the stability
+margin <span class="math inline">\(\hat{\Delta}\)</span>), not the
+<em>symptomatic</em> indicators like VIX that the estimation paradox
+renders uninformative at precisely the moments when information is most
+valuable. The stability margin indicator dominates VIX at every forecast
+horizon beyond two quarters, achieving AUC <span class="math inline">\(=
+0.78\)</span> at the 8-quarter horizon.</p>
+<p>More broadly, the CES landscape framework unifies crisis economics
+under a single generating function. The crisis sequence, the Minsky
+Trap, the <span class="math inline">\(\rho\)</span>-ordering of sectors,
+the pre-crisis calm, and the temporal ordering of standard indicators
+all follow from one object: the CES potential <span
+class="math inline">\(\Phi_q(\mathbf{x}; T)\)</span> with <span
+class="math inline">\(q = \rho\)</span> and its curvature parameter
+<span class="math inline">\(K = (1-\rho)(J-1)/J\)</span>. The apparent
+complexity of crisis dynamics reduces to the geometry of a
+well-understood surface.</p>
+<h1 id="app:vri">Variance-Response Identity: Derivation</h1>
+<p>The VRI <span class="math inline">\(\Sigma = T \cdot (\nabla^2
+\Phi)^{-1}\)</span> follows from the equilibrium condition of the CES
+potential with Tsallis entropy: <span
+class="math display">\[\begin{aligned}
+\nabla \Phi_q &amp;= \nabla \Phi_{\text{CES}} - T \cdot \nabla S_q = 0
+\quad \text{at equilibrium.}
+\end{aligned}\]</span> Perturbing around equilibrium <span
+class="math inline">\(\mathbf{x}^*\)</span>: <span
+class="math display">\[\begin{aligned}
+0 &amp;= \nabla^2 \Phi_{\text{CES}}\,\delta\mathbf{x}- T \cdot \nabla^2
+S_q \,\delta\mathbf{x}+ \eta,
+\end{aligned}\]</span> where <span class="math inline">\(\eta\)</span>
+is a noise perturbation with <span
+class="math inline">\(\mathbb{E}[\eta\eta^T] = T \cdot I\)</span>
+(fluctuation-dissipation relation in the economics sense: the same
+friction that creates adjustment costs also creates noise). Solving:
+<span class="math display">\[\begin{aligned}
+\delta\mathbf{x}&amp;= (\nabla^2 \Phi)^{-1}\,\eta, \\
+\Sigma = \mathbb{E}[\delta\mathbf{x}\,\delta\mathbf{x}^T] &amp;=
+(\nabla^2 \Phi)^{-1}\,T\,I\,(\nabla^2 \Phi)^{-T} = T(\nabla^2
+\Phi)^{-1},
+\end{aligned}\]</span> where the last equality uses the symmetry of the
+Hessian. At the symmetric point, <span class="math inline">\(\nabla^2
+\Phi\)</span> has eigenvalue <span
+class="math inline">\(\lambda_\perp(T) = \lambda_\perp^{(0)}(1 -
+T/T^*)\)</span> in <span
+class="math inline">\(\mathbf{1}^\perp\)</span>, so: <span
+class="math display">\[\operatorname{Var}[x_j] =
+\frac{T}{\lambda_\perp^{(0)}(1 - T/T^*)},\]</span> which diverges as
+<span class="math inline">\(T \to T^*\)</span>, confirming
+Proposition <a href="#prop:early_warning" data-reference-type="ref"
+data-reference="prop:early_warning">14</a>.</p>
+<p>The dynamic version: the impulse response function <span
+class="math inline">\(G(\tau) = e^{-\nabla^2\Phi \cdot \tau}\)</span>
+satisfies: <span
+class="math display">\[\frac{d}{d\tau}\operatorname{Cov}[\mathbf{x}(t),
+\mathbf{x}(t+\tau)] = -\nabla^2\Phi \cdot
+\operatorname{Cov}[\mathbf{x}(t), \mathbf{x}(t+\tau)],\]</span> so the
+autocovariance decays exponentially with rate <span
+class="math inline">\(\lambda_\perp(T)\)</span>, and the AR(1)
+coefficient at lag <span class="math inline">\(\delta t\)</span> is
+<span class="math inline">\(\phi = e^{-\lambda_\perp(T)\cdot\delta
+t}\)</span>.</p>
+<h1 id="app:conservation">Conservation Laws</h1>
+<p>The CES potential satisfies the Euler identity (homogeneity): <span
+class="math display">\[\sum_j x_j \frac{\partial \Phi}{\partial x_j} =
+\rho \cdot \Phi.\]</span> This conservation law constrains the dynamics:
+the total “energy” <span class="math inline">\(\rho\Phi\)</span> is
+conserved along the gradient flow of <span
+class="math inline">\(\Phi\)</span>, projected onto the <span
+class="math inline">\(\mathbf{1}\)</span> direction. The perpendicular
+component (<span class="math inline">\(\mathbf{1}^\perp\)</span>) is
+dissipative. This decomposition—conservative along <span
+class="math inline">\(\mathbf{1}\)</span>, dissipative along <span
+class="math inline">\(\mathbf{1}^\perp\)</span>—is the CES analog of
+energy conservation in mechanics.</p>
+<p>A second conservation law follows from the curvature identity: <span
+class="math display">\[\text{Price curvature} + \text{Quantity
+curvature} = K.\]</span> Under stress, price curvature rises
+(correlations increase) while quantity curvature falls (diversification
+breaks down), but their sum is constant. This “curvature conservation”
+explains the crisis dual (Proposition <a href="#prop:convergence"
+data-reference-type="ref" data-reference="prop:convergence">16</a>):
+prices and quantities carry the same total curvature, redistributed
+between them by friction.</p>
+<p>The reversibility identity (Jarzynski equality for CES): <span
+class="math display">\[\mathbb{E}\left[e^{-\Delta\Phi/T}\right] =
+e^{-\Delta F/T},\]</span> where <span class="math inline">\(\Delta
+F\)</span> is the free-energy difference between equilibria. This
+constrains the distribution of adjustment costs: even in irreversible
+transitions (crises), the average exponential work relates to the
+equilibrium free-energy difference.</p>
+<h1 id="app:lean">Lean Verification Guide</h1>
+<p>All theoretical results in this paper are formally verified in the
+Lean 4 proof assistant (v4.28.0) with Mathlib (v4.28.0). The full
+project builds with 2339 compilation units and 0 errors. Key files for
+this paper:</p>
+<div id="tab:lean">
+<table>
+<caption>Lean Verification: Key Files</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>File</strong></th>
+<th style="text-align: left;"><strong>Content</strong></th>
+<th style="text-align: center;"><strong>Thms</strong></th>
+<th style="text-align: center;"><strong>Axioms</strong></th>
+<th style="text-align: center;"><strong>Sorry</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td
+style="text-align: left;"><code>Paper2/EffectiveCurvature.lean</code></td>
+<td style="text-align: left;"><span
+class="math inline">\(K_{\text{eff}}\)</span>, crisis sequence, <span
+class="math inline">\(T^*\)</span></td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Paper2/CESPotential.lean</code></td>
+<td style="text-align: left;">Welfare loss function, <span
+class="math inline">\(q\)</span>-exponential</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>Paper3/BusinessCycles.lean</code></td>
+<td style="text-align: left;"><span
+class="math inline">\(\rho\)</span>-ordering, Minsky, amplitude</td>
+<td style="text-align: center;">15</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>Paper3/EndogenousRho.lean</code></td>
+<td style="text-align: left;">Four channels</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>Paper3/CoupledRhoT.lean</code></td>
+<td style="text-align: left;">Coupled dynamics, Hopf</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>Paper3/FluctuationResponse.lean</code></td>
+<td style="text-align: left;">VRI, early warning</td>
+<td style="text-align: center;">14</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>Paper3/Relaxation.lean</code></td>
+<td style="text-align: left;">Landscape, eigenstructure</td>
+<td style="text-align: center;">6</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>Paper3/ConservationLaws.lean</code></td>
+<td style="text-align: left;">Euler identity, reversibility</td>
+<td style="text-align: center;">9</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>Paper3/TwoWorldDefs.lean</code></td>
+<td style="text-align: left;">Two-world economy defs</td>
+<td style="text-align: center;">13</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>Paper3/TemporalOrdering.lean</code></td>
+<td style="text-align: left;">Six ordering rules</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>Paper3/IndicatorClassification.lean</code></td>
+<td style="text-align: left;">Conference Board derivation</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>PhaseTransition.lean</code></td>
+<td style="text-align: left;">Order parameter, critical exp.</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>Total</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><strong>141</strong></td>
+<td style="text-align: center;"><strong>0</strong></td>
+<td style="text-align: center;"><strong>0</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>To verify:</p>
+<pre><code>git clone [repository URL]
+cd thesis &amp;&amp; lake build</code></pre>
+<p>The project uses three justified axioms (in other files, not counted
+above): <code>kolmogorov_nagumo</code> and <code>aczel</code> in
+<code>Basic.lean</code> (classical 1930/1948 characterization results),
+and <code>transition_duration_scaling</code> in
+<code>Paper4/TransitionDynamics.lean</code> (Neishtadt 1987 GSPT
+result). All other theorems are proved from definitions.</p>
+<h1 id="app:data">Data Sources</h1>
+<p><strong>GFC Timeline (Table <a href="#tab:gfc"
+data-reference-type="ref" data-reference="tab:gfc">1</a>).</strong>
+Housing correlations: Case-Shiller metro area indices (20 MSAs), rolling
+12-month pairwise correlations. ABX: Markit ABX.HE index (AAA tranche).
+BAA spread: Moody’s BAA Corporate Bond Yield minus 10-Year Treasury
+(FRED: BAA10Y). Industrial production: Federal Reserve Board (FRED:
+INDPRO). TED spread: 3-Month LIBOR minus 3-Month Treasury (FRED:
+TEDRATE). VIX: CBOE Volatility Index (FRED: VIXCLS).</p>
+<p><strong>Stability Margin Indicator (Table <a href="#tab:auc"
+data-reference-type="ref" data-reference="tab:auc">4</a>).</strong>
+Sectoral production: FRED industrial production indices (NAICS 2-digit).
+Rolling <span class="math inline">\(\hat{\rho}\)</span>: escort
+probability matching on 13 PPI commodity groups, 24-month rolling
+windows. Recession dates: NBER Business Cycle Dating Committee.</p>
+<p><strong>CPI Dispersion.</strong> BLS CPI expenditure categories (All
+Urban Consumers), monthly, seasonally adjusted. 8 major groups, 72
+expenditure categories. Cross-sectional standard deviation computed
+monthly.</p>
+<p><strong>Correlation Convergence.</strong> S&amp;P 500 GICS sector
+indices (11 sectors), total returns, CRSP/Compustat. NFCI: Chicago Fed
+National Financial Conditions Index. Sample: January 1999 – December
+2025.</p>
+<p><strong><span class="math inline">\(\rho\)</span>-Ordering (Table <a
+href="#tab:ordering" data-reference-type="ref"
+data-reference="tab:ordering">3</a>).</strong> OECD STAN database, 25
+ISIC Rev.4 sectors. Recession entry defined as first month of two
+consecutive declines in sectoral value added.</p>
+<p><strong>Minsky <span class="math inline">\(\rho\)</span>-Shift
+(Table <a href="#tab:minsky" data-reference-type="ref"
+data-reference="tab:minsky">2</a>).</strong> 13 PPI commodity groups
+(FRED). Rolling escort probability estimates with 12-month and 24-month
+windows. Output gap: CBO potential GDP estimate.</p>
+<p><strong>BCL Indices.</strong> Barth-Caprio-Levine bank regulation
+indices from the World Bank Bank Regulation and Supervision Survey
+(BRSS), 5 waves (2001–2019), 162 countries. Constructed using
+<code>build_bcl_indices.py</code>.</p>
+<div class="thebibliography">
+<p><span>99</span></p>
+<p>Aczél, J. (1948). On mean values. <em>Bulletin of the American
+Mathematical Society</em>, 54(4), 392–400.</p>
+<p>Arrow, K. J., Chenery, H. B., Minhas, B. S., and Solow, R. M. (1961).
+Capital-labor substitution and economic efficiency. <em>Review of
+Economics and Statistics</em>, 43(3), 225–250.</p>
+<p>Bernanke, B. S., Gertler, M., and Gilchrist, S. (1999). The financial
+accelerator in a quantitative business cycle framework. In <em>Handbook
+of Macroeconomics</em>, Vol. 1, pp. 1341–1393. Elsevier.</p>
+<p>Borio, C. (2014). The financial cycle and macroeconomics: What have
+we learnt? <em>Journal of Banking and Finance</em>, 45, 182–198.</p>
+<p>Brunnermeier, M. K. and Sannikov, Y. (2014). A macroeconomic model
+with a financial sector. <em>American Economic Review</em>, 104(2),
+379–421.</p>
+<p>Christiano, L. J., Eichenbaum, M., and Evans, C. L. (2005). Nominal
+rigidities and the dynamic effects of a shock to monetary policy.
+<em>Journal of Political Economy</em>, 113(1), 1–45.</p>
+<p>Gorton, G. B. (2010). <em>Slapped by the Invisible Hand: The Panic of
+2007</em>. Oxford University Press.</p>
+<p>Kiyotaki, N. and Moore, J. (1997). Credit cycles. <em>Journal of
+Political Economy</em>, 105(2), 211–248.</p>
+<p>Kolmogorov, A. N. (1930). Sur la notion de la moyenne. <em>Atti della
+Accademia Nazionale dei Lincei</em>, 12, 388–391.</p>
+<p>Kydland, F. E. and Prescott, E. C. (1982). Time to build and
+aggregate fluctuations. <em>Econometrica</em>, 50(6), 1345–1370.</p>
+<p>Minsky, H. P. (1986). <em>Stabilizing an Unstable Economy</em>. Yale
+University Press.</p>
+<p>Nagumo, M. (1930). Über eine Klasse der Mittelwerte. <em>Japanese
+Journal of Mathematics</em>, 7, 71–79.</p>
+<p>Neishtadt, A. I. (1987). Persistence of stability loss for dynamical
+bifurcations. <em>Differential Equations</em>, 23, 1385–1391.</p>
+<p>Reinhart, C. M. and Rogoff, K. S. (2009). <em>This Time Is Different:
+Eight Centuries of Financial Folly</em>. Princeton University Press.</p>
+<p>Schularick, M. and Taylor, A. M. (2012). Credit booms gone bust:
+Monetary policy, leverage cycles, and financial crises, 1870–2008.
+<em>American Economic Review</em>, 102(2), 1029–1061.</p>
+<p>Smets, F. and Wouters, R. (2007). Shocks and frictions in US business
+cycles: A Bayesian DSGE approach. <em>American Economic Review</em>,
+97(3), 586–606.</p>
+<p>Tsallis, C. (1988). Possible generalization of Boltzmann-Gibbs
+statistics. <em>Journal of Statistical Physics</em>, 52(1–2),
+479–487.</p>
+</div>
+<aside id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Independent Researcher. Email: jonsmirl@gmail.com.<a
+href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</aside>
+</body>
+</html>

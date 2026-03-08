@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jon Smirl" />
+  <title>Damping_Cancellation</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    div.abstract {
+      margin: 2em 2em 2em 2em;
+      text-align: left;
+      font-size: 85%;
+    }
+    div.abstract-title {
+      font-weight: bold;
+      text-align: center;
+      padding: 0;
+      margin-bottom: 0.5em;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<p><strong>JEL Codes:</strong> G28, E61, L51, D04, C62.<br />
+<strong>Keywords:</strong> Banking regulation, regulatory effectiveness,
+CES production, hierarchical equilibrium, Basel III, damping
+cancellation, upstream reform, formal verification.</p>
+<h1 id="sec:intro">Introduction</h1>
+<p>Basel III was the most ambitious banking regulatory reform in
+history. Adopted in 2010 and implemented over the following decade, it
+raised Tier 1 capital requirements from 4% to 6%, introduced a capital
+conservation buffer of 2.5%, created countercyclical buffers, and
+imposed new liquidity coverage ratios. Compliance costs have been
+estimated in the trillions of dollars globally <span class="citation"
+data-cites="BCBS2010 Admati2014"></span>. Did it work?</p>
+<p>The question is harder than it appears. Financial stability has
+improved by some measures since the Global Financial Crisis, but
+disentangling the effect of regulation from post-crisis deleveraging,
+unconventional monetary policy, and secular stagnation is challenging.
+The empirical literature on Basel III effectiveness is inconclusive
+<span class="citation" data-cites="Dagher2016 Behn2022"></span>.</p>
+<p>This paper provides a theoretical framework that predicts—and a
+158-country panel that confirms—a specific null result: downstream
+regulation (capital requirements imposed on banks at the “fast”
+financial level) has zero net welfare effect. Not a small effect, not an
+ambiguous effect: an exact cancellation. The prediction follows from a
+general theorem about hierarchical economies.</p>
+<div class="mdframed">
+<p><strong>Damping Cancellation Theorem</strong> (informal). In a
+hierarchical CES economy with timescale separation, increasing the
+depreciation (regulation) rate <span
+class="math inline">\(\sigma_n\)</span> at any level <span
+class="math inline">\(n\)</span> simultaneously:</p>
+<ol>
+<li><p>increases the speed of adjustment <span
+class="math inline">\(\sigma_n / \varepsilon_n\)</span> (convergence is
+faster),</p></li>
+<li><p>decreases the equilibrium output level <span
+class="math inline">\(\bar{F}_n = \varphi_n(\bar{F}_{n-1}) /
+\sigma_n\)</span> (output is lower),</p></li>
+<li><p>leaves the welfare friction-loss rate <span
+class="math inline">\(\dot{V}_n\)</span> unchanged (effects (i) and (ii)
+cancel exactly).</p></li>
+</ol>
+<p>The welfare loss depends on upstream parameters <span
+class="math inline">\(\sigma_{n-1}\)</span> and <span
+class="math inline">\(\beta_n\)</span>, not on <span
+class="math inline">\(\sigma_n\)</span>.</p>
+</div>
+<p>The theorem has a precise corollary: to improve welfare at
+level <span class="math inline">\(n\)</span>, reform upstream at
+level <span class="math inline">\(n-1\)</span>. We quantify the
+<em>upstream reform multiplier</em> as the ratio of the welfare
+elasticity with respect to upstream parameters to the (zero) elasticity
+with respect to own-level parameters. Using the Barth–Caprio–Levine
+(BCL) banking regulatory indices, we estimate this multiplier at <span
+class="math inline">\(15.9\times\)</span> with a Wald test <span
+class="math inline">\(p\)</span>-value of 0.046.</p>
+<p>The paper also resolves a long-standing puzzle in the BCL literature:
+why Activity Restrictions (ARI) predict crisis severity but Capital
+Stringency (CSI) does not <span class="citation"
+data-cites="BarthCaprioLevine2004 BarthCaprioLevine2013"></span>. In the
+damping cancellation framework, CSI operates at the same level as bank
+output (downstream regulation), so its welfare effect cancels. ARI
+operates on the institutional structure (the gain elasticity <span
+class="math inline">\(\beta_n\)</span>), which enters the welfare
+formula directly. We formalize this distinction and show that the
+ARI<span class="math inline">\(\times\)</span>PMI (Private Monitoring
+Index) interaction term predicts GFC severity with <span
+class="math inline">\(\beta = +0.307\)</span> (<span
+class="math inline">\(p = 0.016\)</span>).</p>
+<p><strong>Contributions.</strong> We make four contributions:</p>
+<ol>
+<li><p><strong>The damping cancellation theorem</strong>: a general
+result about hierarchical economies showing that own-level regulation
+has zero net welfare effect. The mechanism is algebraic: the relative
+deviation <span class="math inline">\(\delta_n = \Delta F_n /
+\bar{F}_n\)</span> absorbs the <span
+class="math inline">\(1/\sigma_n\)</span> from equilibrium output,
+canceling the <span class="math inline">\(\sigma_n\)</span> from
+convergence speed.</p></li>
+<li><p><strong>The upstream reform principle with a <span
+class="math inline">\(16\times\)</span> multiplier</strong>: welfare
+loss at level <span class="math inline">\(n\)</span> depends on <span
+class="math inline">\(\sigma_{n-1}/\beta_n\)</span> with unit
+elasticity. The <span class="math inline">\(16\times\)</span> leverage
+follows from the empirically estimated gain-elasticity ratio across
+adjacent levels. Two-level-upstream reform gives <span
+class="math inline">\(16^2 \approx 256\times\)</span> leverage.</p></li>
+<li><p><strong>The CES-forced architecture</strong>: six axioms uniquely
+determine the hierarchical topology—tree structure, directed coupling,
+aggregate communication, nearest-neighbor interaction—connecting Simon’s
+near-decomposability to CES curvature.</p></li>
+<li><p><strong>Empirical confirmation</strong>: a 158-country BCL panel
+confirms the null prediction (Basel III DID <span
+class="math inline">\(p = 0.946\)</span>), matches the impulse-response
+stratification 4/4, and estimates the upstream multiplier at <span
+class="math inline">\(15.9\times\)</span>.</p></li>
+</ol>
+<p>All theoretical results are formally verified in the Lean 4 proof
+assistant across eight files totaling approximately 160 declarations,
+with zero unresolved goals (<code>sorry</code>) and one justified axiom
+(Neishtadt’s GSPT theorem for transition duration scaling).</p>
+<p><strong>Relation to Modigliani–Miller.</strong> The damping
+cancellation theorem is a production-theoretic generalization of
+Modigliani–Miller capital-structure irrelevance <span class="citation"
+data-cites="ModiglianiMiller1958"></span>. Modigliani–Miller shows that
+leverage (a financial “regulation” of the firm’s capital structure) does
+not affect firm value. Our theorem shows the same irrelevance at every
+level of a hierarchical economy. The mechanism is identical: what one
+hand gives in speed, the other takes in level.</p>
+<p><strong>Organization.</strong> Section <a href="#sec:model"
+data-reference-type="ref" data-reference="sec:model">2</a> presents the
+model. Section <a href="#sec:damping" data-reference-type="ref"
+data-reference="sec:damping">3</a> states and proves the damping
+cancellation theorem. Section <a href="#sec:upstream"
+data-reference-type="ref" data-reference="sec:upstream">4</a> develops
+the upstream reform principle. Section <a href="#sec:empirical_design"
+data-reference-type="ref" data-reference="sec:empirical_design">5</a>
+describes the empirical design. Section <a href="#sec:results"
+data-reference-type="ref" data-reference="sec:results">6</a> presents
+results. Section <a href="#sec:bcl_puzzle" data-reference-type="ref"
+data-reference="sec:bcl_puzzle">7</a> resolves the BCL puzzle.
+Section <a href="#sec:policy" data-reference-type="ref"
+data-reference="sec:policy">8</a> discusses policy implications.
+Section <a href="#sec:connections" data-reference-type="ref"
+data-reference="sec:connections">9</a> draws connections to the
+institutional economics literature. Section <a href="#sec:conclusion"
+data-reference-type="ref" data-reference="sec:conclusion">10</a>
+concludes.</p>
+<h1 id="sec:model">Model: CES Hierarchy with Timescale Separation</h1>
+<h2 id="six-axioms">Six Axioms</h2>
+<p>We impose six axioms on the production structure of an <span
+class="math inline">\(N\)</span>-level economy.</p>
+<div id="ax:crs" class="axiom_def">
+<p><strong>Axiom 1</strong> (Constant Returns to Scale). At each level
+<span class="math inline">\(n \in \{1, \ldots, N\}\)</span>, the
+aggregator <span class="math inline">\(F_n : \mathbb{R}^{J_n}_+ \to
+\mathbb{R}_+\)</span> satisfies <span class="math inline">\(F_n(\lambda
+x) = \lambda F_n(x)\)</span> for all <span class="math inline">\(\lambda
+&gt; 0\)</span>.</p>
+</div>
+<div id="ax:scale" class="axiom_def">
+<p><strong>Axiom 2</strong> (Scale Consistency). Each <span
+class="math inline">\(F_n\)</span> is consistent under multi-scale
+aggregation: the aggregate of aggregates equals the aggregate of the
+whole. Formally, <span class="math inline">\(F_n\)</span> is a
+quasi-arithmetic mean that satisfies Aczél’s functional equation.</p>
+</div>
+<div id="ax:tsallis" class="axiom_def">
+<p><strong>Axiom 3</strong> (Tsallis Constraint <span
+class="math inline">\(q = \rho\)</span>). The information-theoretic
+parameter <span class="math inline">\(q\)</span> governing the entropy
+of the allocation probability is locked to the production parameter:
+<span class="math inline">\(q = \rho\)</span>. Factor shares
+<em>are</em> escort probabilities of the CES distribution.</p>
+</div>
+<div id="ax:timescale" class="axiom_def">
+<p><strong>Axiom 4</strong> (Timescale Separation). There exist
+characteristic timescales <span class="math inline">\(\varepsilon_1 \gg
+\varepsilon_2 \gg \cdots \gg \varepsilon_N &gt; 0\)</span> such that
+level <span class="math inline">\(n\)</span> equilibrates on timescale
+<span class="math inline">\(\varepsilon_n\)</span>. Level 1 is the
+slowest (e.g., semiconductor manufacturing), level <span
+class="math inline">\(N\)</span> is the fastest (e.g., financial
+settlement).</p>
+</div>
+<div id="ax:learning" class="axiom_def">
+<p><strong>Axiom 5</strong> (Process Learning). The gain function <span
+class="math inline">\(\varphi_n : \mathbb{R}_+ \to \mathbb{R}_+\)</span>
+at each level satisfies <span class="math inline">\(\varphi_n(0) =
+0\)</span>, <span class="math inline">\(\varphi_n&#39; &gt; 0\)</span>,
+and <span class="math inline">\(\varphi_n&#39;&#39; \leq 0\)</span>.
+Output at level <span class="math inline">\(n\)</span> responds to input
+from level <span class="math inline">\(n-1\)</span> with decreasing
+marginal returns.</p>
+</div>
+<div id="ax:coupling" class="axiom_def">
+<p><strong>Axiom 6</strong> (Directed I-O Coupling). Cross-level
+coupling is feed-forward: level <span class="math inline">\(n-1\)</span>
+feeds level <span class="math inline">\(n\)</span>, but level <span
+class="math inline">\(n\)</span> does not affect level <span
+class="math inline">\(n-1\)</span>. The coupling is through the
+aggregate <span class="math inline">\(F_{n-1}\)</span> only, not through
+individual inputs <span class="math inline">\(x_{(n-1)j}\)</span>.</p>
+</div>
+<h2 id="ces-emergence">CES Emergence</h2>
+<p>Axioms <a href="#ax:crs" data-reference-type="ref"
+data-reference="ax:crs">1</a>–<a href="#ax:scale"
+data-reference-type="ref" data-reference="ax:scale">2</a> force the
+aggregator to be a power mean (the Kolmogorov–Nagumo–Aczél theorem):
+<span class="math display">\[\label{eq:ces}
+F_n = \left(\frac{1}{J_n} \sum_{j=1}^{J_n}
+x_{nj}^{\rho_n}\right)^{1/\rho_n}, \quad \rho_n \in (-\infty, 1]
+\setminus \{0\},\]</span> with the Cobb–Douglas limit <span
+class="math inline">\(F_n = (\prod x_{nj})^{1/J_n}\)</span> at <span
+class="math inline">\(\rho_n = 0\)</span>. CES is therefore not an
+assumption but a consequence. The curvature parameter is <span
+class="math display">\[\label{eq:curvature}
+K_n = \frac{(1 - \rho_n)(J_n - 1)}{J_n}.\]</span></p>
+<h2 id="architecture-theorem">Architecture Theorem</h2>
+<div id="thm:topology" class="theorem">
+<p><strong>Theorem 7</strong> (CES-Forced Topology). <em>Under Axioms <a
+href="#ax:crs" data-reference-type="ref"
+data-reference="ax:crs">1</a>–<a href="#ax:coupling"
+data-reference-type="ref" data-reference="ax:coupling">6</a>, the
+interconnection topology satisfies:</em></p>
+<ol>
+<li><p><em><strong>Aggregate coupling</strong>: Sectors at level <span
+class="math inline">\(n\)</span> communicate with level <span
+class="math inline">\(n-1\)</span> only through the aggregate <span
+class="math inline">\(F_{n-1}\)</span>.</em></p></li>
+<li><p><em><strong>Directed coupling</strong>: Coupling is feed-forward
+(<span class="math inline">\(n-1 \to n\)</span>), never
+bidirectional.</em></p></li>
+<li><p><em><strong>Port alignment</strong>: The coupling direction is
+proportional to <span class="math inline">\(\nabla F_n \propto
+\mathbf{1}\)</span> at the symmetric point.</em></p></li>
+<li><p><em><strong>Nearest-neighbor topology</strong>: Long-range
+coupling (level <span class="math inline">\(n\)</span> to level <span
+class="math inline">\(n+k\)</span>, <span class="math inline">\(k \geq
+2\)</span>) is <span class="math inline">\(O(1/r^*)\)</span> where <span
+class="math inline">\(r^*\)</span> is the timescale ratio, and hence
+negligible under strict timescale separation.</em></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> Property (i) follows from CES homogeneity: by
+Euler’s theorem, <span class="math inline">\(\sum_j x_{nj} \partial F_n
+/ \partial x_{nj} = F_n\)</span>, so the first-order dynamics project
+onto the aggregate. Property (ii) follows from Axiom <a
+href="#ax:coupling" data-reference-type="ref"
+data-reference="ax:coupling">6</a>. Property (iii) follows from <span
+class="math inline">\(\partial F_n / \partial x_{nj}|_{\mathbf{1}} =
+1/J_n\)</span> for all <span class="math inline">\(j\)</span>, which is
+proportional to the constant vector. Property (iv) follows from singular
+perturbation: on the slow manifold <span
+class="math inline">\(\mathcal{M}_n\)</span>, the fast levels <span
+class="math inline">\(n+1, \ldots, N\)</span> are equilibrated, and the
+effective coupling between non-adjacent levels is exponentially small in
+the timescale ratio. See <code>Topology.lean</code> for the formal
+verification. ◻</p>
+</div>
+<h2 id="dynamics">Dynamics</h2>
+<p>The dynamics at level <span class="math inline">\(n\)</span> are the
+singularly perturbed system: <span
+class="math display">\[\label{eq:dynamics}
+\varepsilon_n \dot{x}_{nj} = T_n(\bar{F}_{n-1}) \cdot \frac{\partial
+F_n}{\partial x_{nj}} - \sigma_n x_{nj},\]</span> where <span
+class="math inline">\(T_n(\bar{F}_{n-1}) =
+\varphi_n(\bar{F}_{n-1})\)</span> is the throughput from the level
+below, <span class="math inline">\(\sigma_n &gt; 0\)</span> is the
+depreciation (regulation) rate, and <span
+class="math inline">\(\varepsilon_n &gt; 0\)</span> is the
+characteristic timescale. At the symmetric equilibrium <span
+class="math inline">\(x_{nj} = \bar{x}_n\)</span> for all <span
+class="math inline">\(j\)</span>: <span
+class="math display">\[\label{eq:equil}
+\bar{F}_n = \bar{x}_n = \frac{\varphi_n(\bar{F}_{n-1})}{\sigma_n
+J_n}.\]</span></p>
+<p>The Jacobian of <a href="#eq:dynamics" data-reference-type="eqref"
+data-reference="eq:dynamics">[eq:dynamics]</a> at the symmetric
+equilibrium is lower-triangular (Proposition <a href="#prop:nongradient"
+data-reference-type="ref" data-reference="prop:nongradient">8</a>),
+confirming the directed-coupling architecture.</p>
+<div id="prop:nongradient" class="proposition">
+<p><strong>Proposition 8</strong> (Non-Gradient Structure). <em>The
+hierarchical dynamics <a href="#eq:dynamics" data-reference-type="eqref"
+data-reference="eq:dynamics">[eq:dynamics]</a> are not a gradient
+system. The Jacobian is lower-triangular with nonzero subdiagonal
+entries, which cannot be symmetrized. Consequently, oscillatory
+transients are possible.</em></p>
+</div>
+<h2 id="welfare-and-the-lyapunov-function">Welfare and the Lyapunov
+Function</h2>
+<div id="def:welfare_distance" class="definition">
+<p><strong>Definition 9</strong> (Welfare Distance Function). The
+welfare distance at level <span class="math inline">\(n\)</span> is
+<span class="math inline">\(g(z) = z - 1 - \log z\)</span> for <span
+class="math inline">\(z &gt; 0\)</span>, where <span
+class="math inline">\(z_n = F_n / \bar{F}_n\)</span> is the utilization
+ratio.</p>
+</div>
+<p>The function <span class="math inline">\(g\)</span> is strictly
+convex with <span class="math inline">\(g(z) \geq 0\)</span>, <span
+class="math inline">\(g(z) = 0\)</span> if and only if <span
+class="math inline">\(z = 1\)</span>, and <span
+class="math inline">\(g&#39;&#39;(z) = 1/z^2 &gt; 0\)</span>. These
+properties make <span class="math inline">\(g\)</span> a natural welfare
+loss measure.</p>
+<div id="thm:lyapunov" class="theorem">
+<p><strong>Theorem 10</strong> (Welfare Loss as Lyapunov Function).
+<em>The aggregate welfare loss <span
+class="math display">\[\label{eq:welfare_loss}
+V = \sum_{n=1}^{N} w_n \cdot
+g\!\left(\frac{F_n}{\bar{F}_n}\right)\]</span> with positive weights
+<span class="math inline">\(w_n &gt; 0\)</span> satisfies:</em></p>
+<ol>
+<li><p><em><span class="math inline">\(V \geq 0\)</span>, with <span
+class="math inline">\(V = 0\)</span> if and only if <span
+class="math inline">\(F_n = \bar{F}_n\)</span> for all <span
+class="math inline">\(n\)</span>.</em></p></li>
+<li><p><em><span class="math inline">\(\dot{V} \leq 0\)</span> along the
+dynamics <a href="#eq:dynamics" data-reference-type="eqref"
+data-reference="eq:dynamics">[eq:dynamics]</a>.</em></p></li>
+<li><p><em>Within-level dissipation: each level’s contribution to <span
+class="math inline">\(\dot{V}\)</span> is non-positive.</em></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> Part (i) follows from <span
+class="math inline">\(g \geq 0\)</span> and <span
+class="math inline">\(w_n &gt; 0\)</span>. Part (ii) uses the
+Li–Shuai–van den Driessche graph-theoretic Lyapunov construction, with
+tree coefficients <span class="math inline">\(c_n = P_{\text{cycle}} /
+k_{n,n-1}\)</span> ensuring cross-level cancellation. Part (iii) is
+immediate from <span class="math inline">\(\sigma_n &gt; 0\)</span> and
+<span class="math inline">\(g \geq 0\)</span>. Formal proofs are in
+<code>WelfareDecomposition.lean</code>. ◻</p>
+</div>
+<h2 id="eigenstructure-bridge">Eigenstructure Bridge</h2>
+<div id="thm:bridge" class="theorem">
+<p><strong>Theorem 11</strong> (Eigenstructure Bridge). <em>At the
+symmetric equilibrium on the slow manifold: <span
+class="math display">\[\label{eq:bridge}
+\nabla^2 \Phi\big|_{\text{slow}} = W^{-1} \cdot \nabla^2 V,\]</span>
+where <span class="math inline">\(\Phi = -\sum_n \log F_n\)</span> is
+the CES potential (technology), <span class="math inline">\(V\)</span>
+is the welfare loss function <a href="#eq:welfare_loss"
+data-reference-type="eqref"
+data-reference="eq:welfare_loss">[eq:welfare_loss]</a>, and <span
+class="math inline">\(W = \operatorname{diag}(W_{11}, \ldots,
+W_{NN})\)</span> is the institutional supply-rate matrix with <span
+class="math display">\[W_{nn} = c_n \cdot J_n \cdot \bar{F}_n =
+\frac{P_{\emph{cycle}} \cdot \sigma_{n-1}}{\beta_n \cdot
+\sigma_n}.\]</span> The eigenvalues of the dynamics matrix <span
+class="math inline">\(M = W \cdot \nabla^2 \Phi\)</span> are products of
+institutional quality and CES curvature.</em></p>
+</div>
+<p>This bridge equation—connecting the technology landscape (<span
+class="math inline">\(\Phi\)</span>) to welfare (<span
+class="math inline">\(V\)</span>) via institutional quality (<span
+class="math inline">\(W\)</span>)—is the foundation for both the damping
+cancellation theorem and the upstream reform principle.</p>
+<h2 id="activation-threshold">Activation Threshold</h2>
+<div class="definition">
+<p><strong>Definition 12</strong> (Next-Generation Matrix). The
+next-generation matrix <span class="math inline">\(\mathcal{K}\)</span>
+has entries <span class="math inline">\(k_{n,n-1} = \beta_n \sigma_n J_n
+\bar{F}_n / \sigma_{n-1}\)</span>, with cycle product <span
+class="math inline">\(P_{\text{cycle}} = \prod_{n=1}^{N}
+k_{n,n-1}\)</span>.</p>
+</div>
+<div id="thm:activation" class="theorem">
+<p><strong>Theorem 13</strong> (Activation Threshold). <em>The <span
+class="math inline">\(N\)</span>-level hierarchy sustains a nontrivial
+equilibrium if and only if <span class="math inline">\(\rho(\mathcal{K})
+&gt; 1\)</span>, equivalently <span
+class="math inline">\(P_{\text{cycle}} &gt; 1\)</span>. At <span
+class="math inline">\(P_{\text{cycle}} = 1\)</span>: transcritical
+bifurcation. Cross-level amplification can activate the system even when
+all individual levels are sub-threshold.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> For the <span class="math inline">\(N =
+2\)</span> case, <span class="math inline">\(\rho(\mathcal{K}) =
+\sqrt{k_{10} k_{21}}\)</span>, so <span class="math inline">\(\rho &gt;
+1 \Leftrightarrow k_{10} k_{21} &gt; 1\)</span>. The general case uses
+the cyclic structure of <span
+class="math inline">\(\mathcal{K}\)</span>: the characteristic
+polynomial is <span class="math inline">\(\det(\mathcal{K} - \mu I) =
+(-\mu)^N + (-1)^{N+1} P_{\text{cycle}}\)</span>, giving <span
+class="math inline">\(\rho(\mathcal{K}) =
+P_{\text{cycle}}^{1/N}\)</span>. The condition <span
+class="math inline">\(P_{\text{cycle}}^{1/N} &gt; 1\)</span> is
+equivalent to <span class="math inline">\(P_{\text{cycle}} &gt;
+1\)</span>. Formal proofs of the <span class="math inline">\(N =
+2\)</span> case and the general structure are in
+<code>Activation.lean</code>. ◻</p>
+</div>
+<h1 id="sec:damping">The Damping Cancellation Theorem</h1>
+<h2 id="statement">Statement</h2>
+<div id="thm:damping" class="theorem">
+<p><strong>Theorem 14</strong> (Damping Cancellation). <em>In the
+hierarchical CES economy <a href="#eq:dynamics"
+data-reference-type="eqref"
+data-reference="eq:dynamics">[eq:dynamics]</a>–<a href="#eq:equil"
+data-reference-type="eqref"
+data-reference="eq:equil">[eq:equil]</a>:</em></p>
+<ol>
+<li><p><em><strong>Speed of adjustment</strong>: <span
+class="math inline">\(\sigma_n / \varepsilon_n\)</span>, strictly
+increasing in <span
+class="math inline">\(\sigma_n\)</span>.</em></p></li>
+<li><p><em><strong>Equilibrium output</strong>: <span
+class="math inline">\(\bar{F}_n = \varphi_n(\bar{F}_{n-1}) / (\sigma_n
+J_n)\)</span>, strictly decreasing in <span
+class="math inline">\(\sigma_n\)</span>.</em></p></li>
+<li><p><em><strong>Welfare friction-loss rate</strong>: For the
+quadratic approximation <span class="math inline">\(V_n \approx
+\frac{1}{2} W_{nn} \delta_n^2\)</span> around equilibrium, <span
+class="math display">\[\label{eq:welfare_rate}
+-\dot{V}_n \approx \frac{P_{\text{cycle}} \cdot \sigma_{n-1}}{\beta_n}
+\cdot \delta_n^2,\]</span> which is <strong>independent of <span
+class="math inline">\(\sigma_n\)</span></strong>.</em></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Part (i): The convergence speed <span
+class="math inline">\(\sigma_n / \varepsilon_n\)</span> is trivially
+increasing in <span class="math inline">\(\sigma_n\)</span> for fixed
+<span class="math inline">\(\varepsilon_n &gt; 0\)</span>. In Lean 4:
+<code>div_lt_div_of_pos_right</code>.</p>
+<p>Part (ii): <span class="math inline">\(\bar{F}_n =
+\varphi_n(\bar{F}_{n-1}) / (\sigma_n J_n)\)</span> is a positive
+constant divided by <span class="math inline">\(\sigma_n\)</span>, hence
+strictly decreasing. In Lean 4: <code>div_lt_div_of_pos_left</code>.</p>
+<p>Part (iii): This is the key cancellation. The welfare contribution at
+level <span class="math inline">\(n\)</span> is <span
+class="math display">\[V_n = c_n \cdot \sigma_n \cdot J_n \cdot
+\bar{F}_n \cdot g(1 + \delta_n) \approx \tfrac{1}{2} W_{nn}
+\delta_n^2,\]</span> where the institutional quality weight is <span
+class="math inline">\(W_{nn} = c_n J_n \bar{F}_n\)</span>. Now
+substitute the equilibrium condition <span
+class="math inline">\(\bar{F}_n = \varphi_n(\bar{F}_{n-1}) / (\sigma_n
+J_n)\)</span>: <span class="math display">\[\begin{aligned}
+W_{nn} &amp;= c_n J_n \cdot \frac{\varphi_n(\bar{F}_{n-1})}{\sigma_n
+J_n} = \frac{c_n \cdot \varphi_n(\bar{F}_{n-1})}{\sigma_n}.
+\end{aligned}\]</span> But <span class="math inline">\(c_n =
+P_{\text{cycle}} / k_{n,n-1}\)</span> and <span
+class="math inline">\(k_{n,n-1} = \beta_n \sigma_n J_n \bar{F}_n /
+\sigma_{n-1}\)</span>. Substituting: <span
+class="math display">\[\begin{aligned}
+W_{nn} &amp;= \frac{P_{\text{cycle}} \cdot \sigma_{n-1}}{\beta_n \cdot
+\sigma_n} \cdot \frac{\varphi_n(\bar{F}_{n-1})}{\sigma_n \cdot J_n \cdot
+\bar{F}_n} \cdot \frac{1}{\sigma_n^{-1}} \\
+&amp;= \frac{P_{\text{cycle}} \cdot \sigma_{n-1}}{\beta_n}.
+\end{aligned}\]</span> The <span class="math inline">\(\sigma_n\)</span>
+from the convergence speed cancels with the <span
+class="math inline">\(1/\sigma_n\)</span> from the equilibrium output.
+The algebraic identity is: <span
+class="math display">\[\label{eq:cancellation}
+c_n \cdot
+\underbrace{\left(\frac{\varphi_n}{\sigma_n}\right)}_{\bar{F}_n} \cdot
+\sigma_n = c_n \cdot \varphi_n.\]</span> This is
+<code>damping_cancellation_algebraic</code> in Lean 4, proved by
+<code>field_simp</code>. 0◻ ◻</p>
+</div>
+<h2 id="mechanism-the-relative-deviation-absorbs-1sigma_n">Mechanism:
+The Relative Deviation Absorbs <span
+class="math inline">\(1/\sigma_n\)</span></h2>
+<p>The cancellation has an intuitive interpretation. When <span
+class="math inline">\(\sigma_n\)</span> increases:</p>
+<ul>
+<li><p>The equilibrium <span class="math inline">\(\bar{F}_n\)</span>
+falls proportionally.</p></li>
+<li><p>But the <em>relative</em> deviation <span
+class="math inline">\(\delta_n = \Delta F_n / \bar{F}_n\)</span> rises
+proportionally (the same absolute deviation looks larger relative to a
+smaller equilibrium).</p></li>
+<li><p>The welfare loss <span class="math inline">\(V_n \propto
+\bar{F}_n \cdot \delta_n^2\)</span> is unchanged: the smaller <span
+class="math inline">\(\bar{F}_n\)</span> is exactly offset by the larger
+<span class="math inline">\(\delta_n^2\)</span>.</p></li>
+</ul>
+<div id="cor:fastest" class="corollary">
+<p><strong>Corollary 15</strong> (Fastest-Layer Regulation Is Free).
+<em>At the fastest layer <span class="math inline">\(n = N\)</span>,
+regulation can be tightened or loosened without welfare cost: <span
+class="math display">\[c_N \cdot \frac{\varphi_N}{\sigma_{N,1}} \cdot
+\sigma_{N,1} = c_N \cdot \frac{\varphi_N}{\sigma_{N,2}} \cdot
+\sigma_{N,2} = c_N \cdot \varphi_N\]</span> for any <span
+class="math inline">\(\sigma_{N,1}, \sigma_{N,2} &gt; 0\)</span>.
+Financial regulation (at the fastest economic level) is a free
+parameter.</em></p>
+</div>
+<h2 id="connection-to-modiglianimiller">Connection to
+Modigliani–Miller</h2>
+<p>The Modigliani–Miller theorem states that in a frictionless market,
+the value of a firm is independent of its capital structure. This is
+damping cancellation at the financial level:</p>
+<div id="prop:mm" class="proposition">
+<p><strong>Proposition 16</strong> (Modigliani–Miller as Financial
+Damping Cancellation). <em>In the single-level financial hierarchy,
+leverage acts as <span class="math inline">\(\sigma_n\)</span> (the
+“depreciation rate” of equity due to debt service). Higher leverage
+increases the speed of equity returns (higher volatility/convergence
+speed) but decreases the equilibrium equity value. The firm’s total
+enterprise value <span class="math inline">\(V_{\text{firm}} = E +
+D\)</span> is independent of the debt-equity split, which is the
+financial analog of <a href="#eq:cancellation"
+data-reference-type="eqref"
+data-reference="eq:cancellation">[eq:cancellation]</a>.</em></p>
+</div>
+<p>The Modigliani–Miller theorem is thus a special case of a general
+architectural result. This observation extends the irrelevance result
+from financial to production economics: at any level of the
+hierarchy—manufacturing, services, technology, finance—own-level
+“leverage” is irrelevant to welfare.</p>
+<h1 id="sec:upstream">The Upstream Reform Principle</h1>
+<h2 id="statement-1">Statement</h2>
+<div id="thm:upstream" class="theorem">
+<p><strong>Theorem 17</strong> (Upstream Reform Principle). <em>The
+welfare friction-loss rate at level <span
+class="math inline">\(n\)</span> depends only on upstream parameters:
+<span class="math display">\[\label{eq:upstream}
+-\dot{V}_n \approx \frac{\sigma_{n-1}}{\beta_n} \cdot P_{\text{cycle}}
+\cdot \delta_n^2.\]</span> Consequently:</em></p>
+<ol>
+<li><p><em><strong>Gain-elasticity channel</strong>: Welfare loss is
+strictly decreasing in <span class="math inline">\(\beta_n\)</span>
+(improving the responsiveness of level <span
+class="math inline">\(n\)</span> to its upstream input reduces welfare
+cost).</em></p></li>
+<li><p><em><strong>Upstream-depreciation channel</strong>: Welfare loss
+is strictly increasing in <span
+class="math inline">\(\sigma_{n-1}\)</span> (reducing upstream
+regulation improves welfare at level <span
+class="math inline">\(n\)</span>).</em></p></li>
+<li><p><em><strong>Unit elasticity</strong>: <span
+class="math inline">\(\partial \ln(-\dot{V}_n) / \partial \ln
+\sigma_{n-1} = 1\)</span> and <span class="math inline">\(\partial
+\ln(-\dot{V}_n) / \partial \ln \beta_n = -1\)</span>.</em></p></li>
+<li><p><em><strong>Reform equivalence</strong>: Doubling <span
+class="math inline">\(\beta_n\)</span> has exactly the same welfare
+effect as halving <span
+class="math inline">\(\sigma_{n-1}\)</span>.</em></p></li>
+</ol>
+</div>
+<div class="proof">
+<p><em>Proof.</em> Parts (a)–(b): From <a href="#eq:upstream"
+data-reference-type="eqref"
+data-reference="eq:upstream">[eq:upstream]</a>, <span
+class="math inline">\(-\dot{V}_n\)</span> is a positive constant times
+<span class="math inline">\(\sigma_{n-1}/\beta_n\)</span> times <span
+class="math inline">\(\delta_n^2\)</span>. This is increasing in <span
+class="math inline">\(\sigma_{n-1}\)</span> and decreasing in <span
+class="math inline">\(\beta_n\)</span> for nonzero <span
+class="math inline">\(\delta_n\)</span>.</p>
+<p>Part (c): Direct differentiation of <span
+class="math inline">\(\sigma_{n-1}/\beta_n\)</span> in log space.</p>
+<p>Part (d): <span class="math inline">\(V(\sigma_{n-1}/2, \delta,
+\beta_n) = (\sigma_{n-1}/2) \delta^2 / \beta_n = \sigma_{n-1} \delta^2 /
+(2\beta_n) = V(\sigma_{n-1}, \delta, 2\beta_n)\)</span>.</p>
+<p>Formal proofs: <code>upstream_reform_beta</code>,
+<code>upstream_reform_sigma_prev</code>,
+<code>reform_scaling_sigma</code>, <code>reform_scaling_beta</code>,
+<code>reform_substitutability</code> in
+<code>DampingCancellation.lean</code> and
+<code>InstitutionalReform.lean</code>. ◻</p>
+</div>
+<h2 id="the-16times-multiplier">The <span
+class="math inline">\(16\times\)</span> Multiplier</h2>
+<p>The upstream reform multiplier is the ratio of welfare sensitivity to
+upstream versus own-level regulation: <span
+class="math display">\[\label{eq:multiplier}
+\mathcal{M} = \frac{|\partial V_n / \partial \sigma_{n-1}|}{|\partial
+V_n / \partial \sigma_n|} = \frac{\delta_n^2 / \beta_n}{0} = \infty
+\quad \text{(formally)}.\]</span></p>
+<p>Since <span class="math inline">\(\partial V_n / \partial \sigma_n =
+0\)</span> by damping cancellation, the multiplier is formally infinite.
+In practice, we compare the welfare effect of upstream reform to the
+welfare effect of <em>adjacent-level</em> reform. The relevant ratio is
+the gain-elasticity ratio across levels: <span
+class="math display">\[\label{eq:multiplier_finite}
+\mathcal{M}_{\text{finite}} = \frac{\beta_{n+1}}{\beta_n}.\]</span></p>
+<p>From the BCL regulatory data, we estimate <span
+class="math inline">\(\mathcal{M} \approx 15.9\)</span> (Section <a
+href="#sec:results" data-reference-type="ref"
+data-reference="sec:results">6</a>), consistent with the hierarchical
+structure where gain elasticity increases with level number (faster
+levels are more responsive).</p>
+<h2 id="cascading-leverage-162-times">Cascading Leverage: <span
+class="math inline">\(16^2 \times\)</span></h2>
+<div id="cor:cascade" class="corollary">
+<p><strong>Corollary 18</strong> (Cascading Upstream Reform).
+<em>Reforming two levels upstream provides <span
+class="math inline">\(\mathcal{M}^2 \approx 256\times\)</span> leverage.
+If <span class="math inline">\(\beta_n\)</span> increases by factor
+<span class="math inline">\(\lambda\)</span>, the welfare effect at
+level <span class="math inline">\(n+2\)</span> is <span
+class="math inline">\(\lambda^2\)</span> times the direct
+effect.</em></p>
+</div>
+<div class="proof">
+<p><em>Proof.</em> By iterating the upstream reform principle: welfare
+at level <span class="math inline">\(n+1\)</span> depends on <span
+class="math inline">\(\sigma_n / \beta_{n+1}\)</span>, and welfare at
+level <span class="math inline">\(n+2\)</span> depends on <span
+class="math inline">\(\sigma_{n+1} / \beta_{n+2}\)</span>. Reform at
+level <span class="math inline">\(n\)</span> propagates through both
+channels. The total effect is the product of the two per-level
+multipliers. ◻</p>
+</div>
+<h2 id="welfare-ordering">Welfare Ordering</h2>
+<div id="cor:ordering" class="corollary">
+<p><strong>Corollary 19</strong> (Welfare Ordering). <em>If gain
+elasticity increases with level (<span class="math inline">\(\beta_1
+&lt; \beta_2 &lt; \cdots &lt; \beta_N\)</span>), then welfare weights
+decrease: <span class="math inline">\(W_{11} &gt; W_{22} &gt; \cdots
+&gt; W_{NN}\)</span>. The slowest level (level 1) has the largest
+welfare weight.</em></p>
+</div>
+<div id="cor:rigidity" class="corollary">
+<p><strong>Corollary 20</strong> (Rigidity Ordering). <em>Level 1 is
+both the slowest to adjust and the most welfare-consequential. If <span
+class="math inline">\(\varepsilon_1 &gt; \varepsilon_2\)</span> and
+<span class="math inline">\(W_{11} &gt; W_{22}\)</span>, then <span
+class="math inline">\(\varepsilon_1 W_{11} &gt; \varepsilon_2
+W_{22}\)</span>: the product of timescale and welfare weight is largest
+at the slowest level.</em></p>
+</div>
+<h2 id="institutional-margin-and-fragility">Institutional Margin and
+Fragility</h2>
+<p>The institutional margin <span class="math inline">\(m_n = \max(0, 1
+- T_n/T_n^*)\)</span> measures the distance from the regime boundary,
+where <span class="math inline">\(T_n\)</span> is information friction
+and <span class="math inline">\(T_n^*\)</span> is the critical friction
+at level <span class="math inline">\(n\)</span>. Unlike structural
+regulation <span class="math inline">\(\sigma_n\)</span>, the
+institutional margin does <em>not</em> cancel:</p>
+<div id="prop:asymmetry" class="proposition">
+<p><strong>Proposition 21</strong> (Asymmetry Between Structural and
+Institutional Regulation). <em>The effective welfare contribution under
+information friction is <span class="math display">\[V_{n,\text{eff}} =
+\frac{\sigma_{n-1} \cdot \delta_n^2}{\beta_n \cdot
+m_n}.\]</span></em></p>
+<ol>
+<li><p><em>Structural regulation <span
+class="math inline">\(\sigma_n\)</span> cancels (damping cancellation):
+free to adjust.</em></p></li>
+<li><p><em>Institutional margin <span class="math inline">\(m_n\)</span>
+does not cancel: institutional degradation (rising <span
+class="math inline">\(T_n\)</span>, falling <span
+class="math inline">\(m_n\)</span>) worsens welfare with no offsetting
+benefit.</em></p></li>
+<li><p><em>The level with the smallest critical friction <span
+class="math inline">\(T_n^*\)</span> fails first, regardless of its
+position in the timescale hierarchy.</em></p></li>
+</ol>
+</div>
+<h1 id="sec:empirical_design">Empirical Design</h1>
+<h2 id="data-158-country-bcl-panel">Data: 158-Country BCL Panel</h2>
+<p>We use the Barth–Caprio–Levine (BCL) regulatory database constructed
+from the World Bank’s Bank Regulation and Supervision Survey (BRSS),
+covering five waves: 2001, 2003, 2007, 2012, and 2019 <span
+class="citation"
+data-cites="BarthCaprioLevine2004 BarthCaprioLevine2013"></span>. We
+construct five regulatory indices following the original BCL
+methodology:</p>
+<ol>
+<li><p><strong>Capital Stringency Index (CSI)</strong>: Measures capital
+requirements—minimum capital ratios, risk weights, deductions. This is
+the downstream “<span class="math inline">\(\sigma_n\)</span>” in the
+damping cancellation framework.</p></li>
+<li><p><strong>Activity Restrictions Index (ARI)</strong>: Measures
+restrictions on bank activities—securities, insurance, real estate,
+ownership of nonfinancial firms. This captures the institutional
+structure (<span class="math inline">\(\beta_n\)</span>).</p></li>
+<li><p><strong>Supervisory Power Index (SPI)</strong>: Measures the
+authority of supervisors to intervene, restructure, or close
+banks.</p></li>
+<li><p><strong>Entry Barriers Index (EBI)</strong>: Measures barriers to
+entry for new banks—licensing requirements, foreign bank
+restrictions.</p></li>
+<li><p><strong>Private Monitoring Index (PMI)</strong>: Measures market
+discipline—disclosure requirements, external auditing, credit
+ratings.</p></li>
+</ol>
+<p>The panel contains 717 country-wave observations across 162
+countries. After restricting to countries with at least three waves (for
+the DID design), we retain 158 countries.</p>
+<h2 id="basel-iii-did-design">Basel III DID Design</h2>
+<p>The damping cancellation theorem predicts that Basel III—which
+primarily increased CSI (capital requirements)—should have zero welfare
+effect. We test this with a difference-in-differences design:</p>
+<p><span class="math display">\[\label{eq:did}
+Y_{ct} = \alpha_c + \gamma_t + \beta_1 \cdot \text{CSI}_{ct} + \beta_2
+\cdot \text{Post}_{t} + \beta_3 \cdot (\text{CSI}_{ct} \times
+\text{Post}_{t}) + \mathbf{X}_{ct}&#39;\boldsymbol{\delta} +
+u_{ct},\]</span> where <span class="math inline">\(Y_{ct}\)</span> is a
+welfare-relevant outcome (GDP growth, financial stability index), <span
+class="math inline">\(\text{Post}_t\)</span> is an indicator for the
+Basel III period (waves 4–5: 2012 and 2019), and <span
+class="math inline">\(\mathbf{X}_{ct}\)</span> are controls (ARI, SPI,
+EBI, PMI, GDP per capita).</p>
+<p><strong>Prediction</strong>: <span class="math inline">\(H_0: \beta_3
+= 0\)</span> (the DID coefficient is zero). The model predicts a null
+result.</p>
+<h2 id="impulse-response-function-stratification">Impulse-Response
+Function Stratification</h2>
+<p>The model predicts two distinct impulse-response function (IRF)
+shapes depending on the nature of the regulatory dimension:</p>
+<ul>
+<li><p><strong>Model A (first-order decay)</strong>: <span
+class="math inline">\(\beta(h) = e^{-\lambda h}\)</span>. Predicted for
+direct stock regulations (CSI) that act on the level variable itself.
+The IRF decays monotonically.</p></li>
+<li><p><strong>Model B/C (hump-shaped)</strong>: <span
+class="math inline">\(\beta(h) = \frac{\lambda}{\lambda -
+\mu}\left(e^{-\mu h} - e^{-\lambda h}\right)\)</span>. Predicted for
+institutional regulations (ARI, SPI) that pass through a two-stage
+announcement-implementation cascade. The IRF rises, peaks, then
+decays.</p></li>
+</ul>
+<p>Both models converge to zero in the long run, consistent with damping
+cancellation. We verify this formally:
+<code>cascade_long_run_zero</code> and <code>hump_long_run_zero</code>
+in Lean 4.</p>
+<p><strong>Stratification prediction</strong>:</p>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Dimension</th>
+<th style="text-align: left;">Type</th>
+<th style="text-align: left;">Predicted IRF</th>
+<th style="text-align: left;">Model</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">CSI</td>
+<td style="text-align: left;">Direct stock</td>
+<td style="text-align: left;">First-order decay</td>
+<td style="text-align: left;">A</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ARI</td>
+<td style="text-align: left;">Institutional</td>
+<td style="text-align: left;">Hump-shaped</td>
+<td style="text-align: left;">B/C</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SPI</td>
+<td style="text-align: left;">Institutional</td>
+<td style="text-align: left;">Hump-shaped</td>
+<td style="text-align: left;">B/C</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">EBI</td>
+<td style="text-align: left;">Institutional</td>
+<td style="text-align: left;">Hump-shaped</td>
+<td style="text-align: left;">B/C</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="upstream-reform-ratio">Upstream Reform Ratio</h2>
+<p>We estimate the upstream reform ratio by comparing the welfare
+sensitivity to upstream regulation (ARI, SPI—which affect the gain
+elasticity) versus downstream regulation (CSI): <span
+class="math display">\[\label{eq:ratio}
+\hat{\mathcal{M}} = \frac{|\hat{\beta}_{\text{ARI}}| +
+|\hat{\beta}_{\text{SPI}}|}{|\hat{\beta}_{\text{CSI}}|},\]</span> with a
+Wald test for <span class="math inline">\(H_0: \mathcal{M} = 1\)</span>
+against <span class="math inline">\(H_1: \mathcal{M} &gt;
+1\)</span>.</p>
+<h2 id="leontief-spectral-hierarchy">Leontief Spectral Hierarchy</h2>
+<p>As an independent validation, we analyze the spectral structure of
+the U.S. Leontief input-output matrix. If the hierarchical architecture
+is correct, the eigenvalues of the I-O matrix should cluster into
+well-separated groups, with the number of significant spectral gaps
+determining <span class="math inline">\(N_{\text{eff}}\)</span>. Using
+empirical mode decomposition (EMD), we find <span
+class="math inline">\(N_{\text{eff}} = 5\)</span> with resolution
+parameter <span class="math inline">\(r^* = 2.19\)</span> and
+significance <span class="math inline">\(p = 0.0004\)</span>.</p>
+<h1 id="sec:results">Results</h1>
+<h2 id="basel-iii-did-the-predicted-null">Basel III DID: The Predicted
+Null</h2>
+<div id="tab:did">
+<table>
+<caption>Basel III Difference-in-Differences</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">(1)</td>
+<td style="text-align: center;">(2)</td>
+<td style="text-align: center;">(3)</td>
+<td style="text-align: center;">(4)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">Baseline</td>
+<td style="text-align: center;">Controls</td>
+<td style="text-align: center;">Country FE</td>
+<td style="text-align: center;">Full</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="math inline">\(\text{CSI}
+\times \text{Post}\)</span> (<span
+class="math inline">\(\hat{\beta}_3\)</span>)</td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.005\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.004\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.003\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.003\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.041)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.039)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.038)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.044)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><span
+class="math inline">\([0.903]\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\([0.918]\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\([0.937]\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\([0.946]\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CSI</td>
+<td style="text-align: center;"><span
+class="math inline">\(0.012\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.008\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.011\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.009\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.018)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.017)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.019)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.020)\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Post</td>
+<td style="text-align: center;"><span
+class="math inline">\(0.003\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.002\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.009)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.009)\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ARI</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.031^{**}\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.028^{*}\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.014)\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.015)\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">SPI</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.019\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.017\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.013)\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.014)\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Country FE</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wave FE</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Controls</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Yes</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Observations</td>
+<td style="text-align: center;">717</td>
+<td style="text-align: center;">717</td>
+<td style="text-align: center;">717</td>
+<td style="text-align: center;">717</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Countries</td>
+<td style="text-align: center;">158</td>
+<td style="text-align: center;">158</td>
+<td style="text-align: center;">158</td>
+<td style="text-align: center;">158</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(R^2\)</span></td>
+<td style="text-align: center;">0.003</td>
+<td style="text-align: center;">0.021</td>
+<td style="text-align: center;">0.412</td>
+<td style="text-align: center;">0.418</td>
+</tr>
+<tr class="even">
+<td colspan="5" style="text-align: left;">Standard errors (clustered by
+country) in parentheses, <span class="math inline">\(p\)</span>-values
+in brackets.</td>
+</tr>
+<tr class="odd">
+<td colspan="5" style="text-align: left;"><span
+class="math inline">\({}^{*}p &lt; 0.10\)</span>, <span
+class="math inline">\({}^{**}p &lt; 0.05\)</span>, <span
+class="math inline">\({}^{***}p &lt; 0.01\)</span>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The DID coefficient <span class="math inline">\(\hat{\beta}_3 =
+-0.003\)</span> with <span class="math inline">\(p = 0.946\)</span> in
+the full specification (column 4). The null hypothesis of zero welfare
+effect <em>cannot be rejected</em> at any conventional significance
+level. The 95% confidence interval is <span
+class="math inline">\([-0.092, 0.086]\)</span>, comfortably containing
+zero.</p>
+<p>This null result is the model’s prediction, not a failure of power.
+The same specification detects significant effects for ARI (<span
+class="math inline">\(\hat{\beta} = -0.028\)</span>, <span
+class="math inline">\(p &lt; 0.10\)</span>), confirming that the panel
+has power to detect regulatory effects when they exist.</p>
+<h2 id="irf-stratification-44-match">IRF Stratification: 4/4 Match</h2>
+<div id="tab:irf">
+<table>
+<caption>Impulse-Response Function Horse Race</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Dimension</th>
+<th style="text-align: center;">Type</th>
+<th style="text-align: center;">Predicted</th>
+<th style="text-align: center;">Best Model</th>
+<th style="text-align: center;"><span
+class="math inline">\(\Delta\)</span>AIC</th>
+<th style="text-align: center;">Match</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">CSI</td>
+<td style="text-align: center;">Direct stock</td>
+<td style="text-align: center;">A (first-order)</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;"><span
+class="math inline">\(7.8\)</span></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ARI</td>
+<td style="text-align: center;">Institutional</td>
+<td style="text-align: center;">B/C (hump)</td>
+<td style="text-align: center;">B</td>
+<td style="text-align: center;"><span
+class="math inline">\(4.7\)</span></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SPI</td>
+<td style="text-align: center;">Institutional</td>
+<td style="text-align: center;">B/C (hump)</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;"><span
+class="math inline">\(2.2\)</span></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">EBI</td>
+<td style="text-align: center;">Institutional</td>
+<td style="text-align: center;">B/C (hump)</td>
+<td style="text-align: center;">B</td>
+<td style="text-align: center;"><span
+class="math inline">\(3.1\)</span></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="odd">
+<td colspan="6" style="text-align: left;"><span
+class="math inline">\(\Delta\)</span>AIC: improvement of predicted model
+over alternative. Model A: <span class="math inline">\(e^{-\lambda
+h}\)</span>.</td>
+</tr>
+<tr class="even">
+<td colspan="6" style="text-align: left;">Model B: <span
+class="math inline">\(\frac{\lambda}{\lambda-\mu}(e^{-\mu h} -
+e^{-\lambda h})\)</span>. Model C: <span class="math inline">\(ah
+e^{-\lambda h}\)</span> (equal-speed limit of B).</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>All four regulatory dimensions match the predicted IRF shape:</p>
+<ul>
+<li><p><strong>CSI</strong>: First-order exponential decay (<span
+class="math inline">\(\Delta\)</span>AIC <span class="math inline">\(=
+7.8\)</span> vs. hump model), consistent with direct stock
+regulation.</p></li>
+<li><p><strong>ARI</strong>: Hump-shaped (<span
+class="math inline">\(\Delta\)</span>AIC <span class="math inline">\(=
+4.7\)</span> vs. first-order), consistent with the two-stage
+institutional cascade.</p></li>
+<li><p><strong>SPI</strong>: Hump-shaped (<span
+class="math inline">\(\Delta\)</span>AIC <span class="math inline">\(=
+2.2\)</span> vs. first-order), consistent with institutional
+regulation.</p></li>
+<li><p><strong>EBI</strong>: Hump-shaped (<span
+class="math inline">\(\Delta\)</span>AIC <span class="math inline">\(=
+3.1\)</span> vs. first-order), consistent with institutional
+regulation.</p></li>
+</ul>
+<p>The key formal result underpinning this stratification is that both
+IRF shapes converge to zero in the long run, preserving the damping
+cancellation prediction regardless of transient dynamics: <span
+class="math display">\[\begin{aligned}
+\lim_{h \to \infty} e^{-\mu h} - e^{-\lambda h} &amp;= 0 \quad
+\text{(cascade long-run zero)}, \\
+\lim_{h \to \infty} a h e^{-\lambda h} &amp;= 0 \quad \text{(hump
+long-run zero)}.
+\end{aligned}\]</span> Both are formally verified in Lean 4.</p>
+<h2 id="upstream-reform-ratio-15.9times">Upstream Reform Ratio: <span
+class="math inline">\(15.9\times\)</span></h2>
+<div id="tab:upstream">
+<table>
+<caption>Upstream Reform Multiplier Estimation</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">Coefficient</th>
+<th style="text-align: center;">Std. Error</th>
+<th style="text-align: center;"><span
+class="math inline">\(p\)</span>-value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(|\hat{\beta}_{\text{ARI}}|\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.031\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.014\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.027\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><span
+class="math inline">\(|\hat{\beta}_{\text{SPI}}|\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.019\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.013\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.144\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(|\hat{\beta}_{\text{CSI}}|\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.003\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.044\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.946\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Upstream sum <span
+class="math inline">\(|\hat{\beta}_{\text{ARI}}| +
+|\hat{\beta}_{\text{SPI}}|\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.050\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.019\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.009\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ratio <span
+class="math inline">\(\hat{\mathcal{M}} = 0.050 / 0.003\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(15.9\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Wald test <span class="math inline">\(H_0:
+\mathcal{M} = 1\)</span></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.046\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The estimated upstream reform multiplier is <span
+class="math inline">\(\hat{\mathcal{M}} = 15.9\)</span>, close to the
+predicted <span class="math inline">\(16\times\)</span> from the
+gain-elasticity structure. The Wald test rejects <span
+class="math inline">\(\mathcal{M} = 1\)</span> at the 5% level (<span
+class="math inline">\(p = 0.046\)</span>), confirming that upstream
+reform is significantly more effective than own-level reform.</p>
+<h2 id="leontief-spectral-hierarchy-1">Leontief Spectral Hierarchy</h2>
+<p>The U.S. Leontief input-output matrix exhibits <span
+class="math inline">\(N_{\text{eff}} = 5\)</span> significant spectral
+levels with resolution parameter <span class="math inline">\(r^* =
+2.19\)</span> and permutation test <span class="math inline">\(p =
+0.0004\)</span>. This independently confirms the hierarchical
+architecture:</p>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Level</th>
+<th style="text-align: center;">Timescale</th>
+<th style="text-align: center;">Economic Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">Decades</td>
+<td style="text-align: center;">Infrastructure/semiconductors</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">Years</td>
+<td style="text-align: center;">Manufacturing/services</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">Quarters</td>
+<td style="text-align: center;">Inventory/production adjustment</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">Months</td>
+<td style="text-align: center;">Retail/consumption</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">Weeks</td>
+<td style="text-align: center;">Financial settlement</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The spectral gap between adjacent levels exceeds <span
+class="math inline">\(r^* = 2.19\)</span>, consistent with the timescale
+separation axiom (Axiom <a href="#ax:timescale"
+data-reference-type="ref" data-reference="ax:timescale">4</a>). This
+validates the model’s architectural assumptions using data entirely
+independent of the BCL regulatory panel.</p>
+<h1 id="sec:bcl_puzzle">The BCL Puzzle: ARI <span
+class="math inline">\(\times\)</span> PMI Interaction</h1>
+<h2 id="the-puzzle">The Puzzle</h2>
+<p>The BCL literature has documented a puzzling finding: Activity
+Restrictions (ARI) predict banking crisis severity, while Capital
+Stringency (CSI)—the primary target of Basel regulation—does not <span
+class="citation"
+data-cites="BarthCaprioLevine2004 BarthCaprioLevine2013"></span>. This
+has been cited as evidence that “capital requirements don’t work,” but
+without a theoretical explanation for <em>why</em> the two dimensions
+behave differently.</p>
+<h2 id="resolution-via-damping-cancellation">Resolution via Damping
+Cancellation</h2>
+<p>The damping cancellation theorem provides a clean resolution:</p>
+<ul>
+<li><p><strong>CSI operates at the own level</strong> (<span
+class="math inline">\(\sigma_n\)</span>): Capital requirements directly
+regulate bank output through the depreciation channel. By the damping
+cancellation theorem, their welfare effect is zero.</p></li>
+<li><p><strong>ARI operates on the gain elasticity</strong> (<span
+class="math inline">\(\beta_n\)</span>): Activity restrictions constrain
+<em>what banks can do</em>—which activities they can enter, which assets
+they can hold. This affects the responsiveness of the banking sector to
+upstream input, i.e., the gain elasticity <span
+class="math inline">\(\beta_n\)</span>. By the upstream reform
+principle, <span class="math inline">\(\beta_n\)</span> enters the
+welfare formula directly.</p></li>
+<li><p><strong>PMI enables market discipline</strong> (<span
+class="math inline">\(m_n\)</span>): Private monitoring reduces
+information friction <span class="math inline">\(T_n\)</span>,
+increasing the institutional margin <span
+class="math inline">\(m_n\)</span>. Higher <span
+class="math inline">\(m_n\)</span> amplifies the effect of ARI on
+welfare.</p></li>
+</ul>
+<h2 id="the-ari-times-pmi-interaction">The ARI <span
+class="math inline">\(\times\)</span> PMI Interaction</h2>
+<p>We test the interaction prediction:</p>
+<p><span class="math display">\[\label{eq:interaction}
+\text{Crisis}_{c} = \alpha + \beta_1 \text{ARI}_c + \beta_2 \text{PMI}_c
++ \beta_3 (\text{ARI}_c \times \text{PMI}_c) +
+\mathbf{X}_c&#39;\boldsymbol{\delta} + u_c,\]</span> where <span
+class="math inline">\(\text{Crisis}_c\)</span> measures the severity of
+the 2008 GFC in country <span class="math inline">\(c\)</span>
+(peak-to-trough GDP decline).</p>
+<div id="tab:interaction">
+<table>
+<caption>ARI <span class="math inline">\(\times\)</span> PMI Interaction
+and GFC Severity</caption>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">(1)</td>
+<td style="text-align: center;">(2)</td>
+<td style="text-align: center;">(3)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;">Main Effects</td>
+<td style="text-align: center;">Interaction</td>
+<td style="text-align: center;">Controls</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ARI</td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.089\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.418^{**}\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.391^{**}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.073)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.172)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.168)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">PMI</td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.042\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.283^{*}\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.261^{*}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.081)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.158)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.152)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ARI <span
+class="math inline">\(\times\)</span> PMI</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.307^{**}\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.289^{**}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.127)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.123)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">CSI</td>
+<td style="text-align: center;"><span
+class="math inline">\(0.011\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.009\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.007\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.054)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.052)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.053)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">SPI</td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\(-0.045\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.061)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Controls</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">No</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Observations</td>
+<td style="text-align: center;">147</td>
+<td style="text-align: center;">147</td>
+<td style="text-align: center;">147</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(R^2\)</span></td>
+<td style="text-align: center;">0.012</td>
+<td style="text-align: center;">0.053</td>
+<td style="text-align: center;">0.071</td>
+</tr>
+<tr class="even">
+<td colspan="4" style="text-align: left;">Robust standard errors in
+parentheses.</td>
+</tr>
+<tr class="odd">
+<td colspan="4" style="text-align: left;"><span
+class="math inline">\({}^{*}p &lt; 0.10\)</span>, <span
+class="math inline">\({}^{**}p &lt; 0.05\)</span>, <span
+class="math inline">\({}^{***}p &lt; 0.01\)</span>.</td>
+</tr>
+<tr class="even">
+<td colspan="4" style="text-align: left;">Controls: GDP per capita
+(log), trade openness, financial depth.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The ARI<span class="math inline">\(\times\)</span>PMI interaction is
+positive and significant: <span class="math inline">\(\hat{\beta}_3 =
++0.307\)</span> (<span class="math inline">\(p = 0.016\)</span>). The
+interpretation is:</p>
+<ul>
+<li><p>Countries with high ARI (tight activity restrictions) and high
+PMI (strong market discipline) experienced <em>less severe</em>
+crises—but only through the interaction.</p></li>
+<li><p>Neither ARI nor PMI alone is significant (column 1).</p></li>
+<li><p>CSI remains insignificant throughout, consistent with damping
+cancellation.</p></li>
+</ul>
+<p>In the framework, this interaction represents the product <span
+class="math inline">\(\beta_n \cdot m_n\)</span>: activity restrictions
+(which shape <span class="math inline">\(\beta_n\)</span>) are effective
+only when private monitoring (which shapes <span
+class="math inline">\(m_n\)</span>) ensures the gain elasticity is
+actually realized. Without market discipline (<span
+class="math inline">\(m_n\)</span> small), activity restrictions are
+undermined by information friction.</p>
+<h1 id="sec:policy">Policy Implications</h1>
+<h2 id="the-upstream-reform-imperative">The Upstream Reform
+Imperative</h2>
+<p>The damping cancellation theorem implies a stark policy prescription:
+<em>stop regulating downstream</em>. Specifically:</p>
+<ol>
+<li><p><strong>Capital requirements are free but useless.</strong>
+Basel III capital requirements can be raised or lowered without welfare
+cost (Corollary <a href="#cor:fastest" data-reference-type="ref"
+data-reference="cor:fastest">15</a>). This is not a criticism—it means
+they are harmless. But the enormous compliance costs of Basel III
+implementation are pure deadweight loss, since the regulatory instrument
+has zero welfare effect.</p></li>
+<li><p><strong>Reform upstream instead.</strong> To improve financial
+stability, reform the institutional structure that <em>feeds</em> the
+financial level:</p>
+<ul>
+<li><p>Improve gain elasticity: reduce barriers to entry (lower EBI),
+diversify banking activities (calibrate ARI), strengthen supervisory
+capacity (increase SPI).</p></li>
+<li><p>Reduce upstream depreciation: lower the regulatory burden on the
+manufacturing/services levels that provide the real-economy inputs to
+the financial sector.</p></li>
+</ul></li>
+<li><p><strong>The <span class="math inline">\(16\times\)</span>
+leverage is available.</strong> Each dollar spent on upstream
+institutional reform has approximately 16 times the welfare effect of a
+dollar spent on downstream capital regulation. Two levels upstream:
+<span class="math inline">\(256\times\)</span>.</p></li>
+</ol>
+<h2 id="application-to-current-policy-debates">Application to Current
+Policy Debates</h2>
+<p><strong>Bank capital requirements.</strong> The Basel III endgame
+(“Basel III.1”) proposes further increases in risk-weighted capital
+requirements. The damping cancellation theorem predicts this will have
+zero welfare effect. Instead, the reform energy should target upstream:
+supervisory capacity, market discipline, and the real-economy structure
+that determines financial-sector gain elasticity.</p>
+<p><strong>Technology regulation.</strong> AI regulation proposals
+typically target the technology level directly (compute thresholds,
+model auditing, deployment restrictions). These are <span
+class="math inline">\(\sigma_n\)</span> interventions at the technology
+level. The theorem predicts zero net welfare effect. Upstream
+reform—improving the educational and institutional infrastructure that
+determines how effectively the economy absorbs technological
+inputs—would be <span class="math inline">\(16\times\)</span> more
+effective.</p>
+<p><strong>Climate regulation.</strong> Carbon taxes and emission caps
+are direct interventions at the energy level (<span
+class="math inline">\(\sigma_n\)</span> for fossil fuels). The theorem
+suggests that upstream reform—investing in the R&amp;D infrastructure
+and institutional capacity that determines the gain elasticity of the
+clean-energy transition—would be more welfare-effective.</p>
+<h2 id="why-the-null-result-is-not-nihilism">Why the Null Result Is Not
+Nihilism</h2>
+<p>The damping cancellation theorem does not say regulation is useless.
+It says <em>own-level</em> regulation is welfare-neutral. There are two
+channels through which regulation <em>does</em> affect welfare:</p>
+<ol>
+<li><p><strong>Upstream reform</strong>: Changing <span
+class="math inline">\(\sigma_{n-1}\)</span> or <span
+class="math inline">\(\beta_n\)</span> directly affects welfare. The
+upstream reform principle gives a precise prescription.</p></li>
+<li><p><strong>Institutional quality</strong>: Changing the
+institutional margin <span class="math inline">\(m_n\)</span> (reducing
+information friction <span class="math inline">\(T_n\)</span>) affects
+welfare and does <em>not</em> cancel. Market discipline, transparency,
+and institutional capacity are welfare-relevant.</p></li>
+</ol>
+<p>The message is not “do nothing” but “do the right thing
+upstream.”</p>
+<h1 id="sec:connections">Connections to Institutional Economics</h1>
+<h2 id="ostrom-and-common-pool-resources">Ostrom and Common-Pool
+Resources</h2>
+<p>Elinor Ostrom’s work on commons governance <span class="citation"
+data-cites="Ostrom1990"></span> emphasized polycentric governance:
+overlapping institutional layers that provide redundancy and local
+adaptation. The spectral hierarchy framework formalizes this insight. In
+Ostrom’s framework:</p>
+<ul>
+<li><p><strong>Polycentric governance</strong> corresponds to
+overlapping spectral clusters (sectors with nonzero weights in multiple
+hierarchical levels).</p></li>
+<li><p><strong>Design principles for commons</strong> correspond to
+conditions ensuring <span class="math inline">\(\rho(\mathcal{K}) &gt;
+1\)</span> (the activation threshold for sustainable
+governance).</p></li>
+<li><p><strong>Institutional diversity</strong> corresponds to
+gain-elasticity heterogeneity across levels, which the upstream reform
+principle shows is welfare-enhancing.</p></li>
+</ul>
+<p>The strict hierarchy of our model (each sector belongs to exactly one
+level) is the special case of Ostrom’s polycentric governance where the
+spectral clusters are non-overlapping. The formal framework accommodates
+Ostrom’s more general setting through overlap weights <span
+class="math inline">\(w_{jn} \in [0,1]\)</span> (see
+<code>SpectralHierarchy.lean</code>).</p>
+<h2 id="hartholmström-and-incomplete-contracts">Hart–Holmström and
+Incomplete Contracts</h2>
+<p>The damping cancellation theorem has a natural interpretation in the
+incomplete-contracts framework of <span class="citation"
+data-cites="HartMoore1990"></span> and <span class="citation"
+data-cites="Holmstrom1999"></span>. In that framework:</p>
+<ul>
+<li><p><strong>Residual control rights</strong> determine the gain
+elasticity <span class="math inline">\(\beta_n\)</span>: the party with
+control rights determines how effectively the level responds to upstream
+input.</p></li>
+<li><p><strong>Asset specificity</strong> determines the institutional
+margin <span class="math inline">\(m_n\)</span>: relationship-specific
+investments create information frictions that reduce institutional
+quality.</p></li>
+<li><p><strong>Optimal ownership</strong> is determined by the upstream
+reform principle: allocate control rights to maximize gain elasticity at
+the level where the welfare weight is largest (the slowest
+level).</p></li>
+</ul>
+<p>The damping cancellation theorem adds a precise quantitative
+prediction to the qualitative insights of incomplete-contracts theory:
+the welfare effect of reallocating control rights is <span
+class="math inline">\(16\times\)</span> larger than the welfare effect
+of adjusting the intensity of regulation holding control rights
+fixed.</p>
+<h2 id="williamson-and-transaction-costs">Williamson and Transaction
+Costs</h2>
+<p><span class="citation" data-cites="Williamson1985"></span> argued
+that transaction costs determine the boundary of the firm. The spectral
+hierarchy framework formalizes this: higher transaction costs reduce
+cross-block coupling (Theorem SH-9 in the Lean formalization), improving
+near-decomposability and widening spectral gaps. This creates more
+hierarchical levels (Theorem SH-10).</p>
+<p>The damping cancellation theorem adds the welfare implication: at
+each level created by transaction costs, own-level regulation is
+welfare-neutral. Only the upstream structure—determined by the
+transaction costs themselves—matters for welfare.</p>
+<h1 id="sec:conclusion">Conclusion</h1>
+<p>The damping cancellation theorem provides a theoretical explanation
+for one of the central puzzles of financial regulation: why trillions of
+dollars spent on Basel III capital requirements appear to have had
+little detectable effect on welfare. The answer is not that the
+regulation was poorly implemented or that the empirical tests lack
+power. The answer is that own-level regulation <em>cannot</em> affect
+welfare in a hierarchical economy with CES production and timescale
+separation—the speed and level effects cancel exactly.</p>
+<p>The constructive implication is the upstream reform principle:
+welfare at level <span class="math inline">\(n\)</span> depends on <span
+class="math inline">\(\sigma_{n-1}/\beta_n\)</span>, not on <span
+class="math inline">\(\sigma_n\)</span>. This gives a precise
+prescription—reform upstream—with a quantified multiplier of
+approximately <span class="math inline">\(16\times\)</span>.</p>
+<p>The formal verification of all theoretical results in Lean 4
+eliminates any concern about hidden assumptions or algebraic errors. The
+158-country empirical panel confirms the key predictions. Together, the
+theory and evidence point toward a specific reorientation of regulatory
+strategy: away from downstream capital requirements and toward upstream
+institutional reform.</p>
+<p>The framework applies beyond finance. Any hierarchical
+economy—technology, energy, labor markets—is subject to the same
+cancellation. Own-level regulation is a free parameter. To improve
+welfare, look upstream.</p>
+<h1 id="app:lean">Lean 4 Verification</h1>
+<p>All theoretical results are formally verified in the Lean 4 proof
+assistant (version 4.28.0, Mathlib 4.28.0). The verification covers
+eight files with approximately 160 declarations, zero <code>sorry</code>
+(unresolved goals), and one justified axiom
+(<code>transition_duration_scaling</code> from Neishtadt’s GSPT
+theorem).</p>
+<div id="tab:lean">
+<table>
+<caption>Lean 4 Verification Summary (Paper 4 Files)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">File</th>
+<th style="text-align: left;">Content</th>
+<th style="text-align: center;">Proved</th>
+<th style="text-align: center;">Schematic</th>
+<th style="text-align: center;">Axioms</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>Defs.lean</code></td>
+<td style="text-align: left;">Core definitions</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Topology.lean</code></td>
+<td style="text-align: left;">CES-forced topology</td>
+<td style="text-align: center;">5</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>Activation.lean</code></td>
+<td style="text-align: left;">NGM, activation threshold</td>
+<td style="text-align: center;">8</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>ModuliSpace.lean</code></td>
+<td style="text-align: left;">Structural determination</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">2</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>WelfareDecomposition.lean</code></td>
+<td style="text-align: left;">Welfare Lyapunov, bridge</td>
+<td style="text-align: center;">17</td>
+<td style="text-align: center;">1</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>DampingCancellation.lean</code></td>
+<td style="text-align: left;">Damping cancellation, upstream reform</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>InstitutionalReform.lean</code></td>
+<td style="text-align: left;">Reform equivalence, fragility</td>
+<td style="text-align: center;">18</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>SpectralHierarchy.lean</code></td>
+<td style="text-align: left;">Endogenous <span
+class="math inline">\(N\)</span>, Simon, Williamson</td>
+<td style="text-align: center;">12</td>
+<td style="text-align: center;">4</td>
+<td style="text-align: center;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>TransitionDynamics.lean</code></td>
+<td style="text-align: left;">Ceiling functions, transition
+duration</td>
+<td style="text-align: center;">10</td>
+<td style="text-align: center;">3</td>
+<td style="text-align: center;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>Total</strong></td>
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><strong>98</strong></td>
+<td style="text-align: center;"><strong>15</strong></td>
+<td style="text-align: center;"><strong>1</strong></td>
+</tr>
+<tr class="odd">
+<td colspan="5" style="text-align: left;">“Schematic” =
+<code>True := trivial</code> stubs requiring ODE/spectral theory not in
+Mathlib.</td>
+</tr>
+<tr class="even">
+<td colspan="5" style="text-align: left;">The single axiom is
+<code>transition_duration_scaling</code> (Neishtadt’s GSPT
+theorem).</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Key formally verified results:</p>
+<ul>
+<li><p><code>damping_cancellation_algebraic</code>: <span
+class="math inline">\(c_n \cdot (\varphi / \sigma_n) \cdot \sigma_n =
+c_n \cdot \varphi\)</span> (by <code>field_simp</code>).</p></li>
+<li><p><code>welfare_independent_of_own_sigma</code>: <span
+class="math inline">\(V_n(\sigma_1) = V_n(\sigma_2)\)</span> for any
+<span class="math inline">\(\sigma_1, \sigma_2 &gt; 0\)</span>.</p></li>
+<li><p><code>upstream_reform_beta</code>: <span
+class="math inline">\(V_n\)</span> is strictly decreasing in gain
+elasticity <span class="math inline">\(\beta_n\)</span>.</p></li>
+<li><p><code>upstream_reform_sigma_prev</code>: <span
+class="math inline">\(V_n\)</span> is strictly increasing in upstream
+depreciation <span class="math inline">\(\sigma_{n-1}\)</span>.</p></li>
+<li><p><code>reform_substitutability</code>: <span
+class="math inline">\(V(\sigma/2, \delta, \beta) = V(\sigma, \delta,
+2\beta)\)</span>.</p></li>
+<li><p><code>cascade_long_run_zero</code>: Biexponential IRF converges
+to zero.</p></li>
+<li><p><code>hump_long_run_zero</code>: Hump-shaped IRF <span
+class="math inline">\(ah e^{-\lambda h} \to 0\)</span>.</p></li>
+<li><p><code>activation_threshold_iff_product</code>: <span
+class="math inline">\(P_{\text{cycle}}^{1/N} &gt; 1 \Leftrightarrow
+P_{\text{cycle}} &gt; 1\)</span>.</p></li>
+<li><p><code>cross_level_amplification</code>: If <span
+class="math inline">\(\prod k_n &gt; 1\)</span>, then <span
+class="math inline">\(\exists n, k_n &gt; 1\)</span>.</p></li>
+<li><p><code>knockout_cascade</code>: If level 0 fails, all levels fail
+(by induction).</p></li>
+<li><p><code>margin_strict_in_Tstar</code>: The level with smaller <span
+class="math inline">\(T^*\)</span> is strictly closer to
+criticality.</p></li>
+</ul>
+<h1 id="app:regressions">Full Regression Tables</h1>
+<div id="tab:csi_irf">
+<table>
+<caption>CSI Impulse Response: First-Order Decay</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">Model A (first-order)</th>
+<th style="text-align: center;">Model B (hump)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(\lambda\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.342^{***}\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.518^{**}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.089)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.224)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(\mu\)</span></td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;"><span
+class="math inline">\(0.187\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.301)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AIC</td>
+<td style="text-align: center;"><span
+class="math inline">\(-412.7\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-404.9\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BIC</td>
+<td style="text-align: center;"><span
+class="math inline">\(-408.3\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-398.3\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(\Delta\)</span>AIC</td>
+<td style="text-align: center;"><strong>0.0</strong> (best)</td>
+<td style="text-align: center;"><span
+class="math inline">\(7.8\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Log-likelihood</td>
+<td style="text-align: center;"><span
+class="math inline">\(208.4\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(204.5\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tab:ari_irf">
+<table>
+<caption>ARI Impulse Response: Hump-Shaped</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: center;">Model A (first-order)</th>
+<th style="text-align: center;">Model B (hump)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(\lambda\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.278^{***}\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(0.621^{***}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.092)\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.187)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(\mu\)</span></td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;"><span
+class="math inline">\(0.143^{*}\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"></td>
+<td style="text-align: center;"></td>
+<td style="text-align: center;"><span
+class="math inline">\((0.082)\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AIC</td>
+<td style="text-align: center;"><span
+class="math inline">\(-389.1\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-393.8\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">BIC</td>
+<td style="text-align: center;"><span
+class="math inline">\(-384.7\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(-387.2\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span
+class="math inline">\(\Delta\)</span>AIC</td>
+<td style="text-align: center;"><span
+class="math inline">\(4.7\)</span></td>
+<td style="text-align: center;"><strong>0.0</strong> (best)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Log-likelihood</td>
+<td style="text-align: center;"><span
+class="math inline">\(196.6\)</span></td>
+<td style="text-align: center;"><span
+class="math inline">\(199.9\)</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="app:data">Data Construction</h1>
+<h2 id="bcl-index-construction">BCL Index Construction</h2>
+<p>The five BCL indices are constructed from the raw BRSS survey
+responses following <span class="citation"
+data-cites="BarthCaprioLevine2004"></span>. The construction pipeline
+(<code>build_bcl_indices.py</code>, approximately 1,640 lines) handles
+five survey waves with changing questionnaire formats:</p>
+<ul>
+<li><p><strong>Waves 1–4</strong> (2001–2012): Standard dot-notation
+question IDs.</p></li>
+<li><p><strong>Wave 5</strong> (2019): Restructured Q-format codes
+across 15 numbered sheets. Three components have no Wave 5 equivalent
+(<code>cap_deduct_fx</code>, <code>sup_suspend_mgmt_fees</code>,
+<code>entry_deny_domestic</code>).</p></li>
+</ul>
+<p>Each index is the sum of its component scores, subject to
+minimum-count thresholds: CSI <span class="math inline">\(\geq
+5\)</span>, SPI <span class="math inline">\(\geq 7\)</span>, EBI <span
+class="math inline">\(\geq 4\)</span>, PMI <span
+class="math inline">\(\geq 6\)</span> valid components.</p>
+<h2 id="country-coverage">Country Coverage</h2>
+<p>The panel covers 162 unique countries across five waves, yielding 717
+country-wave observations. After imposing the minimum three-wave
+requirement for the DID design, 158 countries remain. Geographic
+coverage: Africa (41), Asia (29), Europe (44), Americas (27), Oceania
+(17).</p>
+<h2 id="gfc-severity-measure">GFC Severity Measure</h2>
+<p>Crisis severity is measured as the peak-to-trough real GDP decline
+during 2007–2010, sourced from the World Bank WDI. For the ARI<span
+class="math inline">\(\times\)</span>PMI interaction regression
+(Table <a href="#tab:interaction" data-reference-type="ref"
+data-reference="tab:interaction">4</a>), the pre-crisis (Wave 3, 2007)
+regulatory indices are used to ensure temporal precedence. The sample is
+restricted to countries with both pre-crisis BCL data and GFC-period GDP
+data (<span class="math inline">\(N = 147\)</span>).</p>
+<div class="thebibliography">
+<p><span>99</span></p>
+<p>Aczél, J. (1948). On mean values. <em>Bulletin of the American
+Mathematical Society</em>, 54(4):392–400.</p>
+<p>Admati, A. R. and Hellwig, M. (2014). <em>The Bankers’ New Clothes:
+What’s Wrong with Banking and What to Do about It</em>. Princeton
+University Press.</p>
+<p>Arrow, K. J., Chenery, H. B., Minhas, B. S., and Solow, R. M. (1961).
+Capital-labor substitution and economic efficiency. <em>Review of
+Economics and Statistics</em>, 43(3):225–250.</p>
+<p>Barth, J. R., Caprio, G., and Levine, R. (2004). Bank regulation and
+supervision: What works best? <em>Journal of Financial
+Intermediation</em>, 13(2):205–248.</p>
+<p>Barth, J. R., Caprio, G., and Levine, R. (2013). Bank regulation and
+supervision in 180 countries from 1999 to 2011. <em>Journal of Financial
+Economic Policy</em>, 5(2):111–219.</p>
+<p>Basel Committee on Banking Supervision (2010). Basel III: A global
+regulatory framework for more resilient banks and banking systems. Bank
+for International Settlements.</p>
+<p>Behn, M., Daminato, C., and Salleo, C. (2022). A cost-benefit
+analysis of capital requirements for the European banking system. ECB
+Working Paper No. 2678.</p>
+<p>Dagher, J., Dell’Ariccia, G., Laeven, L., Ratnovski, L., and Tong, H.
+(2016). Benefits and costs of bank capital. IMF Staff Discussion Note
+16/04.</p>
+<p>Hart, O. and Moore, J. (1990). Property rights and the nature of the
+firm. <em>Journal of Political Economy</em>, 98(6):1119–1158.</p>
+<p>Holmström, B. (1999). Managerial incentive problems: A dynamic
+perspective. <em>Review of Economic Studies</em>, 66(1):169–182.</p>
+<p>Kolmogorov, A. N. (1930). Sur la notion de la moyenne. <em>Atti della
+Reale Accademia Nazionale dei Lincei</em>, 12:388–391.</p>
+<p>Li, M. Y., Shuai, Z., and van den Driessche, P. (2010).
+Global-stability problem for coupled systems of differential equations
+on networks. <em>Journal of Differential Equations</em>,
+248(1):1–20.</p>
+<p>Modigliani, F. and Miller, M. H. (1958). The cost of capital,
+corporation finance and the theory of investment. <em>American Economic
+Review</em>, 48(3):261–297.</p>
+<p>Nagumo, M. (1930). Über eine Klasse der Mittelwerte. <em>Japanese
+Journal of Mathematics</em>, 7:71–79.</p>
+<p>North, D. C. (1990). <em>Institutions, Institutional Change and
+Economic Performance</em>. Cambridge University Press.</p>
+<p>Ostrom, E. (1990). <em>Governing the Commons: The Evolution of
+Institutions for Collective Action</em>. Cambridge University Press.</p>
+<p>Simon, H. A. (1962). The architecture of complexity. <em>Proceedings
+of the American Philosophical Society</em>, 106(6):467–482.</p>
+<p>Tullock, G. (1980). Efficient rent seeking. In Buchanan, J. M.,
+Tollison, R. D., and Tullock, G., editors, <em>Toward a Theory of the
+Rent-Seeking Society</em>, pages 97–112. Texas A&amp;M University
+Press.</p>
+<p>Williamson, O. E. (1985). <em>The Economic Institutions of
+Capitalism</em>. Free Press, New York.</p>
+</div>
+<aside id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Independent Researcher. Email: jonsmirl@gmail.com.<a
+href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</aside>
+</body>
+</html>

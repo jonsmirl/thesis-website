@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Jon Smirl" />
+  <title>Paper_A_CES_Uniqueness</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    div.abstract {
+      margin: 2em 2em 2em 2em;
+      text-align: left;
+      font-size: 85%;
+    }
+    div.abstract-title {
+      font-weight: bold;
+      text-align: center;
+      padding: 0;
+      margin-bottom: 0.5em;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<p><strong>JEL Classification:</strong> D24, E23, C65, L23<br />
+<strong>Keywords:</strong> CES production function, aggregation,
+curvature, formal verification, Lean 4</p>
+<h1 id="sec:intro">Introduction</h1>
+<p>The CES production function has been assumed in thousands of papers
+since <span class="citation" data-cites="ACMS1961"></span> and <span
+class="citation" data-cites="Uzawa1962"></span>. The translog <span
+class="citation" data-cites="ChristensenJorgensonLau1973"></span>, the
+generalized Leontief <span class="citation"
+data-cites="Diewert1971"></span>, and dozens of “flexible functional
+forms” have been proposed as alternatives. This paper shows the debate
+was unnecessary. CES is not a modeling choice. It is the unique answer
+to a well-posed mathematical question: <em>What is the only aggregator
+compatible with constant returns and consistent multi-scale
+aggregation?</em></p>
+<p>The answer—power means, which are CES—was established by <span
+class="citation" data-cites="Kolmogorov1930"></span>, <span
+class="citation" data-cites="Nagumo1930"></span>, and <span
+class="citation" data-cites="Aczel1948"></span>. The contribution of
+this paper is not the uniqueness result per se but its consequences: if
+CES is forced rather than chosen, then its curvature parameter <span
+class="math inline">\(\rho\)</span> is not one parameter among many but
+the single structural constant of production economics <span
+class="citation" data-cites="Jones2005"></span>. Understanding what
+<span class="math inline">\(\rho\)</span> controls is therefore
+central.</p>
+<p>We make two contributions.</p>
+<p><strong>1. Uniqueness and stability.</strong> We state the
+Kolmogorov–Nagumo–Aczél characterization (Theorem <a
+href="#thm:uniqueness" data-reference-type="ref"
+data-reference="thm:uniqueness">1</a>) and prove a new aggregation
+stability result (Theorem <a href="#thm:stability"
+data-reference-type="ref" data-reference="thm:stability">2</a>): under
+iterated <span class="math inline">\(k\)</span>-fold aggregation, the
+CES parameter <span class="math inline">\(\rho\)</span> is exactly
+preserved (<span class="math inline">\(\beta(\rho) = 0\)</span>) while
+all non-CES perturbations decay at rate <span
+class="math inline">\(O(k^{-L/2})\)</span> after <span
+class="math inline">\(L\)</span> aggregation layers. CES is therefore a
+line of fixed points in function space, parameterized by <span
+class="math inline">\(\rho\)</span>. No other production function
+survives aggregation.</p>
+<p><strong>2. The quadruple role of curvature.</strong> The CES
+curvature <span class="math inline">\(K = (1-\rho)(J-1)/J\)</span>
+simultaneously controls four mechanisms that the profession treats as
+independent: superadditivity (<span class="math inline">\(\propto
+K\)</span>), correlation robustness (<span class="math inline">\(\propto
+K^2\)</span>), strategic stability (<span class="math inline">\(\propto
+K\)</span>), and network scaling (<span class="math inline">\(\propto K
+\log J\)</span>). These are not separate results. Theorem <a
+href="#thm:geometric_unity" data-reference-type="ref"
+data-reference="thm:geometric_unity">7</a> proves they are four
+projections of a single eigenvalue of <span
+class="math inline">\(-\operatorname{Hess}(\log
+F)|_{\mathbf{1}^\perp}\)</span>, equal to <span
+class="math inline">\((1-\rho)/\rho\)</span> with multiplicity <span
+class="math inline">\(J-1\)</span> at the symmetric point.</p>
+<p>All proofs are formally verified in the Lean 4 proof assistant—over
+182 declarations across 13 files, two classical axioms
+(Kolmogorov–Nagumo and Aczél), zero sorry (unresolved goals). To our
+knowledge, this is the first formally verified result in economic
+theory.</p>
+<p><strong>Relation to existing work.</strong> The characterization of
+quasi-arithmetic means by Kolmogorov, Nagumo, and Aczél is classical.
+The four roles of CES curvature are individually known: superadditivity
+from Jensen’s inequality <span class="citation"
+data-cites="HardyLittlewoodPolya1934"></span>, strategic stability from
+contest theory <span class="citation" data-cites="TullockRent"></span>,
+network effects from diversity economics, and correlation robustness
+from portfolio theory. The contribution is showing they are the same
+geometric fact.</p>
+<p>Section <a href="#sec:emergence" data-reference-type="ref"
+data-reference="sec:emergence">2</a> establishes uniqueness and
+aggregation stability. Section <a href="#sec:quadruple"
+data-reference-type="ref" data-reference="sec:quadruple">3</a> develops
+the quadruple role and geometric unity. Section <a href="#sec:empirical"
+data-reference-type="ref" data-reference="sec:empirical">4</a> reports
+an empirical test of aggregation invariance. Section <a
+href="#sec:discussion" data-reference-type="ref"
+data-reference="sec:discussion">5</a> discusses implications and
+Section <a href="#sec:conclusion" data-reference-type="ref"
+data-reference="sec:conclusion">6</a> concludes.</p>
+<p><strong>Companion papers.</strong> A companion paper <span
+class="citation" data-cites="SmirlB2026"></span> develops the
+information-geometric consequences of the geometric unity factorization:
+the bridge theorem equating production curvature to Fisher information,
+the estimation paradox, the cumulant tower, and the crisis correlation
+dual. Three further companion papers develop extensions: the CES
+potential with information friction (Paper 2), conservative-dissipative
+dynamics with endogenous <span class="math inline">\(\rho\)</span>
+(Paper 3), and the hierarchical architecture with damping cancellation
+(Paper 4). The present paper is self-contained; nothing below depends on
+the companion results.</p>
+<h1 id="sec:emergence">CES Emergence</h1>
+<h2 id="setup">Setup</h2>
+<p>Consider <span class="math inline">\(J \geq 2\)</span> symmetric
+inputs combined by an aggregator <span class="math inline">\(F :
+\mathbb{R}^J_+ \to \mathbb{R}_+\)</span>. We impose three axioms:</p>
+<ol>
+<li><p><strong>Continuity.</strong> <span
+class="math inline">\(F\)</span> is continuous.</p></li>
+<li><p><strong>Homogeneity of degree one.</strong> <span
+class="math inline">\(F(\lambda x) = \lambda F(x)\)</span> for all <span
+class="math inline">\(\lambda &gt; 0\)</span>.</p></li>
+<li><p><strong>Scale consistency.</strong> <span
+class="math inline">\(F\)</span> is consistent under multi-scale
+aggregation: the aggregate of aggregates equals the aggregate of the
+whole. Formally, if <span class="math inline">\(\{1, \ldots,
+J\}\)</span> is partitioned into groups and <span
+class="math inline">\(F\)</span> is applied within each group, then
+applying <span class="math inline">\(F\)</span> again to the group
+aggregates yields the same result as applying <span
+class="math inline">\(F\)</span> to all <span
+class="math inline">\(J\)</span> inputs directly.</p></li>
+</ol>
+<p>Axiom (A3) is the mathematical content of “scale consistency” or
+“aggregation invariance.” It says that the production function does not
+depend on how one draws organizational boundaries—whether one treats a
+factory as a single unit or as separate departments, the aggregate
+output is the same. In national accounts terms: GDP computed at the firm
+level, the industry level, and the sector level should agree.</p>
+<p>Each axiom separately is weak. Constant returns (A2) is the standard
+long-run assumption. Continuity (A1) rules out pathological
+constructions. Scale consistency (A3) is a minimal coherence
+requirement—it says the aggregation procedure respects its own
+structure. The force of the theorem is that these three weak
+requirements together leave no room: the aggregator is determined up to
+a single parameter <span class="math inline">\(\rho\)</span>.</p>
+<h2 id="uniqueness">Uniqueness</h2>
+<div id="thm:uniqueness" class="theorem">
+<p><strong>Theorem 1</strong> (Uniqueness: Kolmogorov–Nagumo–Aczél).
+<em>The only functions satisfying (A1)–(A3) are the power means: <span
+class="math display">\[M_\rho(x) = \left(\frac{1}{J}\sum_{j=1}^{J}
+x_j^\rho\right)^{1/\rho}, \quad \rho \in (-\infty, 1] \setminus
+\{0\},\]</span> with the Cobb-Douglas limit <span
+class="math inline">\(M_0(x) = (\prod x_j)^{1/J}\)</span> at <span
+class="math inline">\(\rho = 0\)</span>.</em></p>
+</div>
+<p>The proof uses the Aczél functional equation characterization of
+quasi-arithmetic means: (A3) forces the generating function <span
+class="math inline">\(\varphi\)</span> to satisfy <span
+class="math inline">\(\varphi(M(\varphi^{-1}(y_1), \ldots,
+\varphi^{-1}(y_k))) = M(y_1, \ldots, y_k)\)</span> for all partitions,
+which with (A2) forces <span class="math inline">\(\varphi(x) =
+x^\rho\)</span>. The formal proof is in <code>Basic.lean</code> and
+<code>Emergence.lean</code>.</p>
+<p>Every paper that “assumes CES” is therefore assuming constant returns
+plus scale consistency. CES is the consequence, not the premise. This
+resolves the long-standing aggregation problem <span class="citation"
+data-cites="Gorman1953 Gorman1968 Fisher1969 BlackorbySchworm1993 Sato1975"></span>:
+the only micro production function that aggregates consistently to a
+macro production function of the same form is CES.</p>
+<h2 id="aggregation-stability">Aggregation Stability</h2>
+<p>Uniqueness says CES is the only solution. The next result says it is
+also the only <em>stable</em> solution—non-CES perturbations are washed
+out by aggregation.</p>
+<div id="thm:stability" class="theorem">
+<p><strong>Theorem 2</strong> (Aggregation stability). <em>Let <span
+class="math inline">\(F\)</span> be a symmetric, degree-one aggregator
+that is a small perturbation of <span
+class="math inline">\(M_\rho\)</span>. Decompose <span
+class="math inline">\(F\)</span> into ANOVA harmonics with mode
+amplitudes <span class="math inline">\(a_m\)</span> for <span
+class="math inline">\(m = 0, 1, 2, \ldots\)</span>. Under iterated <span
+class="math inline">\(k\)</span>-fold aggregation over <span
+class="math inline">\(L\)</span> layers:</em></p>
+<ol>
+<li><p><em>Mode <span class="math inline">\(m = 2\)</span>, which
+encodes <span class="math inline">\(\rho\)</span>, has contraction rate
+exactly <span class="math inline">\(1\)</span>: it is
+preserved.</em></p></li>
+<li><p><em>Every mode <span class="math inline">\(m \geq 3\)</span>
+contracts at rate <span class="math inline">\(k^{-(m-2)/2}\)</span> per
+layer.</em></p></li>
+<li><p><em>After <span class="math inline">\(L\)</span> layers, the
+non-CES residual satisfies <span class="math inline">\(\|F - M_\rho\|
+\leq |a_0| \cdot k^{-L/2}\)</span>.</em></p></li>
+</ol>
+</div>
+<p>The proof constructs the renormalization group flow in the space of
+symmetric degree-one functions and computes the scaling dimensions <span
+class="math inline">\(\Delta_m = (m-2)/2\)</span>. Mode 2 is marginal
+(<span class="math inline">\(\Delta_2 = 0\)</span>), so <span
+class="math inline">\(\rho\)</span> is a fixed point parameter. All
+higher modes are irrelevant (<span class="math inline">\(\Delta_m &gt;
+0\)</span> for <span class="math inline">\(m \geq 3\)</span>), so they
+decay. The formal proof spans
+<code>AggregationInvariantClass.lean</code> and
+<code>RenormalizationGroup.lean</code>.</p>
+<div id="cor:fixed_line" class="corollary">
+<p><strong>Corollary 3</strong> (Line of fixed points). <em>The CES
+family is a line of fixed points parameterized by <span
+class="math inline">\(\rho \in (-\infty, 1]\)</span>. Each <span
+class="math inline">\(\rho\)</span> defines an aggregation-invariant
+class. There are no relevant perturbations: all scaling dimensions are
+non-negative.</em></p>
+</div>
+<p>The economic content: <span class="math inline">\(\rho\)</span> is
+“deep” in the Lucas critique sense. It cannot be changed by choosing a
+different aggregation level. Micro <span
+class="math inline">\(\rho\)</span> equals macro <span
+class="math inline">\(\rho\)</span>. This is falsifiable (see Section <a
+href="#sec:empirical" data-reference-type="ref"
+data-reference="sec:empirical">4</a>).</p>
+<div class="remark">
+<p><strong>Remark 4</strong> (Beta function). <em>In renormalization
+group language, <span class="math inline">\(\beta(\rho) = 0\)</span> for
+all <span class="math inline">\(\rho\)</span>—the CES parameter has zero
+beta function. This is why <span class="math inline">\(\rho\)</span>
+estimated at the firm level should equal <span
+class="math inline">\(\rho\)</span> estimated at the industry level,
+which should equal <span class="math inline">\(\rho\)</span> estimated
+at the national level. Section <a href="#sec:empirical"
+data-reference-type="ref" data-reference="sec:empirical">4</a> tests
+this prediction.</em></p>
+</div>
+<div class="remark">
+<p><strong>Remark 5</strong> (Comparison with the Central Limit
+Theorem). <em>The structure parallels the Central Limit Theorem. The
+Gaussian distribution is the unique stable fixed point of addition: sums
+of independent random variables converge to a Gaussian, with the
+variance preserved and all higher cumulants decaying. CES is the unique
+stable fixed point of multi-scale aggregation: nested groupings of
+inputs converge to CES, with <span class="math inline">\(\rho\)</span>
+preserved and all non-CES features decaying. The convergence rate <span
+class="math inline">\(O(k^{-L/2})\)</span> matches the CLT rate <span
+class="math inline">\(O(1/\sqrt{N})\)</span>. Just as the Gaussian is
+not “assumed” in limit theorems but is <em>forced</em> by the structure
+of addition, CES is not assumed in production theory but forced by the
+structure of aggregation.</em></p>
+<p><em>The analogy is not perfect: the Gaussian corresponds to a single
+point (<span class="math inline">\(q = 1\)</span>, Shannon entropy),
+while CES spans a one-parameter family indexed by <span
+class="math inline">\(\rho\)</span>. This aggregation perspective
+complements <span class="citation" data-cites="Houthakker1955"></span>’s
+(<span class="citation" data-cites="Houthakker1955"></span>)
+demonstration that Cobb-Douglas (<span class="math inline">\(\rho =
+0\)</span>) arises from Pareto-distributed firm productivities—a
+micro-foundation result that our framework generalizes to arbitrary
+<span class="math inline">\(\rho\)</span>. The CES family is thus more
+analogous to the Lévy stable distributions, which form a family of
+aggregation-invariant distributions parameterized by the tail index
+<span class="math inline">\(\alpha \in (0, 2]\)</span>, with the
+Gaussian as a boundary case (<span class="math inline">\(\alpha =
+2\)</span>). Each value of <span class="math inline">\(\rho\)</span>
+labels an “aggregation-invariant class”—the analog of <span
+class="math inline">\(\alpha\)</span>. The parametric correspondence is
+structural, not numerical: <span class="math inline">\(\rho \in
+(-\infty, 1]\)</span> has a different domain from <span
+class="math inline">\(\alpha\)</span>, and the convergence mechanisms
+differ (nested grouping for CES, independent summation for
+Lévy).</em></p>
+</div>
+<h1 id="sec:quadruple">The Quadruple Role of Curvature</h1>
+<h2 id="the-ces-curvature-parameter">The CES Curvature Parameter</h2>
+<p>Define the CES curvature: <span class="math display">\[K =
+\frac{(1-\rho)(J-1)}{J}.\]</span> Note <span class="math inline">\(K
+&gt; 0\)</span> if and only if <span class="math inline">\(\rho &lt;
+1\)</span> (complementary inputs). <span class="math inline">\(K =
+0\)</span> at <span class="math inline">\(\rho = 1\)</span> (perfect
+substitutes). <span class="math inline">\(K\)</span> increases as <span
+class="math inline">\(\rho \to -\infty\)</span> (Leontief limit).</p>
+<h2 id="four-roles">Four Roles</h2>
+<div id="thm:quadruple" class="theorem">
+<p><strong>Theorem 6</strong> (Quadruple role of <span
+class="math inline">\(K\)</span>). <em>At symmetric equilibrium (<span
+class="math inline">\(x_j = \mu\)</span> for all <span
+class="math inline">\(j\)</span>), the CES curvature <span
+class="math inline">\(K\)</span> controls four distinct economic
+mechanisms:</em></p>
+<p><em><strong>(a) Superadditivity.</strong> For any perturbation <span
+class="math inline">\(v \in \mathbf{1}^\perp\)</span> (zero-sum
+reallocation from the symmetric point), the Hessian quadratic form
+satisfies: <span class="math display">\[v^T \operatorname{Hess}(F) \, v
+= -\frac{(1-\rho)}{Jc} \|v\|^2 = -\lambda_\perp \|v\|^2 &lt; 0.\]</span>
+This is exact, not an approximation. Complementary inputs produce
+strictly more together than the sum of parts; the gap is proportional to
+<span class="math inline">\(K\)</span> via <span
+class="math inline">\(\lambda_\perp = K/((J-1)c)\)</span>.</em></p>
+<p><em><strong>(b) Correlation robustness.</strong> The squared
+perpendicular eigenvalue satisfies <span
+class="math inline">\(\lambda_\perp^2 = K^2/((J-1)^2 \mu^4)\)</span>.
+For inputs with independent idiosyncratic noise <span
+class="math inline">\(\varepsilon_j\)</span> with variance <span
+class="math inline">\(\sigma^2_\varepsilon\)</span>, the quadratic
+Fisher information channel—which is absent for a linear aggregator—has
+magnitude proportional to <span class="math inline">\(\lambda_\perp^2
+\cdot \sigma^2_\varepsilon \propto K^2 \cdot
+\sigma^2_\varepsilon\)</span>. CES extracts value from independent
+variation that a linear aggregator misses. The bonus scales as <span
+class="math inline">\(K^2\)</span>.</em></p>
+<p><em><strong>(c) Strategic independence.</strong> The symmetric
+allocation <span class="math inline">\(x_j = \mu\)</span> is a Nash
+equilibrium of the CES contest game (proved:
+<code>symmetric_equilibrium_share</code>). The off-diagonal Hessian
+entry <span class="math inline">\(H_{ij} = (1-\rho)/(J^2 c) &gt;
+0\)</span> for <span class="math inline">\(i \neq j\)</span> establishes
+log-supermodularity (proved: <code>ces_log_supermodular</code>). Any
+coalitional deviation <span class="math inline">\(\delta \in
+\mathbf{1}^\perp\)</span> incurs an exact welfare loss: <span
+class="math display">\[\delta^T \operatorname{Hess}(F)\, \delta =
+-\frac{K}{(J-1)c}\|\delta\|^2.\]</span></em></p>
+<p><em><strong>(d) Network scaling.</strong> At symmetric equilibrium,
+the unnormalized CES aggregate satisfies <span class="math inline">\(G =
+J^{1/\rho} \cdot \mu\)</span>, so the log diversity premium over linear
+scaling is: <span class="math display">\[\log\frac{G}{J\mu} =
+\frac{1-\rho}{\rho}\log J = \frac{K \cdot J}{(J-1)\rho}\log J.\]</span>
+The premium is proportional to <span class="math inline">\(K \cdot \log
+J\)</span> (up to slowly varying <span
+class="math inline">\(J\)</span>-dependent constants for large <span
+class="math inline">\(J\)</span>).</em></p>
+</div>
+<div class="proof">
+<p><em>Proof sketch.</em> Each bound follows from the eigenstructure of
+<span class="math inline">\(\operatorname{Hess}(F)\)</span> at the
+symmetric point. Part (a): Jensen’s inequality applied to <span
+class="math inline">\(x \mapsto x^\rho\)</span> (concave for <span
+class="math inline">\(\rho &lt; 1\)</span>). Part (b): second-order
+expansion of <span
+class="math inline">\(\mathbb{E}[F(x+\varepsilon)]\)</span> using <span
+class="math inline">\(\lambda_\perp^2 = K^2/((J-1)^2 c^2)\)</span>
+(proved in <code>CorrelationRobust.lean</code>). Part (c): the
+off-diagonal Hessian entry <span class="math inline">\(H_{ij} =
+(1-\rho)/(J^2 c) &gt; 0\)</span> for <span class="math inline">\(i \neq
+j\)</span> establishes log-supermodularity; the quadratic form on <span
+class="math inline">\(\mathbf{1}^\perp\)</span> gives the bound (proved
+in <code>Strategic.lean</code>). Part (d): direct computation <span
+class="math inline">\(G(c,\ldots,c) = J^{1/\rho} c\)</span> and the
+identity <span class="math inline">\((1-\rho)/\rho = K \cdot
+J/((J-1)\rho)\)</span> (proved in
+<code>NetworkScaling.lean</code>). ◻</p>
+</div>
+<h2 id="geometric-unity">Geometric Unity</h2>
+<p>The four roles are not four separate facts about CES. They are four
+projections of one geometric object.</p>
+<div id="thm:geometric_unity" class="theorem">
+<p><strong>Theorem 7</strong> (Geometric unity). <em>At the symmetric
+point <span class="math inline">\(x = \mu \cdot \mathbf{1}\)</span>, the
+restricted Hessian <span class="math inline">\(-\operatorname{Hess}(\log
+F)\big|_{\mathbf{1}^\perp}\)</span> has a single eigenvalue <span
+class="math display">\[\lambda_\perp =
+\underbrace{\frac{1-\rho}{\rho^2}}_{\text{bridge ratio}} \cdot
+\underbrace{\frac{\rho^2}{J\mu^2}}_{\text{Fisher eigenvalue}} =
+\frac{1-\rho}{J\mu^2} = \frac{K}{(J-1)\mu^2}\]</span> with multiplicity
+<span class="math inline">\(J-1\)</span>. The second factor is the
+escort Fisher eigenvalue; see <span class="citation"
+data-cites="SmirlB2026"></span> for the information-geometric
+interpretation. All four roles of <span class="math inline">\(K\)</span>
+are determined by this eigenvalue:</em></p>
+<div class="center">
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><em><strong>Role</strong></em></th>
+<th style="text-align: left;"><em><strong>Mechanism</strong></em></th>
+<th style="text-align: left;"><em><strong>Dependence on <span
+class="math inline">\(\lambda_\perp\)</span></strong></em></th>
+<th style="text-align: left;"><em><strong>Scales as</strong></em></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><em>Superadditivity</em></td>
+<td style="text-align: left;"><em><span
+class="math inline">\(v^T(-H)v\)</span> along 1<span
+class="math inline">\(^\perp\)</span></em></td>
+<td style="text-align: left;"><em><span
+class="math inline">\(\lambda_\perp \|v\|^2\)</span></em></td>
+<td style="text-align: left;"><em><span
+class="math inline">\(K\)</span></em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>Correlation robustness</em></td>
+<td style="text-align: left;"><em><span
+class="math inline">\(\operatorname{tr}[(-H)^2 \cdot
+\Sigma_\varepsilon]\)</span></em></td>
+<td style="text-align: left;"><em><span
+class="math inline">\(\lambda_\perp^2 \cdot \sigma^2\)</span></em></td>
+<td style="text-align: left;"><em><span
+class="math inline">\(K^2\)</span></em></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><em>Strategic stability</em></td>
+<td style="text-align: left;"><em>Second-order loss in contest</em></td>
+<td style="text-align: left;"><em><span
+class="math inline">\(\lambda_\perp \|\delta\|^2\)</span></em></td>
+<td style="text-align: left;"><em><span
+class="math inline">\(K\)</span></em></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><em>Network scaling</em></td>
+<td style="text-align: left;"><em><span class="math inline">\(\sum_j
+\lambda_\perp \log s_j\)</span></em></td>
+<td style="text-align: left;"><em><span
+class="math inline">\(\lambda_\perp \cdot H\)</span></em></td>
+<td style="text-align: left;"><em><span class="math inline">\(K \log
+J\)</span></em></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This table is the paper’s central exhibit. It shows that a single
+eigenvalue—the curvature of the CES log-output surface in every
+direction orthogonal to uniform scaling—generates all four economic
+mechanisms. The formal proof is in <code>QuadrupleRole.lean</code> and
+<code>Hessian.lean</code>.</p>
+<p>The geometric unity theorem resolves a puzzle in the literature: why
+do superadditivity, diversification, strategic stability, and network
+effects tend to appear together? Industries with strong input
+complementarity (manufacturing, construction) simultaneously exhibit
+high team premiums, benefit from diversified supplier networks <span
+class="citation"
+data-cites="AcemogluCarvalhoOzdaglarTahbazSalehi2012 Atalay2017"></span>,
+have stable competitive equilibria, and gain from adding input variety.
+Industries with weak complementarity (commodities, digital services)
+exhibit none of these properties. The theorem says this co-occurrence is
+not empirical coincidence but geometric necessity: all four mechanisms
+are controlled by the same eigenvalue, so they must co-vary.</p>
+<p>The <span class="math inline">\(J-1\)</span> degeneracy of <span
+class="math inline">\(\lambda_\perp\)</span> at the symmetric point
+reflects a deep symmetry: at balanced equilibrium, the economy treats
+all input perturbations identically. Any direction orthogonal to uniform
+scaling—whether it represents labor-capital substitution,
+energy-materials substitution, or any other input rebalancing—encounters
+the same curvature. This isotropy is broken away from symmetry, where
+the eigenvalues split according to the general-weights secular equation
+(see Online Appendix <a href="#app:weights" data-reference-type="ref"
+data-reference="app:weights">9</a>).</p>
+<div id="prop:sensitivity" class="proposition">
+<p><strong>Proposition 8</strong> (Sensitivity ordering). <em>The
+correlation robustness channel has elasticity 2 with respect to <span
+class="math inline">\(K_{\text{eff}}\)</span>: <span
+class="math display">\[\frac{d(K_{\text{eff}}^2)}{dK_{\text{eff}}} \cdot
+\frac{K_{\text{eff}}}{K_{\text{eff}}^2} = 2,\]</span> while
+superadditivity, strategic stability, and network scaling have
+elasticity 1. A given proportional decline in <span
+class="math inline">\(K_{\text{eff}}\)</span> produces a proportionally
+larger loss of correlation robustness than of superadditivity.</em></p>
+</div>
+<p>This is a cross-sectional sensitivity claim, not a timing claim. The
+temporal ordering of observables requires the information structure
+developed in the companion paper <span class="citation"
+data-cites="SmirlB2026"></span>—specifically, the estimation paradox and
+the bridge theorem.</p>
+<div id="rem:efficiency_fragility" class="remark">
+<p><strong>Remark 9</strong> (Efficiency-fragility coupling). <em>Higher
+curvature <span class="math inline">\(K\)</span> simultaneously
+increases the superadditivity gap (Theorem <a href="#thm:quadruple"
+data-reference-type="ref" data-reference="thm:quadruple">6</a>a) and
+increases estimation opacity, since the estimation paradox and bridge
+theorem of <span class="citation" data-cites="SmirlB2026"></span>
+together imply that near-symmetric economies with high <span
+class="math inline">\(K\)</span> have near-zero Fisher information for
+<span class="math inline">\(\rho\)</span>. The economy cannot be
+complementary (productive) without being simultaneously opaque (fragile
+to undetected <span class="math inline">\(\rho\)</span>-shifts). See
+<span class="citation" data-cites="SmirlB2026"></span> for the full
+development of this efficiency-fragility coupling.</em></p>
+</div>
+<h1 id="sec:empirical">Empirical Test: Aggregation Invariance</h1>
+<p>This section tests the central prediction of the aggregation
+stability theorem (Theorem <a href="#thm:stability"
+data-reference-type="ref" data-reference="thm:stability">2</a>).</p>
+<h2 id="test-aggregation-invariance-of-rho-theorem-thmstability">Test:
+Aggregation Invariance of <span class="math inline">\(\rho\)</span>
+(Theorem <a href="#thm:stability" data-reference-type="ref"
+data-reference="thm:stability">2</a>)</h2>
+<p><strong>Data.</strong> Thirteen PPI commodity groups from FRED
+(monthly, 1970–2026) at two aggregation levels: the 13 individual series
+(fine) and 4 aggregate groups—Agriculture, Materials, Energy/Chemicals,
+Manufactured goods (coarse).</p>
+<p><strong>Method.</strong> Compute rolling 12-month mean pairwise
+correlation of inflation rates at each level. Compare the two
+correlation time series.</p>
+<p><strong>Prediction.</strong> If <span
+class="math inline">\(\beta(\rho) = 0\)</span>, the correlation
+structure should be preserved across aggregation levels: fine-level and
+coarse-level correlation indicators should be highly correlated.</p>
+<p><strong>Result.</strong> Pearson <span class="math inline">\(r =
+0.846\)</span> (<span class="math inline">\(p &lt; 10^{-181}\)</span>),
+Spearman <span class="math inline">\(\rho_s = 0.755\)</span> (<span
+class="math inline">\(p &lt; 10^{-122}\)</span>). The correlation
+structure is strongly preserved across aggregation levels, consistent
+with aggregation invariance. This is a necessary condition for
+Theorem <a href="#thm:stability" data-reference-type="ref"
+data-reference="thm:stability">2</a>: if <span
+class="math inline">\(\rho\)</span> were not preserved under
+aggregation, the correlation structure at the coarse level would
+systematically differ from the fine level. The <span
+class="math inline">\(r = 0.846\)</span> result indicates that the
+structural parameter driving co-movement is largely invariant to the
+level of aggregation, exactly as the zero-beta-function prediction
+requires. Figure <a href="#fig:agg_invariance" data-reference-type="ref"
+data-reference="fig:agg_invariance">1</a> plots the two time series.</p>
+<p>An alternative explanation—that coarse-level correlations
+mechanically inherit fine-level correlations through simple averaging—is
+insufficient to explain the magnitude. Averaging 13 series into 4 groups
+with independent noise would reduce correlations by a factor of roughly
+<span class="math inline">\(\sqrt{13/4} \approx 1.8\)</span>, predicting
+<span class="math inline">\(r \approx 0.45\)</span> if the fine-level
+correlation were purely mechanical. The observed <span
+class="math inline">\(r = 0.846\)</span> significantly exceeds this,
+consistent with a structural parameter that survives aggregation.</p>
+<figure id="fig:agg_invariance">
+<embed src="../../figures/aggregation_invariance.pdf"
+style="width:85.0%" />
+<figcaption>Aggregation invariance test. Rolling 12-month mean pairwise
+correlation of PPI commodity inflation rates at two aggregation levels:
+13 individual commodity series and 4 aggregate groups. Pearson <span
+class="math inline">\(r = 0.846\)</span> (<span class="math inline">\(p
+&lt; 10^{-181}\)</span>), Spearman <span class="math inline">\(\rho_s =
+0.755\)</span> (<span class="math inline">\(p &lt; 10^{-122}\)</span>).
+The strong co-movement is consistent with <span
+class="math inline">\(\beta(\rho) = 0\)</span>: the correlation
+structure is preserved across aggregation levels.</figcaption>
+</figure>
+<h1 id="sec:discussion">Discussion</h1>
+<h2 id="implications-for-applied-work">Implications for Applied
+Work</h2>
+<p>CES is not a restriction on the model—it is a theorem. Using a “more
+flexible” functional form means either violating constant returns,
+violating scale consistency, or estimating noise that washes out under
+aggregation (Theorem <a href="#thm:stability" data-reference-type="ref"
+data-reference="thm:stability">2</a>). The translog, generalized
+Leontief, and other flexible forms are perturbations of CES with
+positive scaling dimension; they capture micro-level idiosyncrasies that
+vanish at any higher level of aggregation.</p>
+<p>When an applied economist estimates <span
+class="math inline">\(\sigma = 1/(1-\rho)\)</span>—whether at the macro
+level <span class="citation"
+data-cites="Chirinko2008 Antras2004"></span>, in micro production data
+<span class="citation"
+data-cites="OberfieldRaval2021 KlumpMcAdamWillman2012"></span>, or with
+biased technical change <span class="citation"
+data-cites="LeonLedesmaMcAdamWillman2010"></span>—they are
+simultaneously estimating the economy’s superadditivity, diversification
+capacity, strategic stability, and network value. These are not four
+separate parameters. A finding that “the elasticity of substitution
+between capital and labor is 0.6” simultaneously says that teams
+outperform individuals by a factor proportional to <span
+class="math inline">\(K = 0.4 \cdot (J-1)/J\)</span>, that diversified
+input portfolios earn a bonus proportional to <span
+class="math inline">\(K^2\)</span>, and that competitive equilibrium has
+a restoring force proportional to <span
+class="math inline">\(K\)</span>.</p>
+<p>Before estimating <span class="math inline">\(\rho\)</span>, applied
+researchers should compute the escort Herfindahl index (a measure of
+share concentration). If shares are nearly equal, they are near the
+estimation paradox of <span class="citation"
+data-cites="SmirlB2026"></span> and should not expect precise estimates
+regardless of sample size.</p>
+<h2 id="implications-for-flexible-functional-forms">Implications for
+Flexible Functional Forms</h2>
+<p>A common response to the rigidity of CES is to use “more flexible”
+forms: translog <span class="citation"
+data-cites="ChristensenJorgensonLau1973"></span>, generalized Leontief
+<span class="citation" data-cites="Diewert1971"></span>, or
+nonparametric estimators. Theorem <a href="#thm:stability"
+data-reference-type="ref" data-reference="thm:stability">2</a> reframes
+this debate. These flexible forms are perturbations of CES with positive
+scaling dimension (<span class="math inline">\(\Delta_m &gt; 0\)</span>
+for <span class="math inline">\(m \geq 3\)</span>). They capture
+micro-level idiosyncrasies—firm-specific input complementarities,
+sector-specific technology—that are real at the micro level but vanish
+under aggregation.</p>
+<p>This does not mean flexible forms are wrong. It means they estimate
+<em>different objects</em> at different aggregation levels. At the firm
+level, a translog may accurately capture departures from CES. At the
+industry level, those departures have decayed by a factor of <span
+class="math inline">\(k^{-1/2}\)</span>. At the national level, only
+<span class="math inline">\(\rho\)</span> remains. The applied
+economist’s choice of functional form should therefore depend on the
+aggregation level: CES for macro, flexible forms for micro, with the
+understanding that the non-CES features in the micro estimates are noise
+at the macro level.</p>
+<h2 id="formal-verification">Formal Verification</h2>
+<p>All results are verified in Lean 4, building on Mathlib. The
+Kolmogorov–Nagumo and Aczél characterizations are taken as classical
+axioms (<code>Basic.lean</code>); all other results are proved from
+definitions. Table <a href="#tab:lean" data-reference-type="ref"
+data-reference="tab:lean">1</a> summarizes the formalization.</p>
+<div id="tab:lean">
+<table>
+<caption>Lean 4 formalization inventory (Paper A core files). Total:
+<span class="math inline">\({\sim}182\)</span> declarations, 2 classical
+axioms, 0 sorry. The full 115-file formalization across Papers 1–4
+contains <span class="math inline">\({\sim}1{,}870\)</span> declarations
+and is cataloged in <code>DerivationTable.lean</code>.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"><strong>File</strong></th>
+<th style="text-align: right;"><strong>Results</strong></th>
+<th style="text-align: left;"><strong>Key Content</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>Basic.lean</code></td>
+<td style="text-align: right;">3</td>
+<td style="text-align: left;">Kolmogorov–Nagumo, Aczél (2 classical
+axioms)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Emergence.lean</code></td>
+<td style="text-align: right;">26</td>
+<td style="text-align: left;">Three convergent emergence proofs</td>
+</tr>
+<tr class="odd">
+<td
+style="text-align: left;"><code>AggregationInvariantClass.lean</code></td>
+<td style="text-align: right;">12</td>
+<td style="text-align: left;"><span class="math inline">\(\rho\)</span>
+invariance, basin of attraction</td>
+</tr>
+<tr class="even">
+<td
+style="text-align: left;"><code>RenormalizationGroup.lean</code></td>
+<td style="text-align: right;">24</td>
+<td style="text-align: left;"><span class="math inline">\(\beta(\rho) =
+0\)</span>, scaling dimensions, stability</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>Hessian.lean</code></td>
+<td style="text-align: right;">16</td>
+<td style="text-align: left;">Eigenstructure of <span
+class="math inline">\(\operatorname{Hess}(F)\)</span> at symmetry</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Superadditivity.lean</code></td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">Role (a): gap <span
+class="math inline">\(\propto K\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>CorrelationRobust.lean</code></td>
+<td style="text-align: right;">14</td>
+<td style="text-align: left;">Role (b): bonus <span
+class="math inline">\(\propto K^2\)</span>, <span
+class="math inline">\(\lambda_\perp^2 = K^2/((J{-}1)^2c^2)\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>Strategic.lean</code></td>
+<td style="text-align: right;">9</td>
+<td style="text-align: left;">Role (c): log-supermodularity, <span
+class="math inline">\(H_{ij} &gt; 0\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>NetworkScaling.lean</code></td>
+<td style="text-align: right;">12</td>
+<td style="text-align: left;">Role (d): premium <span
+class="math inline">\(\propto K \log J\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>QuadrupleRole.lean</code></td>
+<td style="text-align: right;">2</td>
+<td style="text-align: left;">Master theorem (quadruple role
+subset)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>GeneralHessian.lean</code></td>
+<td style="text-align: right;">11</td>
+<td style="text-align: left;"><span class="math inline">\(v^T H v =
+-(1{-}\rho)F \cdot \operatorname{Var}_P[v/x]\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>FurtherProperties.lean</code></td>
+<td style="text-align: right;">13</td>
+<td style="text-align: left;">Third derivative, knockout, duality</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>GameTheory.lean</code></td>
+<td style="text-align: right;">30</td>
+<td style="text-align: left;">Nash equilibrium, Folk theorem, contest
+games</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="sec:conclusion">Conclusion</h1>
+<p>CES is a theorem. It is the unique aggregator compatible with
+constant returns, continuity, and scale consistency
+(Kolmogorov–Nagumo–Aczél). Moreover, CES is the unique <em>stable</em>
+aggregator: non-CES perturbations decay under iterated aggregation at
+rate <span class="math inline">\(O(k^{-L/2})\)</span>, making <span
+class="math inline">\(\rho\)</span> the only structural parameter that
+survives macro-level estimation. The CES family is a line of fixed
+points in function space with zero beta function, and the convergence to
+it parallels the Central Limit Theorem’s convergence to the
+Gaussian.</p>
+<p>The curvature parameter <span class="math inline">\(K =
+(1-\rho)(J-1)/J\)</span> simultaneously controls four mechanisms the
+profession has treated as independent: superadditivity, correlation
+robustness, strategic stability, and network scaling. The geometric
+unity theorem (Theorem <a href="#thm:geometric_unity"
+data-reference-type="ref" data-reference="thm:geometric_unity">7</a>)
+proves these are four projections of a single eigenvalue of the CES
+Hessian, with multiplicity <span class="math inline">\(J-1\)</span> at
+the symmetric point. Industries with strong input complementarity
+exhibit all four properties simultaneously; those with weak
+complementarity exhibit none. This is geometric necessity, not empirical
+coincidence.</p>
+<p>An empirical test using PPI commodity data confirms that the
+correlation structure is preserved across aggregation levels (<span
+class="math inline">\(r = 0.846\)</span>), consistent with the
+zero-beta-function prediction of aggregation stability.</p>
+<p>The geometric unity factorization <span
+class="math inline">\(\lambda_\perp = [(1-\rho)/\rho^2] \cdot
+[\rho^2/(J\mu^2)]\)</span> decomposes the eigenvalue into a bridge ratio
+and a Fisher eigenvalue. The companion paper <span class="citation"
+data-cites="SmirlB2026"></span> develops the information-geometric
+consequences of this factorization: the bridge theorem equating
+production curvature to statistical curvature, the estimation paradox
+(Fisher information vanishes at symmetric equilibrium), the cumulant
+tower (all higher cumulants vanish simultaneously), and the crisis
+correlation dual (prices converge, quantities diverge, both
+linearly).</p>
+<p>All results are formally verified in Lean 4—two classical axioms,
+zero unresolved goals. The formalization ensures that the logical chain
+from (A1)–(A3) to the quadruple role and geometric unity is gap-free.
+Production economics has exactly one structural parameter, and this
+paper establishes what it does.</p>
+<div class="thebibliography">
+<p><span>99</span></p>
+<p>Acemoglu, D., Carvalho, V. M., Ozdaglar, A., and Tahbaz-Salehi, A.
+(2012). The network origins of aggregate fluctuations.
+<em>Econometrica</em>, 80(5), 1977–2016.</p>
+<p>Aczél, J. (1948). On mean values. <em>Bulletin of the American
+Mathematical Society</em>, 54, 392–400.</p>
+<p>Antras, P. (2004). Is the U.S. aggregate production function
+Cobb-Douglas? New estimates of the elasticity of substitution.
+<em>Contributions to Macroeconomics</em>, 4(1), Article 4.</p>
+<p>Arrow, K. J., Chenery, H. B., Minhas, B. S., and Solow, R. M. (1961).
+Capital-labor substitution and economic efficiency. <em>Review of
+Economics and Statistics</em>, 43(3), 225–250.</p>
+<p>Atalay, E. (2017). How important are sectoral shocks? <em>American
+Economic Journal: Macroeconomics</em>, 9(4), 254–280.</p>
+<p>Blackorby, C. and Schworm, W. (1993). The specification of functional
+structure and its econometric implications. <em>Journal of
+Econometrics</em>, 58(3), 315–337.</p>
+<p>Chirinko, R. S. (2008). <span class="math inline">\(\sigma\)</span>:
+The long and short of it. <em>Journal of Macroeconomics</em>, 30(2),
+671–686.</p>
+<p>Christensen, L. R., Jorgenson, D. W., and Lau, L. J. (1973).
+Transcendental logarithmic production frontiers. <em>Review of Economics
+and Statistics</em>, 55(1), 28–45.</p>
+<p>Diewert, W. E. (1971). An application of the Shephard duality
+theorem: A generalized Leontief production function. <em>Journal of
+Political Economy</em>, 79(3), 481–507.</p>
+<p>Fisher, F. M. (1969). The existence of aggregate production
+functions. <em>Econometrica</em>, 37(4), 553–577.</p>
+<p>Gorman, W. M. (1953). Community preference fields.
+<em>Econometrica</em>, 21(1), 63–80.</p>
+<p>Gorman, W. M. (1968). The structure of utility functions. <em>Review
+of Economic Studies</em>, 35(4), 367–390.</p>
+<p>Hardy, G. H., Littlewood, J. E., and Pólya, G. (1934).
+<em>Inequalities</em>. Cambridge University Press.</p>
+<p>Houthakker, H. S. (1955). The Pareto distribution and the
+Cobb-Douglas production function in activity analysis. <em>Review of
+Economic Studies</em>, 23(1), 27–31.</p>
+<p>Jones, C. I. (2005). The shape of production functions and the
+direction of technical change. <em>Quarterly Journal of Economics</em>,
+120(2), 517–549.</p>
+<p>Klump, R., McAdam, P., and Willman, A. (2012). The normalized CES
+production function: Theory and empirics. <em>Journal of Economic
+Surveys</em>, 26(5), 769–799.</p>
+<p>Kolmogorov, A. N. (1930). Sur la notion de la moyenne. <em>Atti della
+R. Accademia Nazionale dei Lincei</em>, 12, 388–391.</p>
+<p>León-Ledesma, M. A., McAdam, P., and Willman, A. (2010). Identifying
+the elasticity of substitution with biased technical change.
+<em>American Economic Review</em>, 100(4), 1330–1357.</p>
+<p>Nagumo, M. (1930). Über eine Klasse der Mittelwerte. <em>Japanese
+Journal of Mathematics</em>, 7, 71–79.</p>
+<p>Oberfield, E. and Raval, D. (2021). Micro data and macro technology.
+<em>Econometrica</em>, 89(2), 703–732.</p>
+<p>Sato, K. (1975). <em>Production Functions and Aggregation</em>.
+North-Holland.</p>
+<p>Smirl, J. (2026b). The estimation paradox: Information geometry of
+CES production. Working paper.</p>
+<p>Tullock, G. (1980). Efficient rent seeking. In J. M. Buchanan,
+R. D. Tollison, and G. Tullock (Eds.), <em>Toward a Theory of the
+Rent-Seeking Society</em>, pp. 97–112. Texas A&amp;M University
+Press.</p>
+<p>Uzawa, H. (1962). Production functions with constant elasticities of
+substitution. <em>Review of Economic Studies</em>, 29(4), 291–299.</p>
+</div>
+<h1 id="app:proofs">Traditional Proofs</h1>
+<p>This appendix provides traditional mathematical proofs for referees
+who prefer them to the Lean formalization.</p>
+<h2 id="proof-of-theorem-thmquadruple-quadruple-role">Proof of
+Theorem <a href="#thm:quadruple" data-reference-type="ref"
+data-reference="thm:quadruple">6</a> (Quadruple Role)</h2>
+<p>We compute the Hessian of <span class="math inline">\(F(x) =
+((1/J)\sum x_j^\rho)^{1/\rho}\)</span> at the symmetric point <span
+class="math inline">\(x = c \cdot \mathbf{1}\)</span>.</p>
+<p><strong>First derivatives.</strong> <span
+class="math inline">\(\partial F / \partial x_i = (1/J) x_i^{\rho-1}
+\cdot ((1/J)\sum x_k^\rho)^{(1/\rho)-1}\)</span>. At <span
+class="math inline">\(x = c \cdot \mathbf{1}\)</span>: <span
+class="math inline">\(\partial F / \partial x_i = 1/J\)</span> (by
+homogeneity of degree one, <span class="math inline">\(\sum_i (\partial
+F / \partial x_i) x_i = F = c\)</span>, and by symmetry all partials are
+equal).</p>
+<p><strong>Second derivatives.</strong> Differentiating again: <span
+class="math display">\[\begin{aligned}
+\frac{\partial^2 F}{\partial x_i \partial x_j}\bigg|_{x=c\mathbf{1}}
+&amp;= \begin{cases} \frac{(\rho-1)}{Jc} + \frac{(1-\rho)}{J^2 c} &amp;
+\text{if } i = j, \\ \frac{(1-\rho)}{J^2 c} &amp; \text{if } i \neq j.
+\end{cases}
+\end{aligned}\]</span> In matrix form: <span
+class="math inline">\(\operatorname{Hess}(F)|_{c\mathbf{1}} =
+\frac{(\rho-1)}{Jc}(I - \frac{1}{J}\mathbf{1}\mathbf{1}^T)\)</span>.</p>
+<p><strong>Eigenvalues on <span
+class="math inline">\(\mathbf{1}^\perp\)</span>.</strong> The projection
+matrix <span class="math inline">\(I -
+(1/J)\mathbf{1}\mathbf{1}^T\)</span> has eigenvalue 1 on <span
+class="math inline">\(\mathbf{1}^\perp\)</span> (with multiplicity <span
+class="math inline">\(J-1\)</span>) and eigenvalue 0 on <span
+class="math inline">\(\text{span}(\mathbf{1})\)</span>. Therefore: <span
+class="math display">\[\lambda_\perp = \frac{\rho - 1}{Jc} =
+-\frac{1-\rho}{Jc} = -\frac{K}{(J-1)c} &lt; 0 \quad \text{for } \rho
+&lt; 1.\]</span></p>
+<p><strong>Part (a).</strong> For <span class="math inline">\(v \in
+\mathbf{1}^\perp\)</span>: <span class="math inline">\(v^T
+\operatorname{Hess}(F) v = \lambda_\perp \|v\|^2 =
+-\frac{(1-\rho)}{Jc}\|v\|^2 &lt; 0\)</span>. The negative definiteness
+on <span class="math inline">\(\mathbf{1}^\perp\)</span> is
+superadditivity: reallocating inputs away from symmetry reduces output,
+so complementary inputs produce more together.</p>
+<p><strong>Part (b).</strong> <span
+class="math inline">\(\lambda_\perp^2 = (1-\rho)^2/(J^2c^2) =
+K^2/((J-1)^2 c^2)\)</span>. The second-order expansion <span
+class="math inline">\(\mathbb{E}[F(x+\varepsilon)] \approx F(x) +
+\frac{1}{2}\operatorname{tr}[\operatorname{Hess}(F) \cdot
+\Sigma_\varepsilon]\)</span> shows that the curvature bonus from
+idiosyncratic noise scales as <span
+class="math inline">\(\lambda_\perp^2 \sigma^2 \propto K^2\)</span>.</p>
+<p><strong>Part (c).</strong> The off-diagonal entry <span
+class="math inline">\(H_{ij} = (1-\rho)/(J^2 c) &gt; 0\)</span> for
+<span class="math inline">\(\rho &lt; 1\)</span>. This means increasing
+input <span class="math inline">\(j\)</span> raises the marginal product
+of input <span class="math inline">\(i\)</span>—log-supermodularity. The
+welfare loss from deviation <span class="math inline">\(\delta \in
+\mathbf{1}^\perp\)</span> is <span class="math inline">\(\delta^T
+\operatorname{Hess}(F) \delta = -(K/((J-1)c))\|\delta\|^2\)</span>.</p>
+<p><strong>Part (d).</strong> <span class="math inline">\(G(c,\ldots,c)
+= (\sum c^\rho)^{1/\rho} = J^{1/\rho} c\)</span>. So <span
+class="math inline">\(\log(G/(J c)) = (1/\rho - 1)\log J =
+((1-\rho)/\rho)\log J\)</span>. Using <span
+class="math inline">\((1-\rho)/\rho = KJ/((J-1)\rho)\)</span> gives the
+result. 0◻</p>
+<h2 id="proof-of-theorem-thmgeometric_unity-geometric-unity">Proof of
+Theorem <a href="#thm:geometric_unity" data-reference-type="ref"
+data-reference="thm:geometric_unity">7</a> (Geometric Unity)</h2>
+<p>The log-output Hessian is: <span
+class="math display">\[\frac{\partial^2 \log F}{\partial x_i \partial
+x_j}\bigg|_{c\mathbf{1}} = -\frac{1-\rho}{Jc^2}\left(\delta_{ij} -
+\frac{1}{J}\right).\]</span> So <span
+class="math inline">\(-\operatorname{Hess}(\log
+F)|_{\mathbf{1}^\perp}\)</span> has eigenvalue <span
+class="math inline">\((1-\rho)/(Jc^2) = K/((J-1)c^2)\)</span> with
+multiplicity <span class="math inline">\(J-1\)</span>. This equals <span
+class="math inline">\([(1-\rho)/\rho^2] \cdot [\rho^2/(Jc^2)]\)</span>,
+which is the bridge ratio times the escort Fisher eigenvalue (see <span
+class="citation" data-cites="SmirlB2026"></span> for the Fisher
+information computation). All four roles follow from powers of this
+single eigenvalue. 0◻</p>
+<h1 id="app:lean">Lean Formalization Guide</h1>
+<p>The formalization uses Lean 4 (v4.28.0) with Mathlib (v4.28.0). To
+verify:</p>
+<pre><code>git clone [URL available upon acceptance; anonymous replication archive attached]
+cd thesis &amp;&amp; lake build</code></pre>
+<p>The build produces 2339 compilation units with 0 errors. The key
+files for this paper are listed in Table <a href="#tab:lean"
+data-reference-type="ref" data-reference="tab:lean">1</a>. The two
+axioms (<code>kolmogorov_nagumo</code> and <code>aczel</code> in
+<code>Basic.lean</code>) encode classical 1930/1948 characterization
+results not yet formalized in Mathlib; all other theorems are proved
+from definitions. The authoritative catalog of the full formalization is
+maintained in <code>DerivationTable.lean</code>, which compile-time
+verifies every theorem name.</p>
+<h1 id="app:weights">General Weights Extension</h1>
+<p>All main-text results assume symmetric CES. The general-weights
+extension <span class="math inline">\(F(x) = (\sum_j w_j
+x_j^\rho)^{1/\rho}\)</span> with <span class="math inline">\(\sum w_j =
+1\)</span> modifies the results as follows. The eigenvalues of <span
+class="math inline">\(-\operatorname{Hess}(\log
+F)|_{\mathbf{1}^\perp}\)</span> are no longer degenerate: they are
+determined by the secular equation <span
+class="math display">\[\det\left[\lambda I - \frac{1-\rho}{\rho}
+\text{diag}(w) + \frac{1-\rho}{\rho} w w^T\right] = 0,\]</span> which
+yields <span class="math inline">\(J-1\)</span> distinct eigenvalues.
+The bridge theorem, estimation paradox, and quadruple role all
+generalize, with <span class="math inline">\(K\)</span> replaced by the
+spectral gap of the weighted Hessian. Full details are in
+<code>GeneralWeights.lean</code> and the companion papers.</p>
+<h1 id="app:data">Data Appendix</h1>
+<p><strong>Test 1 (Aggregation invariance).</strong> PPI commodity
+groups from FRED (BLS WPU series): Farm Products (WPU01), Processed
+Foods (WPU02), Textile Products (WPU03), Fuels (WPU0561), Chemicals
+(WPU06), Rubber/Plastics (WPU07), Lumber (WPU08), Pulp/Paper (WPU09),
+Metals (WPU10), Machinery (WPU11), Furniture (WPU12), Nonmetallic
+Minerals (WPU13), Transportation Equipment (WPU14). Aggregated into:
+Agriculture (WPU01–03), Materials (WPU07–10, WPU13), Energy/Chemicals
+(WPU0561, WPU06), Manufactured (WPU11, WPU12, WPU14). Sample: January
+1970 – January 2026. Rolling windows: 12 months. Replication script:
+<code>scripts/plot_aggregation_invariance.py</code>.</p>
+<aside id="footnotes" class="footnotes footnotes-end-of-document"
+role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1"><p>Independent Researcher. Email: jonsmirl@gmail.com.<a
+href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</aside>
+</body>
+</html>
