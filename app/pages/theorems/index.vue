@@ -56,30 +56,32 @@ const { data: sections } = await useAsyncData('derivation-sections', async () =>
   return data || []
 })
 
-const totalDecls = computed(() =>
-  sections.value?.reduce((sum, s) => sum + (s.theorem_count || 0), 0) || 0
-)
-
-const totalMarquee = computed(() =>
-  sections.value?.reduce((sum, s) => sum + (s.marquee_count || 0), 0) || 0
-)
-
-const totalAxioms = computed(() => {
-  const m = statusCounts.value || {}
-  return Object.values(m).reduce((sum, sc: any) => sum + (sc.axiom || 0), 0)
+// Dynamic counts from theorems table
+const { data: dynamicCounts } = await useAsyncData('theorem-counts', async () => {
+  const [declRes, marqueeRes, axiomRes, schematicRes] = await Promise.all([
+    client.from('theorems').select('id', { count: 'exact', head: true }),
+    client.from('theorems').select('id', { count: 'exact', head: true }).eq('is_marquee', true),
+    client.from('theorems').select('id', { count: 'exact', head: true }).eq('status', 'axiom'),
+    client.from('theorems').select('id', { count: 'exact', head: true }).eq('status', 'trivial'),
+  ])
+  return {
+    decls: declRes.count || 0,
+    marquee: marqueeRes.count || 0,
+    axioms: axiomRes.count || 0,
+    schematics: schematicRes.count || 0,
+  }
 })
 
-const totalSchematics = computed(() => {
-  const m = statusCounts.value || {}
-  return Object.values(m).reduce((sum, sc: any) => sum + (sc.trivial || 0), 0)
-})
+const totalDecls = computed(() => dynamicCounts.value?.decls || 0)
+const totalMarquee = computed(() => dynamicCounts.value?.marquee || 0)
+const totalAxioms = computed(() => dynamicCounts.value?.axioms || 0)
+const totalSchematics = computed(() => dynamicCounts.value?.schematics || 0)
 
 // Fetch per-section status counts
 const { data: statusCounts } = await useAsyncData('section-status-counts', async () => {
   const { data, error } = await client
     .rpc('section_status_counts')
   if (error) return {}
-  // Turn array into map: section_id -> { proved, sorry, trivial, axiom }
   const map: Record<number, Record<string, number>> = {}
   for (const row of (data || [])) {
     if (!map[row.section_id]) map[row.section_id] = {}
