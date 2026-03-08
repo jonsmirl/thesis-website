@@ -4,7 +4,11 @@
 
     <div v-if="theorem">
       <div class="breadcrumb">
-        <NuxtLink to="/theorems">Theorems</NuxtLink> / {{ theorem.name }}
+        <NuxtLink to="/theorems">Sections</NuxtLink>
+        <template v-if="sectionInfo">
+          / <NuxtLink :to="`/theorems/section/${sectionInfo.number}`">Section {{ sectionInfo.number }}: {{ sectionInfo.title }}</NuxtLink>
+        </template>
+        / {{ theorem.name }}
       </div>
 
       <div class="detail-header">
@@ -13,6 +17,7 @@
           <span class="badge kind">{{ theorem.kind }}</span>
           <span class="badge" :class="theorem.status">{{ theorem.status }}</span>
           <span class="badge paper" v-if="theorem.paper">{{ theorem.paper }}</span>
+          <span class="badge marquee" v-if="theorem.is_marquee">key theorem</span>
         </div>
       </div>
 
@@ -23,7 +28,38 @@
 
       <div v-if="theorem.source_code" class="section">
         <h3>Source</h3>
-        <pre class="source-code">{{ theorem.source_code }}</pre>
+        <LeanHighlight :code="theorem.source_code" />
+      </div>
+
+      <!-- Dependencies -->
+      <div v-if="depsOn.length" class="section">
+        <h3>Depends on</h3>
+        <div class="dep-grid">
+          <NuxtLink
+            v-for="d in depsOn"
+            :key="d.name"
+            :to="`/theorems/${d.name}`"
+            class="dep-chip"
+          >
+            <span class="dep-dot" :class="d.status"></span>
+            {{ d.name }}
+          </NuxtLink>
+        </div>
+      </div>
+
+      <div v-if="usedBy.length" class="section">
+        <h3>Used by</h3>
+        <div class="dep-grid">
+          <NuxtLink
+            v-for="d in usedBy"
+            :key="d.name"
+            :to="`/theorems/${d.name}`"
+            class="dep-chip"
+          >
+            <span class="dep-dot" :class="d.status"></span>
+            {{ d.name }}
+          </NuxtLink>
+        </div>
       </div>
 
       <div class="section">
@@ -35,7 +71,7 @@
       </div>
 
       <div v-if="theorem.section" class="section">
-        <h3>Section</h3>
+        <h3>Module Section</h3>
         <p>{{ theorem.section }}</p>
       </div>
     </div>
@@ -53,11 +89,32 @@ const client = useSupabaseClient()
 const { data: theorem } = await useAsyncData(`theorem-${route.params.name}`, async () => {
   const { data, error } = await client
     .from('theorems')
-    .select('*')
+    .select('*, derivation_sections(number, title, color)')
     .eq('name', route.params.name)
     .single()
   if (error) return null
   return data
+})
+
+const sectionInfo = computed(() => theorem.value?.derivation_sections as any)
+
+// Fetch dependencies
+const { data: depsOn } = await useAsyncData(`deps-on-${route.params.name}`, async () => {
+  if (!theorem.value) return []
+  const { data } = await client
+    .from('theorem_deps')
+    .select('to_id, theorems!theorem_deps_to_id_fkey(name, status)')
+    .eq('from_id', theorem.value.id)
+  return (data || []).map(d => (d.theorems as any)).filter(Boolean)
+})
+
+const { data: usedBy } = await useAsyncData(`used-by-${route.params.name}`, async () => {
+  if (!theorem.value) return []
+  const { data } = await client
+    .from('theorem_deps')
+    .select('from_id, theorems!theorem_deps_from_id_fkey(name, status)')
+    .eq('to_id', theorem.value.id)
+  return (data || []).map(d => (d.theorems as any)).filter(Boolean)
 })
 </script>
 
@@ -74,10 +131,35 @@ const { data: theorem } = await useAsyncData(`theorem-${route.params.name}`, asy
 .badge.axiom { background: #e8d5f5; color: #6f42c1; }
 .badge.trivial { background: #d1ecf1; color: #0c5460; }
 .badge.paper { background: #e7f0ff; color: #0550ae; }
+.badge.marquee { background: #fef3c7; color: #92400e; font-weight: 600; }
 .section { margin-bottom: 1.5rem; }
 .section h3 { font-size: 0.9rem; color: #666; margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .docstring { margin: 0; line-height: 1.6; white-space: pre-wrap; }
-.source-code { background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 1rem; font-size: 0.85rem; overflow-x: auto; line-height: 1.5; font-family: 'SF Mono', 'Fira Code', monospace; }
 .meta { font-size: 0.9rem; }
 .meta code { background: #f6f8fa; padding: 0.15rem 0.4rem; border-radius: 3px; }
+.dep-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.dep-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 12px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.75rem;
+  color: #111;
+  text-decoration: none;
+}
+.dep-chip:hover { background: #eef1f5; border-color: #0066cc; }
+.dep-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ccc;
+}
+.dep-dot.proved { background: #22c55e; }
+.dep-dot.sorry { background: #fbbf24; }
+.dep-dot.axiom { background: #a78bfa; }
+.dep-dot.trivial { background: #67e8f9; }
 </style>
