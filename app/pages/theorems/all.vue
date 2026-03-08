@@ -30,7 +30,8 @@
         <option value="axiom">axiom</option>
         <option value="trivial">trivial</option>
       </select>
-      <button v-if="search || filterKind || filterPaper || filterStatus" class="clear-btn" @click="clearFilters">Clear</button>
+      <label v-if="filterMarquee" class="marquee-label"><input type="checkbox" v-model="filterMarquee" /> Key only</label>
+      <button v-if="search || filterKind || filterPaper || filterStatus || filterMarquee" class="clear-btn" @click="clearFilters">Clear</button>
     </div>
 
     <div class="stats-bar">
@@ -75,6 +76,7 @@ const search = ref('')
 const filterKind = ref((route.query.kind as string) || '')
 const filterPaper = ref((route.query.paper as string) || '')
 const filterStatus = ref((route.query.status as string) || '')
+const filterMarquee = ref((route.query.marquee as string) === 'true')
 const page = ref(1)
 const perPage = 50
 
@@ -86,7 +88,7 @@ const { data: theorems } = await useAsyncData('theorems-all', async () => {
   while (true) {
     const { data, error } = await client
       .from('theorems')
-      .select('id, name, display_name, file_path, paper, kind, docstring, status, line_number')
+      .select('id, name, display_name, file_path, paper, kind, docstring, status, line_number, is_marquee')
       .order('file_path')
       .order('line_number')
       .range(from, from + pageSize - 1)
@@ -116,6 +118,7 @@ const filtered = computed(() => {
   if (filterKind.value) result = result.filter(t => t.kind === filterKind.value)
   if (filterPaper.value) result = result.filter(t => t.paper === filterPaper.value)
   if (filterStatus.value) result = result.filter(t => t.status === filterStatus.value)
+  if (filterMarquee.value) result = result.filter(t => t.is_marquee)
   return result
 })
 
@@ -125,7 +128,7 @@ const paginated = computed(() => {
   return filtered.value.slice(start, start + perPage)
 })
 
-watch([search, filterKind, filterPaper, filterStatus], () => { page.value = 1 })
+watch([search, filterKind, filterPaper, filterStatus, filterMarquee], () => { page.value = 1 })
 
 function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + '...' : s
@@ -142,6 +145,7 @@ function clearFilters() {
   filterKind.value = ''
   filterPaper.value = ''
   filterStatus.value = ''
+  filterMarquee.value = false
 }
 </script>
 

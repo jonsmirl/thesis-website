@@ -16,7 +16,7 @@
         <span class="stat-num">{{ totalDecls }}</span>
         <span class="stat-label">Declarations</span>
       </NuxtLink>
-      <NuxtLink to="/theorems/all?status=proved" class="stat-box" style="background: #ecfdf5; border-color: #bbf7d0;">
+      <NuxtLink to="/theorems/all?marquee=true" class="stat-box" style="background: #ecfdf5; border-color: #bbf7d0;">
         <span class="stat-num">{{ totalMarquee }}</span>
         <span class="stat-label">Key Theorems</span>
       </NuxtLink>
