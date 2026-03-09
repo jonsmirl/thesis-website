@@ -134,11 +134,11 @@ const rawLayout = computed<LayoutNode[]>(() => {
   return result
 })
 
-// Offset to make all coords positive + add padding
+// Offset to make all coords positive + add padding (account for node half-widths)
 const renderedNodes = computed<LayoutNode[]>(() => {
   if (!rawLayout.value.length) return []
-  const minX = Math.min(...rawLayout.value.map(n => n.x))
-  const ox = -minX + PAD
+  const minLeft = Math.min(...rawLayout.value.map(n => n.x - n.w / 2))
+  const ox = -minLeft + PAD
   return rawLayout.value.map(n => ({ ...n, x: n.x + ox, y: n.y + PAD }))
 })
 
@@ -186,7 +186,7 @@ onMounted(() => { fetchTree() })
 </script>
 
 <style scoped>
-.dep-graph-wrap { border: 1px solid #e1e4e8; border-radius: 8px; background: #fafbfc; overflow: hidden; }
+.dep-graph-wrap { border: 1px solid #e1e4e8; border-radius: 8px; background: #fafbfc; }
 .graph-controls {
   display: flex; align-items: center; gap: 1rem;
   padding: 0.5rem 1rem; background: #f0f4f8; border-bottom: 1px solid #e1e4e8; font-size: 0.8rem;
