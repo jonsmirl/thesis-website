@@ -119,17 +119,10 @@ async function fetchTree() {
   loading.value = false
 }
 
-// Build adjacency: parent → sorted children, filtered to only tree edges
-// (child.depth = parent.depth + 1) to avoid cross-level shortcuts
+// Build adjacency: parent → sorted children
 const childrenOf = computed(() => {
-  const nodes = rawNodes.value
   const map = new Map<string, string[]>()
   for (const e of rawEdges.value) {
-    const parentNode = nodes.get(e.from)
-    const childNode = nodes.get(e.to)
-    if (!parentNode || !childNode) continue
-    // Only include edges that go exactly one level deeper
-    if (childNode.depth !== parentNode.depth + 1) continue
     if (!map.has(e.from)) map.set(e.from, [])
     map.get(e.from)!.push(e.to)
   }
