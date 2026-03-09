@@ -167,12 +167,12 @@ async function fetchTree() {
   })
   if (error || !data) { loading.value = false; return }
 
-  const newNodes: GNode[] = []
+  const nodeMap = new Map<string, GNode>()
   const newEdges: GEdge[] = []
   const edgeSet = new Set<string>()
   for (const row of data as any[]) {
     if (row.type === 'node') {
-      newNodes.push({ name: row.from_name, status: row.status, kind: row.kind, depth: row.depth })
+      nodeMap.set(row.from_name, { name: row.from_name, status: row.status, kind: row.kind, depth: 0 })
     } else {
       const key = `${row.from_name}→${row.to_name}`
       if (!edgeSet.has(key)) {
@@ -181,7 +181,26 @@ async function fetchTree() {
       }
     }
   }
-  nodes.value = newNodes
+  // Recompute depths via longest-path from root (ensures all edges go downward)
+  const depths = new Map<string, number>()
+  for (const n of nodeMap.keys()) depths.set(n, 0)
+  depths.set(props.rootName, 0)
+  let changed = true
+  while (changed) {
+    changed = false
+    for (const e of newEdges) {
+      const fd = depths.get(e.from) ?? 0
+      const td = depths.get(e.to) ?? 0
+      if (td <= fd) {
+        depths.set(e.to, fd + 1)
+        changed = true
+      }
+    }
+  }
+  for (const [name, node] of nodeMap) {
+    node.depth = depths.get(name) ?? 0
+  }
+  nodes.value = [...nodeMap.values()]
   edges.value = newEdges
   loading.value = false
 }
