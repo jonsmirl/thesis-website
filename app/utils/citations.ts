@@ -91,15 +91,15 @@ export const citationRegex = new RegExp(
     if (!parts) return k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const prefix = parts[1].trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
     const year = parts[2]
-    return `${prefix}\\s*\\(?${year}\\)?`
+    return `${prefix},?\\s*\\(?${year}\\)?`
   }).join('|') + ')',
   'g'
 )
 
 // Given matched text, find the URL
 export function getCitationUrl(match: string): string | null {
-  // Normalize: strip parens, collapse whitespace
-  const normalized = match.replace(/[()]/g, '').replace(/\s+/g, ' ').trim()
+  // Normalize: strip parens and commas before year, collapse whitespace
+  const normalized = match.replace(/[()]/g, '').replace(/,\s*(\d{4})/, ' $1').replace(/\s+/g, ' ').trim()
   // Try exact match first
   if (citationUrls[normalized]) return citationUrls[normalized]
   // Try with different spacing
