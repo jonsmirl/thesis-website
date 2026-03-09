@@ -75,6 +75,10 @@ export const citationUrls: Record<string, string> = {
   // ML
   'Shumailov et al. 2023': 'https://doi.org/10.1038/s41586-024-07566-y',
 
+  // Additional references
+  'Jarzynski 1997': 'https://doi.org/10.1103/PhysRevLett.78.2690',
+  'Hänggi et al. 1990': 'https://doi.org/10.1103/RevModPhys.62.251',
+
   // Self-reference
   'Smirl 2026b': '',
 }

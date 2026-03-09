@@ -59,12 +59,27 @@ function renderBlock(text: string) {
   // Markdown backtick `...`
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
 
-  // Citation hyperlinks: Author (Year) → linked
+  // Citation hyperlinks
+  // Pass 1: Parenthetical citations — link the entire (Author Year, ...) group
+  html = html.replace(/\(([^)]+)\)/g, (full, inner) => {
+    // Check if this paren group contains a known citation
+    const citMatch = inner.match(citationRegex)
+    if (citMatch) {
+      const url = getCitationUrl(citMatch[0])
+      if (url) return `(<a href="${url}" class="citation-link" target="_blank" rel="noopener">${inner}</a>)`
+    }
+    return full
+  })
+  // Pass 2: Narrative citations — Author (Year) not already inside a link
   html = html.replace(citationRegex, (match) => {
+    // Skip if already inside an <a> tag
     const url = getCitationUrl(match)
     if (url) return `<a href="${url}" class="citation-link" target="_blank" rel="noopener">${match}</a>`
     return match
   })
+  // Clean up double-wrapped links from both passes
+  html = html.replace(/<a ([^>]+)><a [^>]+>/g, '<a $1>')
+  html = html.replace(/<\/a><\/a>/g, '</a>')
 
   // Markdown tables: detect consecutive lines starting with |
   html = html.replace(/((?:^|\n)\|[^\n]+(?:\n\|[^\n]+)+)/g, (tableBlock) => {
