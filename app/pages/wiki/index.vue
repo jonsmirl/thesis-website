@@ -135,7 +135,7 @@ const { data: searchResults } = useAsyncData('wiki-search', async () => {
 useHead({
   title: 'Economics Wiki — CES Curvature Theory',
   meta: [
-    { name: 'description', content: 'Interactive knowledge base explaining CES curvature theory for economists. 63 cross-linked articles with 3D demos.' },
+    { name: 'description', content: 'Interactive knowledge base explaining CES curvature theory for economists. 123 cross-linked articles with 3D demos.' },
   ],
 })
 </script>
