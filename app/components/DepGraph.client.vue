@@ -1,49 +1,151 @@
 <template>
-  <div class="dep-graph-wrap">
-    <div class="graph-controls">
-      <label>Depth:
-        <select :value="depth" @input="onDepthChange">
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-        </select>
-      </label>
-      <span class="graph-stats" v-if="nodes.length">{{ nodes.length }} nodes, {{ edges.length }} edges</span>
+  <div class="dep-graph">
+    <div class="graph-toolbar">
+      <div class="toolbar-left">
+        <div class="depth-control">
+          <span class="depth-label">Traversal depth</span>
+          <div class="depth-buttons">
+            <button
+              v-for="d in [1, 2, 3]"
+              :key="d"
+              :class="{ active: depth === d }"
+              @click="setDepth(d)"
+            >{{ d }}</button>
+          </div>
+        </div>
+      </div>
+      <div class="toolbar-right" v-if="nodes.length">
+        <span class="stat">{{ nodes.length }} declarations</span>
+        <span class="stat-sep">&middot;</span>
+        <span class="stat">{{ edges.length }} dependencies</span>
+      </div>
     </div>
-    <div class="graph-scroll">
-      <svg :width="svgW" :height="svgH" :viewBox="`0 0 ${svgW} ${svgH}`" class="dep-svg">
-        <!-- Edges -->
-        <template v-for="(e, i) in edgePaths" :key="'e'+i">
-          <path :d="e.line" fill="none" stroke="#bbb" stroke-width="1.5" />
-          <polygon :points="e.arrow" fill="#999" />
-        </template>
-        <!-- Nodes -->
+
+    <div class="graph-viewport" ref="viewport">
+      <div v-if="loading" class="graph-loading">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+      </div>
+
+      <svg
+        v-else-if="renderedNodes.length"
+        :width="svgW"
+        :height="svgH"
+        :viewBox="`0 0 ${svgW} ${svgH}`"
+        class="graph-svg"
+      >
+        <!-- Grid lines for depth layers -->
+        <line
+          v-for="d in depthLayers"
+          :key="'grid-'+d"
+          :x1="0"
+          :y1="d * LAYER_GAP + PAD"
+          :x2="svgW"
+          :y2="d * LAYER_GAP + PAD"
+          stroke="#e8ecf0"
+          stroke-width="1"
+          stroke-dasharray="4 6"
+          opacity="0.6"
+        />
+
+        <!-- Edge curves -->
+        <g class="edges-layer">
+          <path
+            v-for="(e, i) in edgePaths"
+            :key="'edge-'+i"
+            :d="e.curve"
+            fill="none"
+            :stroke="e.color"
+            stroke-width="1.5"
+            :opacity="hovered && hovered !== e.from && hovered !== e.to ? 0.15 : 0.5"
+            class="edge-line"
+          />
+        </g>
+
+        <!-- Arrowheads as separate layer (on top of lines, below nodes) -->
+        <g class="arrows-layer">
+          <polygon
+            v-for="(e, i) in edgePaths"
+            :key="'arrow-'+i"
+            :points="e.arrowPoints"
+            :fill="e.color"
+            :opacity="hovered && hovered !== e.from && hovered !== e.to ? 0.15 : 0.65"
+          />
+        </g>
+
+        <!-- Node groups -->
         <g
           v-for="n in renderedNodes"
           :key="n.name"
           :transform="`translate(${n.x}, ${n.y})`"
-          class="graph-node"
+          class="node-group"
+          :class="{ dimmed: hovered && hovered !== n.name }"
+          @mouseenter="hovered = n.name"
+          @mouseleave="hovered = null"
           @click="navigateTo(n.name)"
         >
+          <!-- Shadow -->
           <rect
             :width="n.w"
-            :height="28"
-            :x="-n.w/2"
-            y="-14"
-            rx="4"
-            :fill="nodeColor(n.status)"
-            :stroke="n.name === rootName ? '#333' : nodeStroke(n.status)"
+            :height="NODE_H"
+            :x="-n.w / 2"
+            :y="-NODE_H / 2 + 2"
+            :rx="NODE_H / 2"
+            fill="black"
+            opacity="0.04"
+          />
+          <!-- Background pill -->
+          <rect
+            :width="n.w"
+            :height="NODE_H"
+            :x="-n.w / 2"
+            :y="-NODE_H / 2"
+            :rx="NODE_H / 2"
+            :fill="statusConfig[n.status]?.bg || '#f5f5f5'"
+            :stroke="n.name === rootName ? statusConfig[n.status]?.accent || '#333' : statusConfig[n.status]?.border || '#ddd'"
             :stroke-width="n.name === rootName ? 2 : 1"
           />
+          <!-- Status dot -->
+          <circle
+            :cx="-n.w / 2 + 12"
+            cy="0"
+            r="3"
+            :fill="statusConfig[n.status]?.accent || '#999'"
+          />
+          <!-- Label -->
           <text
+            :x="1"
+            y="0.5"
             text-anchor="middle"
             dominant-baseline="central"
-            font-size="10"
-            :fill="textColor(n.status)"
-            class="node-label"
-          >{{ truncName(n.name) }}</text>
+            class="node-text"
+            :fill="statusConfig[n.status]?.text || '#333'"
+          >{{ n.name }}</text>
+          <!-- Root indicator -->
+          <text
+            v-if="n.name === rootName"
+            :x="n.w / 2 - 10"
+            y="0.5"
+            text-anchor="middle"
+            dominant-baseline="central"
+            class="root-marker"
+            :fill="statusConfig[n.status]?.accent || '#333'"
+          >&#x25C6;</text>
         </g>
       </svg>
+
+      <div v-else-if="!loading" class="graph-empty">
+        No dependencies found
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="graph-legend" v-if="renderedNodes.length">
+      <div class="legend-item" v-for="(cfg, key) in statusConfig" :key="key">
+        <span class="legend-dot" :style="{ background: cfg.accent }"></span>
+        <span class="legend-label">{{ cfg.label }}</span>
+      </div>
     </div>
   </div>
 </template>
@@ -54,6 +156,8 @@ const router = useRouter()
 const client = useSupabaseClient()
 
 const depth = ref(2)
+const loading = ref(true)
+const hovered = ref<string | null>(null)
 
 interface GNode { name: string; status: string; kind: string; depth: number }
 interface GEdge { from: string; to: string }
@@ -62,12 +166,20 @@ interface LayoutNode extends GNode { x: number; y: number; w: number }
 const nodes = ref<GNode[]>([])
 const edges = ref<GEdge[]>([])
 
+const statusConfig: Record<string, { bg: string; border: string; accent: string; text: string; label: string }> = {
+  proved:  { bg: '#f0faf3', border: '#c1e6cd', accent: '#2da44e', text: '#1a5c30', label: 'Proved' },
+  axiom:   { bg: '#f5f0fa', border: '#d4c1e8', accent: '#8250df', text: '#512a85', label: 'Axiom' },
+  trivial: { bg: '#eef8fa', border: '#b8dce4', accent: '#0a7b8a', text: '#065660', label: 'Trivial' },
+  sorry:   { bg: '#fdf8ed', border: '#e8d5a0', accent: '#b08800', text: '#6e5600', label: 'Sorry' },
+}
+
 async function fetchTree() {
+  loading.value = true
   const { data, error } = await client.rpc('get_dep_tree', {
     root_name: props.rootName,
     max_depth: depth.value,
   })
-  if (error || !data) return
+  if (error || !data) { loading.value = false; return }
 
   const newNodes: GNode[] = []
   const newEdges: GEdge[] = []
@@ -80,19 +192,34 @@ async function fetchTree() {
   }
   nodes.value = newNodes
   edges.value = newEdges
+  loading.value = false
 }
 
-const NODE_H = 28
-const LAYER_GAP = 60
-const NODE_GAP = 20
-const PAD = 40
-const CHAR_W = 7.2 // approximate monospace char width at font-size 10
+function setDepth(d: number) {
+  depth.value = d
+  fetchTree()
+}
+
+// Layout constants
+const NODE_H = 30
+const LAYER_GAP = 72
+const NODE_GAP = 18
+const PAD = 50
+const CHAR_W = 6.8
+const ARROW_H = 7
+const ARROW_W = 7
 
 function calcNodeW(name: string) {
-  return Math.max(90, name.length * CHAR_W + 24)
+  // Extra space for status dot + padding
+  return Math.max(100, name.length * CHAR_W + 40)
 }
 
-// Layered layout: group by depth, space evenly using actual node widths
+const depthLayers = computed(() => {
+  if (!nodes.value.length) return []
+  const maxD = Math.max(...nodes.value.map(n => n.depth))
+  return Array.from({ length: maxD + 1 }, (_, i) => i)
+})
+
 const rawLayout = computed<LayoutNode[]>(() => {
   if (!nodes.value.length) return []
 
@@ -105,26 +232,18 @@ const rawLayout = computed<LayoutNode[]>(() => {
 
   const result: LayoutNode[] = []
   for (const [d, layer] of [...layers.entries()].sort(([a], [b]) => a - b)) {
-    // Calculate total width based on actual node widths
     const widths = layer.map(n => calcNodeW(n.name))
     const totalW = widths.reduce((s, w) => s + w, 0) + (layer.length - 1) * NODE_GAP
     let cx = -totalW / 2
     for (let i = 0; i < layer.length; i++) {
-      const n = layer[i]
       const w = widths[i]
-      result.push({
-        ...n,
-        x: cx + w / 2,
-        y: d * LAYER_GAP,
-        w,
-      })
+      result.push({ ...layer[i], x: cx + w / 2, y: d * LAYER_GAP, w })
       cx += w + NODE_GAP
     }
   }
   return result
 })
 
-// Offset to make all coords positive + add padding (account for node half-widths)
 const renderedNodes = computed<LayoutNode[]>(() => {
   if (!rawLayout.value.length) return []
   const minLeft = Math.min(...rawLayout.value.map(n => n.x - n.w / 2))
@@ -139,13 +258,10 @@ const svgW = computed(() => {
 })
 
 const svgH = computed(() => {
-  if (!nodes.value.length) return 200
+  if (!nodes.value.length) return 120
   const maxD = Math.max(...nodes.value.map(n => n.depth))
   return (maxD + 1) * LAYER_GAP + PAD * 2
 })
-
-const ARROW_H = 8
-const ARROW_W = 6
 
 const edgePaths = computed(() => {
   const map = new Map<string, LayoutNode>()
@@ -155,50 +271,193 @@ const edgePaths = computed(() => {
     const from = map.get(e.from)
     const to = map.get(e.to)
     if (!from || !to) return []
-    const x1 = from.x, y1 = from.y + NODE_H / 2
-    const x2 = to.x, y2 = to.y - NODE_H / 2
-    const cy = (y1 + y2) / 2
-    // Line stops at the top of the arrowhead
-    const lineEndY = y2 - ARROW_H
-    const line = `M ${x1} ${y1} C ${x1} ${cy}, ${x2} ${cy}, ${x2} ${lineEndY}`
-    // Triangle: tip at box edge, base at line end
-    const arrow = `${x2},${y2} ${x2 - ARROW_W / 2},${y2 - ARROW_H} ${x2 + ARROW_W / 2},${y2 - ARROW_H}`
-    return [{ line, arrow }]
+
+    const x1 = from.x
+    const y1 = from.y + NODE_H / 2
+    const x2 = to.x
+    const y2 = to.y - NODE_H / 2
+
+    // Bezier: line ends at arrow base
+    const arrowBaseY = y2 - ARROW_H
+    const cy1 = y1 + (arrowBaseY - y1) * 0.4
+    const cy2 = y1 + (arrowBaseY - y1) * 0.6
+    const curve = `M ${x1} ${y1} C ${x1} ${cy1}, ${x2} ${cy2}, ${x2} ${arrowBaseY}`
+
+    // Arrow polygon: tip at box edge, base where line ends
+    const arrowPoints = `${x2},${y2} ${x2 - ARROW_W / 2},${arrowBaseY} ${x2 + ARROW_W / 2},${arrowBaseY}`
+
+    // Color from source node status
+    const color = statusConfig[from.status]?.accent || '#999'
+
+    return [{ curve, arrowPoints, color, from: e.from, to: e.to }]
   })
 })
 
-function nodeColor(s: string) {
-  return s === 'proved' ? '#e6f4ea' : s === 'axiom' ? '#e8d5f5' : s === 'trivial' ? '#d1ecf1' : s === 'sorry' ? '#fff3cd' : '#f0f0f0'
-}
-function nodeStroke(s: string) {
-  return s === 'proved' ? '#a3d9a5' : s === 'axiom' ? '#c4a5de' : s === 'trivial' ? '#a2d5db' : s === 'sorry' ? '#e6cf8a' : '#ddd'
-}
-function textColor(s: string) {
-  return s === 'proved' ? '#1a7f37' : s === 'axiom' ? '#6f42c1' : s === 'trivial' ? '#0c5460' : s === 'sorry' ? '#856404' : '#333'
-}
-function truncName(name: string) { return name }
-function navigateTo(name: string) { router.push(`/theorems/${name}`) }
-
-function onDepthChange(e: Event) {
-  depth.value = Number((e.target as HTMLSelectElement).value)
-  fetchTree()
+function navigateTo(name: string) {
+  router.push(`/theorems/${name}`)
 }
 
 onMounted(() => { fetchTree() })
 </script>
 
 <style scoped>
-.dep-graph-wrap { border: 1px solid #e1e4e8; border-radius: 8px; background: #fafbfc; }
-.graph-controls {
-  display: flex; align-items: center; gap: 1rem;
-  padding: 0.5rem 1rem; background: #f0f4f8; border-bottom: 1px solid #e1e4e8; font-size: 0.8rem;
+.dep-graph {
+  border: 1px solid #d8dee4;
+  border-radius: 10px;
+  background: #fdfdfe;
+  overflow: hidden;
 }
-.graph-controls label { display: flex; align-items: center; gap: 0.3rem; font-weight: 500; color: #555; }
-.graph-controls select { padding: 0.15rem 0.3rem; border: 1px solid #ccc; border-radius: 3px; font-size: 0.8rem; }
-.graph-stats { color: #888; font-size: 0.75rem; }
-.graph-scroll { overflow-x: auto; overflow-y: auto; max-height: 500px; padding: 0.5rem; }
-.dep-svg { display: block; margin: 0 auto; }
-.graph-node { cursor: pointer; }
-.graph-node:hover rect { filter: brightness(0.92); }
-.node-label { font-family: 'SF Mono', 'Fira Code', monospace; pointer-events: none; }
+
+/* Toolbar */
+.graph-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.9rem;
+  background: linear-gradient(180deg, #f6f8fa 0%, #eff2f5 100%);
+  border-bottom: 1px solid #d8dee4;
+}
+.toolbar-left { display: flex; align-items: center; gap: 0.75rem; }
+.toolbar-right { display: flex; align-items: center; gap: 0.4rem; }
+
+.depth-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.depth-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #57606a;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.depth-buttons {
+  display: flex;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.depth-buttons button {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  border: none;
+  border-right: 1px solid #d0d7de;
+  background: white;
+  color: #57606a;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.depth-buttons button:last-child { border-right: none; }
+.depth-buttons button:hover { background: #f3f4f6; }
+.depth-buttons button.active {
+  background: #0969da;
+  color: white;
+}
+
+.stat {
+  font-size: 0.72rem;
+  color: #656d76;
+  font-variant-numeric: tabular-nums;
+}
+.stat-sep { color: #d0d7de; font-size: 0.65rem; }
+
+/* Viewport */
+.graph-viewport {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 480px;
+  min-height: 100px;
+  scrollbar-width: thin;
+  scrollbar-color: #c8ccd0 transparent;
+}
+.graph-viewport::-webkit-scrollbar { height: 6px; width: 6px; }
+.graph-viewport::-webkit-scrollbar-thumb { background: #c8ccd0; border-radius: 3px; }
+.graph-viewport::-webkit-scrollbar-track { background: transparent; }
+
+.graph-svg { display: block; }
+
+/* Loading */
+.graph-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 2.5rem;
+}
+.loading-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #8b949e;
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+.loading-dot:nth-child(2) { animation-delay: 0.15s; }
+.loading-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes pulse-dot {
+  0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+  40% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Empty state */
+.graph-empty {
+  padding: 2rem;
+  text-align: center;
+  color: #8b949e;
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+/* Edges */
+.edge-line {
+  transition: opacity 0.2s ease;
+}
+
+/* Nodes */
+.node-group {
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.node-group:hover rect:first-of-type { opacity: 0.08; }
+.node-group:hover rect:nth-of-type(2) { filter: brightness(0.96); }
+.node-group.dimmed { opacity: 0.3; }
+
+.node-text {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 10.5px;
+  font-weight: 450;
+  pointer-events: none;
+  letter-spacing: -0.01em;
+}
+.root-marker {
+  font-size: 7px;
+  pointer-events: none;
+}
+
+/* Legend */
+.graph-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.45rem 0.9rem;
+  border-top: 1px solid #d8dee4;
+  background: #f6f8fa;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.legend-label {
+  font-size: 0.68rem;
+  color: #656d76;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
 </style>
