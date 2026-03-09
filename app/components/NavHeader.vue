@@ -3,12 +3,13 @@
     <div class="nav-inner">
       <NuxtLink to="/" class="logo">CES Formalization</NuxtLink>
       <nav>
+        <NuxtLink to="/wiki">Wiki</NuxtLink>
         <NuxtLink to="/papers">Papers</NuxtLink>
         <NuxtLink to="/theorems">Theorems</NuxtLink>
         <NuxtLink to="/tests">Tests</NuxtLink>
       </nav>
-      <div class="user-bar">
-        <span class="email">{{ user?.email }}</span>
+      <div class="user-bar" v-if="user">
+        <span class="email">{{ user.email }}</span>
         <button @click="handleLogout">Sign out</button>
       </div>
     </div>

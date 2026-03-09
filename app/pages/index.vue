@@ -2,6 +2,16 @@
   <div>
     <NavHeader />
     <main class="container">
+      <NuxtLink to="/wiki" class="card">
+        <h2>Economics Wiki</h2>
+        <p>Interactive knowledge base: CES curvature theory explained for economists, with 3D demos</p>
+        <ul>
+          <li>63 cross-linked articles across 10 categories</li>
+          <li>Interactive WebGL demos (isoquants, regime diagrams, crisis sequences)</li>
+          <li>No login required</li>
+        </ul>
+      </NuxtLink>
+
       <NuxtLink to="/theorems" class="card">
         <h2>Lean 4 Proofs</h2>
         <p>117 files, ~1,826 declarations, 3 axioms, ~29,000 lines</p>
