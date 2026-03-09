@@ -306,9 +306,9 @@ onMounted(() => { fetchTree() })
 
 <style scoped>
 .dep-graph {
-  border: 1px solid #d8dee4;
-  border-radius: 10px;
-  background: #fdfdfe;
+  border: 1px solid var(--color-border-heavy);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-page);
   overflow: hidden;
 }
 
@@ -318,8 +318,8 @@ onMounted(() => { fetchTree() })
   align-items: center;
   justify-content: space-between;
   padding: 0.55rem 0.9rem;
-  background: linear-gradient(180deg, #f6f8fa 0%, #eff2f5 100%);
-  border-bottom: 1px solid #d8dee4;
+  background: var(--color-bg-toolbar);
+  border-bottom: 1px solid var(--color-border-heavy);
 }
 .toolbar-left { display: flex; align-items: center; gap: 0.75rem; }
 .toolbar-right { display: flex; align-items: center; gap: 0.4rem; }
@@ -332,14 +332,14 @@ onMounted(() => { fetchTree() })
 .depth-label {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #57606a;
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 .depth-buttons {
   display: flex;
-  border: 1px solid #d0d7de;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-heavy);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 .depth-buttons button {
@@ -347,25 +347,25 @@ onMounted(() => { fetchTree() })
   font-size: 0.78rem;
   font-weight: 500;
   border: none;
-  border-right: 1px solid #d0d7de;
-  background: white;
-  color: #57606a;
+  border-right: 1px solid var(--color-border-heavy);
+  background: var(--color-bg-page);
+  color: var(--color-text-muted);
   cursor: pointer;
   transition: all 0.15s ease;
 }
 .depth-buttons button:last-child { border-right: none; }
-.depth-buttons button:hover { background: #f3f4f6; }
+.depth-buttons button:hover { background: var(--color-bg-hover); }
 .depth-buttons button.active {
-  background: #0969da;
+  background: var(--color-link);
   color: white;
 }
 
 .stat {
   font-size: 0.72rem;
-  color: #656d76;
+  color: var(--color-text-muted);
   font-variant-numeric: tabular-nums;
 }
-.stat-sep { color: #d0d7de; font-size: 0.65rem; }
+.stat-sep { color: var(--color-border-heavy); font-size: 0.65rem; }
 
 /* Viewport */
 .graph-viewport {
@@ -374,10 +374,10 @@ onMounted(() => { fetchTree() })
   max-height: 480px;
   min-height: 100px;
   scrollbar-width: thin;
-  scrollbar-color: #c8ccd0 transparent;
+  scrollbar-color: var(--color-border-heavy) transparent;
 }
 .graph-viewport::-webkit-scrollbar { height: 6px; width: 6px; }
-.graph-viewport::-webkit-scrollbar-thumb { background: #c8ccd0; border-radius: 3px; }
+.graph-viewport::-webkit-scrollbar-thumb { background: var(--color-border-heavy); border-radius: 3px; }
 .graph-viewport::-webkit-scrollbar-track { background: transparent; }
 
 .graph-svg { display: block; }
@@ -394,7 +394,7 @@ onMounted(() => { fetchTree() })
   width: 5px;
   height: 5px;
   border-radius: 50%;
-  background: #8b949e;
+  background: var(--color-text-faint);
   animation: pulse-dot 1.2s ease-in-out infinite;
 }
 .loading-dot:nth-child(2) { animation-delay: 0.15s; }
@@ -408,7 +408,7 @@ onMounted(() => { fetchTree() })
 .graph-empty {
   padding: 2rem;
   text-align: center;
-  color: #8b949e;
+  color: var(--color-text-faint);
   font-size: 0.82rem;
   font-style: italic;
 }
@@ -428,7 +428,7 @@ onMounted(() => { fetchTree() })
 .node-group.dimmed { opacity: 0.3; }
 
 .node-text {
-  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-family: var(--font-mono);
   font-size: 10.5px;
   font-weight: 450;
   pointer-events: none;
@@ -445,8 +445,8 @@ onMounted(() => { fetchTree() })
   align-items: center;
   gap: 1rem;
   padding: 0.45rem 0.9rem;
-  border-top: 1px solid #d8dee4;
-  background: #f6f8fa;
+  border-top: 1px solid var(--color-border-heavy);
+  background: var(--color-bg-surface);
 }
 .legend-item {
   display: flex;
@@ -460,7 +460,7 @@ onMounted(() => { fetchTree() })
 }
 .legend-label {
   font-size: 0.68rem;
-  color: #656d76;
+  color: var(--color-text-muted);
   font-weight: 500;
   letter-spacing: 0.02em;
 }

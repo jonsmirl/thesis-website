@@ -10,6 +10,7 @@
           placeholder="Email"
           required
           :disabled="loading"
+          aria-label="Email address"
         />
         <input
           v-model="password"
@@ -17,6 +18,7 @@
           placeholder="Password"
           required
           :disabled="loading"
+          aria-label="Password"
         />
         <button type="submit" :disabled="loading">
           {{ loading ? 'Signing in...' : 'Sign in' }}
@@ -58,14 +60,13 @@ async function handleLogin() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f5f5f5;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--color-bg-login);
 }
 .login-card {
-  background: white;
+  background: var(--color-bg-page);
   padding: 2.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
   width: 100%;
   max-width: 380px;
 }
@@ -74,7 +75,7 @@ h1 {
   font-size: 1.5rem;
 }
 .subtitle {
-  color: #666;
+  color: var(--color-text-muted);
   margin: 0 0 1.5rem;
   font-size: 0.9rem;
 }
@@ -83,25 +84,27 @@ input {
   width: 100%;
   padding: 0.6rem 0.75rem;
   margin-bottom: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-input);
   border-radius: 4px;
   font-size: 0.95rem;
   box-sizing: border-box;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
 }
 button {
   width: 100%;
   padding: 0.6rem;
-  background: #111;
+  background: var(--color-btn-primary);
   color: white;
   border: none;
   border-radius: 4px;
   font-size: 0.95rem;
   cursor: pointer;
 }
-button:hover { background: #333; }
+button:hover { background: var(--color-btn-primary-hover); }
 button:disabled { opacity: 0.6; cursor: not-allowed; }
 .error {
-  color: #c00;
+  color: var(--color-error);
   margin: 0.75rem 0 0;
   font-size: 0.85rem;
 }

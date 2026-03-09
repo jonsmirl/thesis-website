@@ -3,14 +3,16 @@
 </template>
 
 <script setup lang="ts">
+import { escapeHtmlFull } from '~/utils/math-render'
+
 const props = defineProps<{ code: string }>()
 
 const highlighted = computed(() => {
   if (!props.code) return ''
 
-  let html = escapeHtml(props.code)
+  let html = escapeHtmlFull(props.code)
 
-  // Extract comments first, replace with placeholders to avoid keyword matches inside them
+  // Extract comments first, replace with placeholders
   const comments: string[] = []
   const placeholder = (i: number) => `\x00CMT${i}\x00`
 
@@ -20,13 +22,13 @@ const highlighted = computed(() => {
     return placeholder(comments.length - 1)
   })
 
-  // Single-line comments (-- to end of line)
+  // Single-line comments
   html = html.replace(/(--.*?)$/gm, (m) => {
     comments.push(m)
     return placeholder(comments.length - 1)
   })
 
-  // sorry (make it stand out)
+  // sorry
   html = html.replace(/\b(sorry)\b/g, '<span class="lh-sorry">$1</span>')
 
   // Keywords
@@ -61,33 +63,25 @@ const highlighted = computed(() => {
   // Strings
   html = html.replace(/(&quot;[^&]*?&quot;)/g, '<span class="lh-string">$1</span>')
 
-  // Restore comments with highlighting
+  // Restore comments
   for (let i = 0; i < comments.length; i++) {
     html = html.replace(placeholder(i), `<span class="lh-comment">${comments[i]}</span>`)
   }
 
   return html
 })
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-}
 </script>
 
 <style scoped>
 .lean-highlight {
-  background: #f6f8fa;
-  border: 1px solid #e1e4e8;
-  border-radius: 6px;
+  background: var(--color-bg-code);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
   padding: 1rem;
   font-size: 0.85rem;
   overflow-x: auto;
   line-height: 1.5;
-  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-family: var(--font-mono);
   margin: 0;
 }
 :deep(.lh-keyword) { color: #7c3aed; font-weight: 500; }
@@ -96,5 +90,5 @@ function escapeHtml(s: string): string {
 :deep(.lh-number) { color: #0369a1; }
 :deep(.lh-comment) { color: #6b7280; font-style: italic; }
 :deep(.lh-string) { color: #16a34a; }
-:deep(.lh-sorry) { color: #dc2626; font-weight: 700; background: #fef2f2; padding: 0 2px; border-radius: 2px; }
+:deep(.lh-sorry) { color: var(--color-error); font-weight: 700; background: #fef2f2; padding: 0 2px; border-radius: 2px; }
 </style>

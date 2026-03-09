@@ -38,16 +38,12 @@ function truncate(s: string, n: number) {
 </script>
 
 <style scoped>
-.container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-.page-header { margin-bottom: 1.5rem; }
-.page-header h2 { margin: 0 0 0.25rem; }
-.subtitle { color: #666; margin: 0; font-size: 0.9rem; }
 .paper-list { display: flex; flex-direction: column; gap: 0.75rem; }
-.paper-card { display: flex; gap: 1rem; border: 1px solid #eee; border-radius: 8px; padding: 1rem 1.25rem; }
-.paper-number { font-size: 1.5rem; font-weight: 700; color: #0550ae; min-width: 2.5rem; text-align: center; padding-top: 0.2rem; }
+.paper-card { display: flex; gap: 1rem; border: 1px solid var(--color-border-light); border-radius: var(--radius-lg); padding: 1rem 1.25rem; }
+.paper-number { font-size: 1.5rem; font-weight: 700; color: var(--color-link-alt); min-width: 2.5rem; text-align: center; padding-top: 0.2rem; }
 .paper-content { flex: 1; }
-.paper-title { display: block; margin: 0 0 0.3rem; font-size: 1rem; font-weight: 600; color: #111; text-decoration: none; }
-.paper-title:hover { color: #0066cc; }
-.journal { font-size: 0.8rem; color: #666; font-style: italic; margin-bottom: 0.4rem; }
-.abstract { margin: 0; font-size: 0.85rem; color: #444; line-height: 1.5; }
+.paper-title { display: block; margin: 0 0 0.3rem; font-size: 1rem; font-weight: 600; color: var(--color-text-primary); text-decoration: none; }
+.paper-title:hover { color: var(--color-link); }
+.journal { font-size: 0.8rem; color: var(--color-text-muted); font-style: italic; margin-bottom: 0.4rem; }
+.abstract { margin: 0; font-size: 0.85rem; color: var(--color-text-secondary); line-height: 1.5; }
 </style>

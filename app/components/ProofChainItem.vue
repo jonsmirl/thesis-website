@@ -1,11 +1,11 @@
 <template>
   <div class="chain-item">
-    <div class="timeline-dot" :class="item.status" :style="{ borderColor: accentColor }"></div>
+    <div class="timeline-dot" :class="`timeline-dot--${item.status}`" :style="{ borderColor: accentColor }"></div>
     <div class="chain-content">
       <details>
         <summary class="chain-summary">
           <NuxtLink :to="`/theorems/${item.name}`" class="thm-name" @click.stop>{{ item.name }}</NuxtLink>
-          <span class="badge" :class="item.status">{{ item.status }}</span>
+          <span class="badge" :class="`badge--${item.status}`">{{ item.status }}</span>
           <span class="check-comment" v-if="item.check_comment">{{ item.check_comment }}</span>
         </summary>
         <div class="chain-detail">
@@ -43,11 +43,7 @@
 </template>
 
 <script setup lang="ts">
-function githubUrl(filePath?: string, line?: number) {
-  const base = 'https://github.com/jonsmirl/thesis/blob/main'
-  const url = `${base}/${filePath || ''}`
-  return line ? `${url}#L${line}` : url
-}
+import { githubUrl } from '~/utils/formatting'
 
 defineProps<{
   item: {
@@ -76,16 +72,16 @@ defineProps<{
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  border: 2px solid #ccc;
-  background: white;
+  border: 2px solid var(--color-border-input);
+  background: var(--color-bg-page);
   flex-shrink: 0;
   margin-top: 0.35rem;
   z-index: 1;
 }
-.timeline-dot.proved { background: #22c55e; border-color: #16a34a; }
-.timeline-dot.sorry { background: #fbbf24; border-color: #d97706; }
-.timeline-dot.axiom { background: #a78bfa; border-color: #7c3aed; }
-.timeline-dot.trivial { background: #67e8f9; border-color: #06b6d4; }
+.timeline-dot--proved { background: var(--color-proved-dot); border-color: var(--color-proved-accent); }
+.timeline-dot--sorry { background: var(--color-sorry-dot); border-color: var(--color-sorry-accent); }
+.timeline-dot--axiom { background: var(--color-axiom-dot); border-color: var(--color-axiom-accent); }
+.timeline-dot--trivial { background: var(--color-trivial-dot); border-color: var(--color-trivial-accent); }
 .chain-content { flex: 1; min-width: 0; }
 .chain-summary {
   display: flex;
@@ -100,47 +96,38 @@ defineProps<{
 .chain-summary::before {
   content: '\25B6';
   font-size: 0.6rem;
-  color: #999;
+  color: var(--color-text-ghost);
   transition: transform 0.15s;
 }
 details[open] > .chain-summary::before { transform: rotate(90deg); }
 .thm-name {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: var(--font-mono);
   font-weight: 600;
   font-size: 0.9rem;
-  color: #111;
+  color: var(--color-text-primary);
   text-decoration: none;
 }
-.thm-name:hover { color: #0066cc; }
-.badge {
-  font-size: 0.65rem;
-  padding: 0.1rem 0.35rem;
-  border-radius: 3px;
-  background: #f0f0f0;
-  color: #555;
-}
-.badge.proved { background: #e6f4ea; color: #1a7f37; }
-.badge.sorry { background: #fff3cd; color: #856404; }
-.badge.axiom { background: #e8d5f5; color: #6f42c1; }
-.badge.trivial { background: #d1ecf1; color: #0c5460; }
+.thm-name:hover { color: var(--color-link); }
 .check-comment {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--color-text-muted);
   font-style: italic;
 }
 .chain-detail {
   margin-top: 0.5rem;
   padding: 0.75rem;
-  background: #fafafa;
-  border: 1px solid #eee;
-  border-radius: 6px;
+  background: var(--color-bg-surface-alt);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
 }
 .docstring {
   margin: 0 0 0.75rem;
   font-size: 0.85rem;
-  color: #444;
+  color: var(--color-text-secondary);
   line-height: 1.5;
   white-space: pre-wrap;
+  font-family: var(--font-serif);
+  line-height: 1.85;
 }
 .detail-meta {
   margin-top: 0.75rem;
@@ -150,26 +137,19 @@ details[open] > .chain-summary::before { transform: rotate(90deg); }
   margin-bottom: 0.4rem;
 }
 .dep-list strong {
-  color: #666;
+  color: var(--color-text-muted);
   margin-right: 0.3rem;
 }
 .dep-link {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: #0066cc;
+  color: var(--color-link);
   text-decoration: none;
   margin-right: 0.5rem;
 }
 .dep-link:hover { text-decoration: underline; }
 .file-loc {
   margin-top: 0.4rem;
-  color: #999;
+  color: var(--color-text-ghost);
 }
-.file-link {
-  font-size: 0.75rem;
-  color: #0066cc;
-  text-decoration: none;
-  font-family: monospace;
-}
-.file-link:hover { text-decoration: underline; }
 </style>

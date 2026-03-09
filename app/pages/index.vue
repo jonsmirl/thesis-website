@@ -1,7 +1,7 @@
 <template>
   <div>
     <NavHeader />
-    <main class="container">
+    <main class="container--narrow">
       <NuxtLink to="/wiki" class="card">
         <h2>Economics Wiki</h2>
         <p>Interactive knowledge base: CES curvature theory explained for economists, with 3D demos</p>
@@ -38,26 +38,20 @@
 </template>
 
 <style scoped>
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
 .card {
   display: block;
-  background: white;
-  border: 1px solid #eee;
-  border-radius: 8px;
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
   padding: 1.25rem 1.5rem;
   margin-bottom: 1rem;
   text-decoration: none;
   color: inherit;
   transition: border-color 0.15s;
 }
-.card:hover { border-color: #0066cc; }
+.card:hover { border-color: var(--color-link); }
 .card h2 { margin: 0 0 0.5rem; font-size: 1.1rem; }
-.card p { margin: 0 0 0.5rem; color: #555; font-size: 0.9rem; }
-.card ul { margin: 0.5rem 0 0; padding-left: 1.25rem; font-size: 0.9rem; color: #444; }
+.card p { margin: 0 0 0.5rem; color: var(--color-text-tertiary); font-size: 0.9rem; }
+.card ul { margin: 0.5rem 0 0; padding-left: 1.25rem; font-size: 0.9rem; color: var(--color-text-secondary); }
 .card li { margin-bottom: 0.25rem; }
 </style>

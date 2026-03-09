@@ -36,19 +36,19 @@ if (demoComponents[props.name]) {
 
 <style scoped>
 .demo-container {
-  background: #fafbfc;
+  background: var(--color-bg-surface-alt);
 }
 .demo-toolbar {
   display: flex;
   align-items: center;
   padding: 0.5rem 1rem;
-  background: #f0f4f8;
-  border-bottom: 1px solid #e1e4e8;
+  background: var(--color-bg-surface);
+  border-bottom: 1px solid var(--color-border-medium);
 }
 .demo-label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #555;
+  color: var(--color-text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
@@ -61,6 +61,6 @@ if (demoComponents[props.name]) {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #888;
+  color: var(--color-text-faint);
 }
 </style>

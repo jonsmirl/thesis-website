@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container--narrow">
     <NavHeader />
 
     <div v-if="theorem">
@@ -14,10 +14,10 @@
       <div class="detail-header">
         <h2>{{ theorem.display_name || theorem.name }}</h2>
         <div class="badges">
-          <NuxtLink :to="`/theorems/all?kind=${theorem.kind}`" class="badge kind">{{ theorem.kind }}</NuxtLink>
-          <NuxtLink :to="`/theorems/all?status=${theorem.status}`" class="badge" :class="theorem.status">{{ theorem.status }}</NuxtLink>
-          <NuxtLink v-if="theorem.paper" :to="`/theorems/all?paper=${theorem.paper}`" class="badge paper">{{ theorem.paper }}</NuxtLink>
-          <span class="badge marquee" v-if="theorem.is_marquee">key theorem</span>
+          <NuxtLink :to="`/theorems/all?kind=${theorem.kind}`" class="badge badge--kind">{{ theorem.kind }}</NuxtLink>
+          <NuxtLink :to="`/theorems/all?status=${theorem.status}`" class="badge" :class="`badge--${theorem.status}`">{{ theorem.status }}</NuxtLink>
+          <NuxtLink v-if="theorem.paper" :to="`/theorems/all?paper=${theorem.paper}`" class="badge badge--paper">{{ theorem.paper }}</NuxtLink>
+          <span class="badge badge--marquee" v-if="theorem.is_marquee">key theorem</span>
         </div>
       </div>
 
@@ -31,7 +31,6 @@
         <LeanHighlight :code="theorem.source_code" />
       </div>
 
-      <!-- Dependency Graph -->
       <div class="section">
         <h3>Dependency Graph</h3>
         <DepGraph :root-name="theorem.name" />
@@ -46,7 +45,7 @@
             :to="`/theorems/${d.name}`"
             class="dep-chip"
           >
-            <span class="dep-dot" :class="d.status"></span>
+            <span class="dep-dot" :class="`dep-dot--${d.status}`"></span>
             {{ d.name }}
           </NuxtLink>
         </div>
@@ -66,7 +65,6 @@
         <p>{{ theorem.section }}</p>
       </div>
 
-      <!-- Same-file neighbors -->
       <div v-if="neighbors.length" class="section">
         <h3>In the same file</h3>
         <div class="dep-grid">
@@ -76,7 +74,7 @@
             :to="`/theorems/${n.name}`"
             class="dep-chip"
           >
-            <span class="dep-dot" :class="n.status"></span>
+            <span class="dep-dot" :class="`dep-dot--${n.status}`"></span>
             {{ n.name }}
           </NuxtLink>
         </div>
@@ -91,6 +89,8 @@
 </template>
 
 <script setup lang="ts">
+import { githubUrl } from '~/utils/formatting'
+
 const route = useRoute()
 const client = useSupabaseClient()
 
@@ -115,7 +115,6 @@ const { data: usedBy } = await useAsyncData(`used-by-${route.params.name}`, asyn
   return (data || []).map(d => (d.theorems as any)).filter(Boolean)
 })
 
-// Same-file neighbors
 const { data: neighborsRaw } = await useAsyncData(`neighbors-${route.params.name}`, async () => {
   if (!theorem.value?.file_path) return []
   const { data } = await client
@@ -129,59 +128,42 @@ const { data: neighborsRaw } = await useAsyncData(`neighbors-${route.params.name
 })
 
 const neighbors = computed(() => neighborsRaw.value || [])
-
-function githubUrl(filePath: string, line?: number) {
-  const base = 'https://github.com/jonsmirl/thesis/blob/main'
-  const url = `${base}/${filePath}`
-  return line ? `${url}#L${line}` : url
-}
 </script>
 
 <style scoped>
-.container { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-.breadcrumb { font-size: 0.85rem; color: #666; margin-bottom: 1rem; }
-.breadcrumb a { color: #0066cc; text-decoration: none; }
 .detail-header { margin-bottom: 1.5rem; }
-.detail-header h2 { margin: 0 0 0.5rem; font-family: 'SF Mono', 'Fira Code', monospace; }
+.detail-header h2 { margin: 0 0 0.5rem; font-family: var(--font-mono); }
 .badges { display: flex; gap: 0.25rem; }
-.badge { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 3px; background: #f0f0f0; color: #555; }
-.badge.proved { background: #e6f4ea; color: #1a7f37; }
-.badge.sorry { background: #fff3cd; color: #856404; }
-.badge.axiom { background: #e8d5f5; color: #6f42c1; }
-.badge.trivial { background: #d1ecf1; color: #0c5460; }
-.badge.paper { background: #e7f0ff; color: #0550ae; }
-.badge.marquee { background: #fef3c7; color: #92400e; font-weight: 600; }
+.badge { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: var(--radius-sm); text-decoration: none; }
+.badge--kind { background: var(--color-bg-hover); color: var(--color-text-tertiary); }
 .section { margin-bottom: 1.5rem; }
-.section h3 { font-size: 0.9rem; color: #666; margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
-.docstring { margin: 0; line-height: 1.6; white-space: pre-wrap; }
+.section h3 { font-size: 0.9rem; color: var(--color-text-muted); margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.docstring { margin: 0; line-height: 1.6; white-space: pre-wrap; font-family: var(--font-serif); line-height: 1.85; }
 .meta { font-size: 0.9rem; }
-.meta code { background: #f6f8fa; padding: 0.15rem 0.4rem; border-radius: 3px; }
+.meta code { background: var(--color-bg-code); padding: 0.15rem 0.4rem; border-radius: var(--radius-sm); }
 .dep-grid { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .dep-chip {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
   padding: 0.2rem 0.6rem;
-  background: #f6f8fa;
-  border: 1px solid #e1e4e8;
-  border-radius: 12px;
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  background: var(--color-bg-code);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: #111;
+  color: var(--color-text-primary);
   text-decoration: none;
 }
-.dep-chip:hover { background: #eef1f5; border-color: #0066cc; }
+.dep-chip:hover { background: var(--color-bg-hover); border-color: var(--color-link); }
 .dep-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #ccc;
+  background: var(--color-border-input);
 }
-.dep-dot.proved { background: #22c55e; }
-.dep-dot.sorry { background: #fbbf24; }
-.dep-dot.axiom { background: #a78bfa; }
-.dep-dot.trivial { background: #67e8f9; }
-.file-link { color: #0066cc; text-decoration: none; font-family: monospace; }
-.file-link:hover { text-decoration: underline; }
-.badge { text-decoration: none; }
+.dep-dot--proved { background: var(--color-proved-dot); }
+.dep-dot--sorry { background: var(--color-sorry-dot); }
+.dep-dot--axiom { background: var(--color-axiom-dot); }
+.dep-dot--trivial { background: var(--color-trivial-dot); }
 </style>

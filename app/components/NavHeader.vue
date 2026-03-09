@@ -28,25 +28,25 @@ async function handleLogout() {
 
 <style scoped>
 .nav-header {
-  border-bottom: 1px solid #eee;
-  background: white;
+  border-bottom: 1px solid var(--color-border-light);
+  background: var(--color-bg-page);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 .nav-inner {
-  max-width: 960px;
+  max-width: var(--container-width);
   margin: 0 auto;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem var(--container-padding);
   display: flex;
   align-items: center;
   gap: 1.5rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
 }
 .logo {
   font-weight: 700;
   font-size: 1.1rem;
-  color: #111;
+  color: var(--color-text-primary);
   text-decoration: none;
   white-space: nowrap;
 }
@@ -55,16 +55,16 @@ nav {
   gap: 1rem;
 }
 nav a {
-  color: #555;
+  color: var(--color-text-tertiary);
   text-decoration: none;
   font-size: 0.9rem;
   padding: 0.25rem 0;
   border-bottom: 2px solid transparent;
 }
-nav a:hover { color: #111; }
+nav a:hover { color: var(--color-text-primary); }
 nav a.router-link-active {
-  color: #111;
-  border-bottom-color: #111;
+  color: var(--color-text-primary);
+  border-bottom-color: var(--color-text-primary);
 }
 .user-bar {
   margin-left: auto;
@@ -73,15 +73,15 @@ nav a.router-link-active {
   gap: 0.75rem;
   font-size: 0.8rem;
 }
-.email { color: #888; }
+.email { color: var(--color-text-faint); }
 .user-bar button {
   padding: 0.25rem 0.5rem;
   background: none;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-input);
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.75rem;
-  color: #555;
+  color: var(--color-text-tertiary);
 }
-.user-bar button:hover { background: #f5f5f5; }
+.user-bar button:hover { background: var(--color-bg-hover); }
 </style>

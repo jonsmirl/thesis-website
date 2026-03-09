@@ -4,7 +4,6 @@
       <h3>Discussion <span class="count" v-if="topLevel.length">({{ topLevel.length }})</span></h3>
     </div>
 
-    <!-- Comment list -->
     <div v-if="loading" class="loading">Loading discussion...</div>
 
     <div v-else-if="topLevel.length === 0" class="empty">
@@ -29,7 +28,6 @@
       />
     </div>
 
-    <!-- New comment form -->
     <div v-if="user" class="new-comment">
       <textarea
         v-model="newBody"
@@ -174,14 +172,14 @@ const CommentNode = defineComponent({
             class: ['vote-btn', 'up', { active: myVote.value === 1 }],
             onClick: () => emit('vote', c.id, 1),
             disabled: !props.user,
-            title: 'Upvote',
+            'aria-label': 'Upvote',
           }, '\u25B2'),
           h('span', { class: ['vote-score', { positive: c.score > 0, negative: c.score < 0 }] }, String(c.score)),
           h('button', {
             class: ['vote-btn', 'down', { active: myVote.value === -1 }],
             onClick: () => emit('vote', c.id, -1),
             disabled: !props.user,
-            title: 'Downvote',
+            'aria-label': 'Downvote',
           }, '\u25BC'),
         ])
       )
@@ -319,20 +317,20 @@ const CommentNode = defineComponent({
 .comment-section {
   margin-top: 2.5rem;
   padding-top: 1.5rem;
-  border-top: 2px solid #e5e7eb;
+  border-top: 2px solid var(--color-border);
 }
 .section-header {
   margin-bottom: 1rem;
 }
 .section-header h3 {
   font-size: 1rem;
-  color: #111;
+  color: var(--color-text-primary);
   margin: 0;
 }
-.count { color: #888; font-weight: 400; }
+.count { color: var(--color-text-faint); font-weight: 400; }
 
 .loading, .empty {
-  color: #888;
+  color: var(--color-text-faint);
   font-size: 0.9rem;
   padding: 1rem 0;
 }
@@ -344,10 +342,9 @@ const CommentNode = defineComponent({
 }
 
 .comment-node {
-  border-left: 2px solid #e5e7eb;
+  border-left: 2px solid var(--color-border);
   margin-bottom: 0.25rem;
 }
-.comment-node:first-child { margin-top: 0; }
 
 .comment-row {
   display: flex;
@@ -368,22 +365,22 @@ const CommentNode = defineComponent({
   border: none;
   cursor: pointer;
   font-size: 0.6rem;
-  color: #bbb;
+  color: var(--color-text-placeholder);
   padding: 0.1rem 0.25rem;
   line-height: 1;
 }
-.vote-btn:hover:not(:disabled) { color: #555; }
-.vote-btn.up.active { color: #059669; }
-.vote-btn.down.active { color: #dc2626; }
+.vote-btn:hover:not(:disabled) { color: var(--color-text-tertiary); }
+.vote-btn.up.active { color: var(--color-success); }
+.vote-btn.down.active { color: var(--color-error); }
 .vote-btn:disabled { cursor: default; opacity: 0.5; }
 .vote-score {
   font-size: 0.75rem;
   font-weight: 700;
-  color: #666;
+  color: var(--color-text-muted);
   line-height: 1.2;
 }
-.vote-score.positive { color: #059669; }
-.vote-score.negative { color: #dc2626; }
+.vote-score.positive { color: var(--color-success); }
+.vote-score.negative { color: var(--color-error); }
 
 .comment-content {
   flex: 1;
@@ -397,23 +394,23 @@ const CommentNode = defineComponent({
   flex-wrap: wrap;
   margin-bottom: 0.2rem;
 }
-.author { font-size: 0.8rem; color: #111; }
-.institution { font-size: 0.72rem; color: #888; }
+.author { font-size: 0.8rem; color: var(--color-text-primary); }
+.institution { font-size: 0.72rem; color: var(--color-text-faint); }
 .rep {
   font-size: 0.7rem;
-  color: #059669;
-  background: #e6f4ea;
+  color: var(--color-success);
+  background: var(--color-proved-bg);
   padding: 0 0.3rem;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   font-weight: 600;
 }
-.time { font-size: 0.72rem; color: #aaa; }
-.edited { font-size: 0.7rem; color: #bbb; font-style: italic; }
+.time { font-size: 0.72rem; color: var(--color-text-placeholder); }
+.edited { font-size: 0.7rem; color: var(--color-text-placeholder); font-style: italic; }
 
 .comment-body {
   font-size: 0.88rem;
   line-height: 1.55;
-  color: #333;
+  color: var(--color-text-secondary);
   word-wrap: break-word;
 }
 
@@ -427,20 +424,20 @@ const CommentNode = defineComponent({
   border: none;
   cursor: pointer;
   font-size: 0.72rem;
-  color: #999;
+  color: var(--color-text-ghost);
   padding: 0;
   font-weight: 500;
 }
-.action-btn:hover { color: #555; }
-.action-btn.delete:hover { color: #dc2626; }
-.action-btn.flag:hover { color: #d97706; }
+.action-btn:hover { color: var(--color-text-tertiary); }
+.action-btn.delete:hover { color: var(--color-error); }
+.action-btn.flag:hover { color: var(--color-warning); }
 
 .inline-form {
   margin-top: 0.5rem;
   padding: 0.5rem;
-  background: #f8f9fb;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
+  background: var(--color-bg-surface-warm);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
 }
 
 .flag-form {
@@ -451,24 +448,28 @@ const CommentNode = defineComponent({
 .flag-select {
   font-size: 0.8rem;
   padding: 0.2rem 0.4rem;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-input);
   border-radius: 4px;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
 }
 
 .comment-input {
   width: 100%;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
   font-size: 0.88rem;
   resize: vertical;
   box-sizing: border-box;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
 }
 .comment-input:focus {
   outline: none;
-  border-color: #0066cc;
-  box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.1);
+  border-color: var(--color-link);
+  box-shadow: var(--shadow-focus);
 }
 .comment-input.small {
   font-size: 0.82rem;
@@ -482,12 +483,12 @@ const CommentNode = defineComponent({
   gap: 0.5rem;
   margin-top: 0.35rem;
 }
-.char-count { font-size: 0.72rem; color: #aaa; margin-right: auto; }
-.char-count.warn { color: #dc2626; }
+.char-count { font-size: 0.72rem; color: var(--color-text-placeholder); margin-right: auto; }
+.char-count.warn { color: var(--color-error); }
 
 .submit-btn {
   padding: 0.35rem 0.85rem;
-  background: #0066cc;
+  background: var(--color-btn-accent);
   color: white;
   border: none;
   border-radius: 5px;
@@ -495,33 +496,33 @@ const CommentNode = defineComponent({
   font-size: 0.82rem;
   font-weight: 500;
 }
-.submit-btn:hover:not(:disabled) { background: #0052a3; }
+.submit-btn:hover:not(:disabled) { background: var(--color-btn-accent-hover); }
 .submit-btn:disabled { opacity: 0.5; cursor: default; }
 .submit-btn.small { padding: 0.25rem 0.6rem; font-size: 0.78rem; }
 
 .cancel-btn {
   padding: 0.25rem 0.6rem;
   background: none;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border-input);
   border-radius: 5px;
   cursor: pointer;
   font-size: 0.78rem;
-  color: #666;
+  color: var(--color-text-muted);
 }
-.cancel-btn:hover { background: #f0f0f0; }
+.cancel-btn:hover { background: var(--color-bg-hover); }
 
-.error { color: #dc2626; font-size: 0.8rem; margin: 0.35rem 0 0; }
+.error { color: var(--color-error); font-size: 0.8rem; margin: 0.35rem 0 0; }
 
 .login-prompt {
   margin-top: 1rem;
   font-size: 0.88rem;
-  color: #666;
+  color: var(--color-text-muted);
   padding: 0.75rem 1rem;
-  background: #f8f9fb;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
+  background: var(--color-bg-surface-warm);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
 }
-.login-prompt a { color: #0066cc; font-weight: 500; }
+.login-prompt a { color: var(--color-link); font-weight: 500; }
 
 .new-comment {
   margin-top: 1rem;

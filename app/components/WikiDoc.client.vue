@@ -3,8 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import katex from 'katex'
-import 'katex/dist/katex.min.css'
+import { escapeHtml, renderKatex } from '~/utils/math-render'
 
 const props = defineProps<{ text: string }>()
 
@@ -17,18 +16,10 @@ function renderMarkdown(text: string) {
   let html = escapeHtml(text)
 
   // Display math: $$...$$
-  html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_match, tex) => {
-    try {
-      return katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false })
-    } catch { return tex }
-  })
+  html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_match, tex) => renderKatex(tex, true))
 
   // Inline math: $...$
-  html = html.replace(/(?<!\$)\$(?!\$)(.*?)\$/g, (_match, tex) => {
-    try {
-      return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false })
-    } catch { return tex }
-  })
+  html = html.replace(/(?<!\$)\$(?!\$)(.*?)\$/g, (_match, tex) => renderKatex(tex))
 
   // Wiki links: [[slug]] and [[slug|display text]]
   html = html.replace(/\[\[([^\]|]+?)(?:\|([^\]]+?))?\]\]/g, (_match, slug, display) => {
@@ -36,7 +27,7 @@ function renderMarkdown(text: string) {
     return `<a href="/wiki/${slug}" class="wiki-link">${linkText}</a>`
   })
 
-  // Headers: ## ... and ### ...
+  // Headers
   html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>')
   html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>')
 
@@ -49,7 +40,7 @@ function renderMarkdown(text: string) {
   // Backtick `...`
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>')
 
-  // Bullet lists: lines starting with -
+  // Bullet lists
   html = html.replace(/((?:^|\n)- .+(?:\n- .+)*)/g, (block) => {
     const items = block.trim().split('\n').map(l => `<li>${l.replace(/^- /, '')}</li>`)
     return `<ul>${items.join('')}</ul>`
@@ -80,35 +71,34 @@ function renderMarkdown(text: string) {
 
   return '<p>' + html + '</p>'
 }
-
-function escapeHtml(s: string) {
-  return s.replace(/&/g, '&amp;')
-}
 </script>
 
 <style>
 .wiki-doc {
-  line-height: 1.8;
+  line-height: 1.85;
   font-size: 0.95rem;
-  color: #222;
+  color: var(--color-text-primary);
+  font-family: var(--font-serif);
 }
 .wiki-doc p { margin: 0.6rem 0; }
 .wiki-doc h2 {
   font-size: 1.15rem;
+  font-family: var(--font-sans);
   margin: 1.5rem 0 0.5rem;
   padding-bottom: 0.3rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border-light);
 }
 .wiki-doc h3 {
   font-size: 1rem;
+  font-family: var(--font-sans);
   margin: 1.25rem 0 0.4rem;
 }
 .wiki-doc code {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: var(--font-mono);
   font-size: 0.85em;
-  background: #f6f8fa;
+  background: var(--color-bg-code);
   padding: 0.1rem 0.3rem;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
 .wiki-doc ul {
   margin: 0.5rem 0;
@@ -117,9 +107,9 @@ function escapeHtml(s: string) {
 .wiki-doc li { margin-bottom: 0.25rem; }
 .wiki-doc .katex-display { margin: 0.75rem 0; }
 .wiki-doc .wiki-link {
-  color: #0066cc;
+  color: var(--color-link);
   text-decoration: none;
-  border-bottom: 1px dashed #0066cc;
+  border-bottom: 1px dashed var(--color-link);
 }
 .wiki-doc .wiki-link:hover {
   border-bottom-style: solid;
@@ -129,15 +119,16 @@ function escapeHtml(s: string) {
   margin: 0.75rem 0;
   font-size: 0.9rem;
   width: 100%;
+  font-family: var(--font-sans);
 }
 .wiki-doc .wiki-table th,
 .wiki-doc .wiki-table td {
-  border: 1px solid #e1e4e8;
+  border: 1px solid var(--color-border-medium);
   padding: 0.35rem 0.6rem;
   text-align: left;
 }
 .wiki-doc .wiki-table th {
-  background: #f6f8fa;
+  background: var(--color-bg-code);
   font-weight: 600;
 }
 </style>

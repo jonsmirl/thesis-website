@@ -2,7 +2,7 @@
   <div class="container">
     <NavHeader />
 
-    <div class="page-header">
+    <div class="page-header page-header--flex">
       <div>
         <h2>Theorem Explorer</h2>
         <p class="subtitle">Lean 4 formalization organized by economic concept</p>
@@ -12,40 +12,52 @@
       </NuxtLink>
     </div>
 
-    <div class="stats-banner">
-      <div class="stat-box current" style="background: #fef9c3; border-color: #fde047;">
-        <span class="stat-num">{{ sections?.length || 0 }}</span>
-        <span class="stat-label">Overview</span>
+    <!-- Skeleton loading -->
+    <template v-if="!sections">
+      <div class="stats-banner">
+        <div v-for="i in 5" :key="i" class="stat-box-skeleton skeleton" />
       </div>
-      <NuxtLink to="/theorems/all" class="stat-box" style="background: #eff6ff; border-color: #bfdbfe;">
-        <span class="stat-num">{{ totalDecls }}</span>
-        <span class="stat-label">Declarations</span>
-      </NuxtLink>
-      <NuxtLink to="/theorems/all?marquee=true" class="stat-box" style="background: #ecfdf5; border-color: #bbf7d0;">
-        <span class="stat-num">{{ totalMarquee }}</span>
-        <span class="stat-label">Key Theorems</span>
-      </NuxtLink>
-      <NuxtLink to="/theorems/all?status=axiom" class="stat-box" style="background: #f5f3ff; border-color: #ddd6fe;">
-        <span class="stat-num">{{ totalAxioms }}</span>
-        <span class="stat-label">Axioms</span>
-      </NuxtLink>
-      <NuxtLink to="/theorems/all?status=trivial" class="stat-box" style="background: #ecfeff; border-color: #a5f3fc;">
-        <span class="stat-num">{{ totalSchematics }}</span>
-        <span class="stat-label">Schematics</span>
-      </NuxtLink>
-    </div>
+      <div class="section-grid">
+        <div v-for="i in 8" :key="i" class="section-skeleton skeleton" />
+      </div>
+    </template>
 
-    <div class="section-grid">
-      <SectionCard
-        v-for="s in enrichedSections"
-        :key="s.number"
-        :section="s"
-      />
-    </div>
+    <template v-else>
+      <div class="stats-banner">
+        <div class="stat-box stat-box--current">
+          <span class="stat-num">{{ sections?.length || 0 }}</span>
+          <span class="stat-label">Overview</span>
+        </div>
+        <NuxtLink to="/theorems/all" class="stat-box stat-box--decls">
+          <span class="stat-num">{{ totalDecls }}</span>
+          <span class="stat-label">Declarations</span>
+        </NuxtLink>
+        <NuxtLink to="/theorems/all?marquee=true" class="stat-box stat-box--marquee">
+          <span class="stat-num">{{ totalMarquee }}</span>
+          <span class="stat-label">Key Theorems</span>
+        </NuxtLink>
+        <NuxtLink to="/theorems/all?status=axiom" class="stat-box stat-box--axiom">
+          <span class="stat-num">{{ totalAxioms }}</span>
+          <span class="stat-label">Axioms</span>
+        </NuxtLink>
+        <NuxtLink to="/theorems/all?status=trivial" class="stat-box stat-box--trivial">
+          <span class="stat-num">{{ totalSchematics }}</span>
+          <span class="stat-label">Schematics</span>
+        </NuxtLink>
+      </div>
 
-    <div class="all-link">
-      <NuxtLink to="/theorems/all">View all {{ totalDecls }} declarations as flat list</NuxtLink>
-    </div>
+      <div class="section-grid">
+        <SectionCard
+          v-for="s in enrichedSections"
+          :key="s.number"
+          :section="s"
+        />
+      </div>
+
+      <div class="all-link">
+        <NuxtLink to="/theorems/all">View all {{ totalDecls }} declarations as flat list</NuxtLink>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -61,7 +73,6 @@ const { data: sections } = await useAsyncData('derivation-sections', async () =>
   return data || []
 })
 
-// Dynamic counts from theorems table
 const { data: dynamicCounts } = await useAsyncData('theorem-counts', async () => {
   const [declRes, marqueeRes, axiomRes, schematicRes] = await Promise.all([
     client.from('theorems').select('id', { count: 'exact', head: true }),
@@ -82,7 +93,6 @@ const totalMarquee = computed(() => dynamicCounts.value?.marquee || 0)
 const totalAxioms = computed(() => dynamicCounts.value?.axioms || 0)
 const totalSchematics = computed(() => dynamicCounts.value?.schematics || 0)
 
-// Fetch per-section status counts
 const { data: statusCounts } = await useAsyncData('section-status-counts', async () => {
   const { data, error } = await client
     .rpc('section_status_counts')
@@ -104,17 +114,7 @@ const enrichedSections = computed(() =>
 </script>
 
 <style scoped>
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-.page-header h2 { margin: 0 0 0.25rem; }
-.download-btn { display: inline-block; padding: 0.5rem 1rem; background: #0550ae; color: #fff; text-decoration: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: background 0.15s; white-space: nowrap; }
-.download-btn:hover { background: #033d8b; }
-.subtitle { color: #666; margin: 0; font-size: 0.9rem; }
+.page-header--flex { display: flex; justify-content: space-between; align-items: center; }
 .stats-banner {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -123,7 +123,7 @@ const enrichedSections = computed(() =>
 }
 .stat-box {
   border: 1px solid;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 0.75rem 1rem;
   text-align: center;
   text-decoration: none;
@@ -131,24 +131,30 @@ const enrichedSections = computed(() =>
   transition: box-shadow 0.15s, transform 0.1s;
   cursor: pointer;
 }
-.stat-box:hover:not(.current) {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.stat-box:hover:not(.stat-box--current) {
+  box-shadow: var(--shadow-md);
   transform: translateY(-1px);
 }
-.stat-box.current {
+.stat-box--current {
+  background: var(--color-marquee-bg);
+  border-color: var(--color-sorry-dot);
   cursor: default;
   font-weight: 600;
-  box-shadow: inset 0 0 0 2px #eab308;
+  box-shadow: inset 0 0 0 2px var(--color-sorry-dot);
 }
+.stat-box--decls { background: var(--color-paper-bg); border-color: #bfdbfe; }
+.stat-box--marquee { background: var(--color-marquee-alt-bg); border-color: #bbf7d0; }
+.stat-box--axiom { background: var(--color-axiom-bg); border-color: #ddd6fe; }
+.stat-box--trivial { background: var(--color-trivial-bg); border-color: #a5f3fc; }
 .stat-num {
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
-  color: #111;
+  color: var(--color-text-primary);
 }
 .stat-label {
   font-size: 0.8rem;
-  color: #555;
+  color: var(--color-text-tertiary);
 }
 .section-grid {
   display: grid;
@@ -161,10 +167,14 @@ const enrichedSections = computed(() =>
   font-size: 0.9rem;
 }
 .all-link a {
-  color: #0066cc;
+  color: var(--color-link);
   text-decoration: none;
 }
 .all-link a:hover { text-decoration: underline; }
+
+/* Skeletons */
+.stat-box-skeleton { height: 72px; }
+.section-skeleton { height: 120px; }
 
 @media (max-width: 640px) {
   .stats-banner { grid-template-columns: repeat(3, 1fr); }

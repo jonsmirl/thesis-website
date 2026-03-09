@@ -1,0 +1,207 @@
+/* ============================================================
+   Design Tokens — CES Formalization Companion Website
+   ============================================================ */
+
+:root {
+  /* ── Colors: text ── */
+  --color-text-primary: #111;
+  --color-text-secondary: #444;
+  --color-text-tertiary: #555;
+  --color-text-muted: #666;
+  --color-text-faint: #888;
+  --color-text-ghost: #999;
+  --color-text-placeholder: #aaa;
+
+  /* ── Colors: links ── */
+  --color-link: #0066cc;
+  --color-link-hover: #0052a3;
+  --color-link-alt: #0550ae;
+  --color-link-alt-hover: #033d8b;
+
+  /* ── Colors: backgrounds ── */
+  --color-bg-page: #fff;
+  --color-bg-surface: #f6f8fa;
+  --color-bg-surface-alt: #fafafa;
+  --color-bg-surface-warm: #f8f9fb;
+  --color-bg-hover: #f5f5f5;
+  --color-bg-inset: #f0f2f5;
+  --color-bg-login: #f5f5f5;
+  --color-bg-toolbar: linear-gradient(180deg, #f6f8fa 0%, #eff2f5 100%);
+  --color-bg-code: #f6f8fa;
+
+  /* ── Colors: borders ── */
+  --color-border: #e5e7eb;
+  --color-border-light: #eee;
+  --color-border-medium: #e1e4e8;
+  --color-border-heavy: #d8dee4;
+  --color-border-input: #ddd;
+  --color-border-faint: #f5f5f5;
+
+  /* ── Colors: status badges ── */
+  --color-proved-bg: #e6f4ea;
+  --color-proved-fg: #1a7f37;
+  --color-proved-dot: #22c55e;
+  --color-proved-accent: #16a34a;
+
+  --color-sorry-bg: #fff3cd;
+  --color-sorry-fg: #856404;
+  --color-sorry-dot: #fbbf24;
+  --color-sorry-accent: #d97706;
+
+  --color-axiom-bg: #e8d5f5;
+  --color-axiom-fg: #6f42c1;
+  --color-axiom-dot: #a78bfa;
+  --color-axiom-accent: #7c3aed;
+
+  --color-trivial-bg: #d1ecf1;
+  --color-trivial-fg: #0c5460;
+  --color-trivial-dot: #67e8f9;
+  --color-trivial-accent: #06b6d4;
+
+  --color-marquee-bg: #fef3c7;
+  --color-marquee-fg: #92400e;
+  --color-marquee-alt-bg: #ecfdf5;
+  --color-marquee-alt-fg: #059669;
+
+  --color-paper-bg: #e7f0ff;
+  --color-paper-fg: #0550ae;
+
+  --color-consistent-bg: #e6f4ea;
+  --color-consistent-fg: #1a7f37;
+
+  --color-ambiguous-bg: #fff3cd;
+  --color-ambiguous-fg: #856404;
+
+  --color-inconsistent-bg: #f8d7da;
+  --color-inconsistent-fg: #842029;
+
+  --color-pending-bg: #f0f0f0;
+  --color-pending-fg: #555;
+
+  /* ── Colors: interactive ── */
+  --color-btn-primary: #111;
+  --color-btn-primary-hover: #333;
+  --color-btn-accent: #0066cc;
+  --color-btn-accent-hover: #0052a3;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
+  --color-success: #059669;
+  --color-focus-ring: rgba(0, 102, 204, 0.1);
+
+  /* ── Typography ── */
+  --font-sans: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* ── Layout ── */
+  --container-width: 960px;
+  --container-narrow: 800px;
+  --container-reading: 860px;
+  --container-padding: 1rem;
+
+  /* ── Radius ── */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-pill: 10px;
+  --radius-full: 12px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12);
+  --shadow-focus: 0 0 0 2px var(--color-focus-ring);
+
+  /* ── Skeleton loading ── */
+  --color-skeleton: #e5e7eb;
+  --color-skeleton-shine: #f3f4f6;
+}
+
+/* ============================================================
+   Phase 5: Dark Mode
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text-primary: #e6edf3;
+    --color-text-secondary: #c9d1d9;
+    --color-text-tertiary: #b1bac4;
+    --color-text-muted: #8b949e;
+    --color-text-faint: #6e7681;
+    --color-text-ghost: #484f58;
+    --color-text-placeholder: #6e7681;
+
+    --color-link: #58a6ff;
+    --color-link-hover: #79c0ff;
+    --color-link-alt: #58a6ff;
+    --color-link-alt-hover: #79c0ff;
+
+    --color-bg-page: #0d1117;
+    --color-bg-surface: #161b22;
+    --color-bg-surface-alt: #1c2128;
+    --color-bg-surface-warm: #1c2128;
+    --color-bg-hover: #1c2128;
+    --color-bg-inset: #21262d;
+    --color-bg-login: #0d1117;
+    --color-bg-toolbar: linear-gradient(180deg, #161b22 0%, #1c2128 100%);
+    --color-bg-code: #161b22;
+
+    --color-border: #30363d;
+    --color-border-light: #21262d;
+    --color-border-medium: #30363d;
+    --color-border-heavy: #3d444d;
+    --color-border-input: #3d444d;
+    --color-border-faint: #21262d;
+
+    --color-proved-bg: #0d2818;
+    --color-proved-fg: #56d364;
+    --color-proved-dot: #3fb950;
+    --color-proved-accent: #3fb950;
+
+    --color-sorry-bg: #3b2e00;
+    --color-sorry-fg: #e3b341;
+    --color-sorry-dot: #d29922;
+    --color-sorry-accent: #d29922;
+
+    --color-axiom-bg: #271244;
+    --color-axiom-fg: #bc8cff;
+    --color-axiom-dot: #a371f7;
+    --color-axiom-accent: #a371f7;
+
+    --color-trivial-bg: #0a2e36;
+    --color-trivial-fg: #56d4dd;
+    --color-trivial-dot: #39d2c0;
+    --color-trivial-accent: #39d2c0;
+
+    --color-marquee-bg: #3b2e00;
+    --color-marquee-fg: #e3b341;
+    --color-marquee-alt-bg: #0d2818;
+    --color-marquee-alt-fg: #56d364;
+
+    --color-paper-bg: #0d1d3d;
+    --color-paper-fg: #58a6ff;
+
+    --color-consistent-bg: #0d2818;
+    --color-consistent-fg: #56d364;
+
+    --color-ambiguous-bg: #3b2e00;
+    --color-ambiguous-fg: #e3b341;
+
+    --color-inconsistent-bg: #3d1117;
+    --color-inconsistent-fg: #f85149;
+
+    --color-pending-bg: #21262d;
+    --color-pending-fg: #8b949e;
+
+    --color-btn-primary: #e6edf3;
+    --color-btn-primary-hover: #c9d1d9;
+    --color-btn-accent: #58a6ff;
+    --color-btn-accent-hover: #79c0ff;
+    --color-error: #f85149;
+    --color-warning: #d29922;
+    --color-success: #3fb950;
+    --color-focus-ring: rgba(88, 166, 255, 0.15);
+
+    --color-skeleton: #21262d;
+    --color-skeleton-shine: #30363d;
+  }
+}

@@ -1,0 +1,54 @@
+/* ============================================================
+   Base Styles — resets and element defaults
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-text-primary);
+  background: var(--color-bg-page);
+  line-height: 1.6;
+}
+
+/* ── Focus visibility ── */
+:focus-visible {
+  outline: 2px solid var(--color-link);
+  outline-offset: 2px;
+}
+
+/* Remove default focus outline for mouse users */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── Links ── */
+a {
+  color: var(--color-link);
+}
+
+/* ── Images ── */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Code ── */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+
+pre {
+  font-family: var(--font-mono);
+}

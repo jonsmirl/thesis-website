@@ -23,12 +23,10 @@
         </div>
       </div>
 
-      <!-- Proof chain timeline -->
       <div v-if="enrichedMarquees.length" class="proof-chain">
         <h3>Key Theorems</h3>
         <div class="timeline" :style="{ '--accent': section.color }">
           <template v-for="(item, idx) in enrichedMarquees" :key="item.name">
-            <!-- Subsection divider -->
             <div
               v-if="item.subsection && (idx === 0 || item.subsection !== enrichedMarquees[idx - 1]?.subsection)"
               class="subsection-divider"
@@ -40,20 +38,18 @@
         </div>
       </div>
 
-      <!-- All declarations in section -->
       <details class="all-decls">
         <summary>All {{ sectionTheorems.length }} declarations in this section</summary>
         <div class="decl-table">
           <div v-for="t in sectionTheorems" :key="t.id" class="decl-row">
             <NuxtLink :to="`/theorems/${t.name}`" class="decl-name">{{ t.name }}</NuxtLink>
             <span class="decl-kind">{{ t.kind }}</span>
-            <NuxtLink :to="`/theorems/all?status=${t.status}`" class="badge" :class="t.status">{{ t.status }}</NuxtLink>
+            <NuxtLink :to="`/theorems/all?status=${t.status}`" class="badge" :class="`badge--${t.status}`">{{ t.status }}</NuxtLink>
             <a :href="githubUrl(t.file_path, t.line_number)" target="_blank" class="decl-file">{{ t.file_path?.split('/').pop() }}<span v-if="t.line_number">:{{ t.line_number }}</span></a>
           </div>
         </div>
       </details>
 
-      <!-- Navigation -->
       <div class="nav-links">
         <NuxtLink v-if="prevSection" :to="`/theorems/section/${prevSection.number}`" class="nav-prev">
           &laquo; {{ prevSection.number }}. {{ prevSection.title }}
@@ -73,11 +69,12 @@
 </template>
 
 <script setup lang="ts">
+import { githubUrl } from '~/utils/formatting'
+
 const route = useRoute()
 const client = useSupabaseClient()
 const sectionNumber = Number(route.params.id)
 
-// Fetch section
 const { data: section } = await useAsyncData(`section-${sectionNumber}`, async () => {
   const { data, error } = await client
     .from('derivation_sections')
@@ -88,7 +85,6 @@ const { data: section } = await useAsyncData(`section-${sectionNumber}`, async (
   return data
 })
 
-// Fetch marquee theorems with joined theorem data
 const { data: marquees } = await useAsyncData(`marquees-${sectionNumber}`, async () => {
   if (!section.value) return []
   const { data, error } = await client
@@ -100,7 +96,6 @@ const { data: marquees } = await useAsyncData(`marquees-${sectionNumber}`, async
   return data || []
 })
 
-// Fetch all theorems in this section (may exceed 1000 default limit)
 const { data: sectionTheorems } = await useAsyncData(`section-theorems-${sectionNumber}`, async () => {
   if (!section.value) return []
   const pageSize = 1000
@@ -123,7 +118,6 @@ const { data: sectionTheorems } = await useAsyncData(`section-theorems-${section
   return all
 })
 
-// Fetch deps for marquee theorems
 const { data: allDeps } = await useAsyncData(`section-deps-${sectionNumber}`, async () => {
   const marqueeIds = marquees.value?.map(m => m.theorems?.id).filter(Boolean) || []
   if (!marqueeIds.length) return { depsOn: [], usedBy: [] }
@@ -139,7 +133,6 @@ const { data: allDeps } = await useAsyncData(`section-deps-${sectionNumber}`, as
   }
 })
 
-// Enrich marquees with deps
 const enrichedMarquees = computed(() => {
   if (!marquees.value) return []
 
@@ -177,7 +170,6 @@ const statusCounts = computed(() => {
   return counts
 })
 
-// Fetch adjacent sections for nav titles
 const { data: adjacentSections } = await useAsyncData(`adjacent-${sectionNumber}`, async () => {
   const { data } = await client
     .from('derivation_sections')
@@ -188,23 +180,9 @@ const { data: adjacentSections } = await useAsyncData(`adjacent-${sectionNumber}
 
 const prevSection = computed(() => adjacentSections.value?.find(s => s.number === sectionNumber - 1))
 const nextSection = computed(() => adjacentSections.value?.find(s => s.number === sectionNumber + 1))
-
-function githubUrl(filePath: string, line?: number) {
-  const base = 'https://github.com/jonsmirl/thesis/blob/main'
-  const url = `${base}/${filePath}`
-  return line ? `${url}#L${line}` : url
-}
 </script>
 
 <style scoped>
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-.breadcrumb { font-size: 0.85rem; color: #666; margin-bottom: 1rem; }
-.breadcrumb a { color: #0066cc; text-decoration: none; }
 .section-header {
   display: flex;
   gap: 1rem;
@@ -220,19 +198,19 @@ function githubUrl(filePath: string, line?: number) {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   flex-shrink: 0;
 }
 .section-header h2 { margin: 0 0 0.25rem; }
-.section-desc { margin: 0 0 0.5rem; color: #666; font-size: 0.9rem; }
+.section-desc { margin: 0 0 0.5rem; color: var(--color-text-muted); font-size: 0.9rem; }
 .section-stats {
   display: flex;
   gap: 1rem;
   font-size: 0.8rem;
-  color: #888;
+  color: var(--color-text-faint);
 }
 .proof-chain { margin-bottom: 2rem; }
-.proof-chain h3 { margin: 0 0 1rem; font-size: 1rem; color: #333; }
+.proof-chain h3 { margin: 0 0 1rem; font-size: 1rem; color: var(--color-text-secondary); }
 .timeline {
   position: relative;
   padding-left: 6px;
@@ -244,7 +222,7 @@ function githubUrl(filePath: string, line?: number) {
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--accent, #ddd);
+  background: var(--accent, var(--color-border-input));
   opacity: 0.3;
 }
 .subsection-divider {
@@ -253,26 +231,26 @@ function githubUrl(filePath: string, line?: number) {
 .subsection-label {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #555;
+  color: var(--color-text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
 .all-decls {
   margin-top: 2rem;
-  border: 1px solid #eee;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
 }
 .all-decls summary {
   padding: 0.75rem 1rem;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #555;
-  background: #fafafa;
-  border-radius: 6px;
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-surface-alt);
+  border-radius: var(--radius-md);
 }
 .all-decls[open] summary {
-  border-bottom: 1px solid #eee;
-  border-radius: 6px 6px 0 0;
+  border-bottom: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
 }
 .decl-table { max-height: 400px; overflow-y: auto; }
 .decl-row {
@@ -280,12 +258,12 @@ function githubUrl(filePath: string, line?: number) {
   align-items: center;
   gap: 0.5rem;
   padding: 0.35rem 1rem;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid var(--color-border-faint);
   font-size: 0.8rem;
 }
 .decl-name {
-  font-family: 'SF Mono', 'Fira Code', monospace;
-  color: #111;
+  font-family: var(--font-mono);
+  color: var(--color-text-primary);
   text-decoration: none;
   flex: 1;
   min-width: 0;
@@ -293,14 +271,11 @@ function githubUrl(filePath: string, line?: number) {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.decl-name:hover { color: #0066cc; }
-.decl-kind { color: #888; font-size: 0.7rem; }
-.decl-file { color: #aaa; font-size: 0.7rem; font-family: monospace; }
-.badge { font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: 3px; background: #f0f0f0; color: #555; }
-.badge.proved { background: #e6f4ea; color: #1a7f37; }
-.badge.sorry { background: #fff3cd; color: #856404; }
-.badge.axiom { background: #e8d5f5; color: #6f42c1; }
-.badge.trivial { background: #d1ecf1; color: #0c5460; }
+.decl-name:hover { color: var(--color-link); }
+.decl-kind { color: var(--color-text-faint); font-size: 0.7rem; }
+.decl-file { color: var(--color-link); text-decoration: none; font-size: 0.7rem; font-family: var(--font-mono); }
+.decl-file:hover { text-decoration: underline; }
+.badge { font-size: 0.65rem; padding: 0.1rem 0.3rem; border-radius: var(--radius-sm); text-decoration: none; }
 .nav-links {
   display: flex;
   justify-content: space-between;
@@ -308,14 +283,11 @@ function githubUrl(filePath: string, line?: number) {
   font-size: 0.9rem;
 }
 .nav-links a {
-  color: #0066cc;
+  color: var(--color-link);
   text-decoration: none;
 }
 .nav-links a:hover { text-decoration: underline; }
-.nav-center { color: #666; font-size: 0.85rem; }
-.stat-link { color: #888; text-decoration: none; }
-.stat-link:hover { text-decoration: underline; color: #0066cc; }
-.decl-file { color: #0066cc; text-decoration: none; font-size: 0.7rem; font-family: monospace; }
-.decl-file:hover { text-decoration: underline; }
-.badge { text-decoration: none; }
+.nav-center { color: var(--color-text-muted); font-size: 0.85rem; }
+.stat-link { color: var(--color-text-faint); text-decoration: none; }
+.stat-link:hover { text-decoration: underline; color: var(--color-link); }
 </style>

@@ -10,8 +10,8 @@
       <div class="detail-header">
         <h2>{{ paper.title }}</h2>
         <div class="meta">
-          <span class="badge">Paper {{ paper.number }}</span>
-          <span v-if="paper.target_journal" class="badge journal">{{ paper.target_journal }}</span>
+          <span class="badge badge--paper">Paper {{ paper.number }}</span>
+          <span v-if="paper.target_journal" class="badge badge--journal">{{ paper.target_journal }}</span>
         </div>
       </div>
 
@@ -52,16 +52,12 @@ const { data: paper } = await useAsyncData(`paper-${route.params.slug}`, async (
 </script>
 
 <style scoped>
-.container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-.breadcrumb { font-size: 0.85rem; color: #666; margin-bottom: 1rem; }
-.breadcrumb a { color: #0066cc; text-decoration: none; }
 .detail-header { margin-bottom: 1.5rem; }
 .detail-header h2 { margin: 0 0 0.5rem; }
 .meta { display: flex; gap: 0.25rem; }
-.badge { font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 3px; background: #e7f0ff; color: #0550ae; }
-.badge.journal { background: #f0f0f0; color: #555; font-style: italic; }
+.badge--journal { background: var(--color-bg-hover); color: var(--color-text-tertiary); font-style: italic; }
 .section { margin-bottom: 1.5rem; }
-.section h3 { font-size: 0.9rem; color: #666; margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
-.abstract-text { margin: 0; line-height: 1.6; font-size: 0.95rem; }
-.paper-frame { width: 100%; height: 80vh; border: 1px solid #eee; border-radius: 6px; }
+.section h3 { font-size: 0.9rem; color: var(--color-text-muted); margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.abstract-text { margin: 0; line-height: 1.6; font-size: 0.95rem; font-family: var(--font-serif); }
+.paper-frame { width: 100%; height: 80vh; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); }
 </style>

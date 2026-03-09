@@ -1,0 +1,131 @@
+/* ============================================================
+   Utility Classes
+   ============================================================ */
+
+/* ── Layout ── */
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 2rem var(--container-padding);
+}
+
+.container--narrow {
+  max-width: var(--container-narrow);
+  margin: 0 auto;
+  padding: 2rem var(--container-padding);
+}
+
+.container--reading {
+  max-width: var(--container-reading);
+  margin: 0 auto;
+  padding: 2rem var(--container-padding);
+}
+
+/* ── Status badges ── */
+.badge {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-hover);
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-block;
+}
+.badge--proved { background: var(--color-proved-bg); color: var(--color-proved-fg); }
+.badge--sorry { background: var(--color-sorry-bg); color: var(--color-sorry-fg); }
+.badge--axiom { background: var(--color-axiom-bg); color: var(--color-axiom-fg); }
+.badge--trivial { background: var(--color-trivial-bg); color: var(--color-trivial-fg); }
+.badge--marquee { background: var(--color-marquee-bg); color: var(--color-marquee-fg); font-weight: 600; }
+.badge--paper { background: var(--color-paper-bg); color: var(--color-paper-fg); }
+.badge--consistent { background: var(--color-consistent-bg); color: var(--color-consistent-fg); }
+.badge--ambiguous { background: var(--color-ambiguous-bg); color: var(--color-ambiguous-fg); }
+.badge--inconsistent { background: var(--color-inconsistent-bg); color: var(--color-inconsistent-fg); }
+.badge--pending { background: var(--color-pending-bg); color: var(--color-pending-fg); }
+
+/* ── Pills (rounded badges) ── */
+.pill {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-hover);
+  color: var(--color-text-tertiary);
+}
+.pill--proved { background: var(--color-proved-bg); color: var(--color-proved-fg); }
+.pill--sorry { background: var(--color-sorry-bg); color: var(--color-sorry-fg); }
+.pill--axiom { background: var(--color-axiom-bg); color: var(--color-axiom-fg); }
+.pill--trivial { background: var(--color-trivial-bg); color: var(--color-trivial-fg); }
+.pill--marquee { background: var(--color-marquee-alt-bg); color: var(--color-marquee-alt-fg); }
+
+/* ── Skeleton loading ── */
+.skeleton {
+  background: var(--color-skeleton);
+  border-radius: var(--radius-md);
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  background-image: linear-gradient(
+    90deg,
+    var(--color-skeleton) 0%,
+    var(--color-skeleton-shine) 40%,
+    var(--color-skeleton-shine) 60%,
+    var(--color-skeleton) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Common patterns ── */
+.breadcrumb {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+.breadcrumb a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+}
+.page-header h2 {
+  margin: 0 0 0.25rem;
+}
+.subtitle {
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.download-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--color-link-alt);
+  color: #fff;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.download-btn:hover {
+  background: var(--color-link-alt-hover);
+  color: #fff;
+}
+
+.file-link {
+  color: var(--color-link);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+.file-link:hover {
+  text-decoration: underline;
+}

@@ -18,7 +18,7 @@
             <span class="cat-badge" v-if="category" :style="{ background: category.color + '20', color: category.color, borderColor: category.color }">
               {{ category.title }}
             </span>
-            <span class="demo-badge" v-if="page.demo_component">Interactive Demo</span>
+            <span class="demo-indicator" v-if="page.demo_component">Interactive Demo</span>
           </div>
         </header>
 
@@ -131,27 +131,11 @@ useHead({
 </script>
 
 <style scoped>
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-.breadcrumb {
-  font-size: 0.85rem;
-  margin-bottom: 1.5rem;
-  color: #666;
-}
-.breadcrumb a {
-  color: #0066cc;
-  text-decoration: none;
-}
-.breadcrumb a:hover { text-decoration: underline; }
-.sep { margin: 0 0.35rem; color: #ccc; }
+.sep { margin: 0 0.35rem; color: var(--color-text-placeholder); }
 
 .wiki-article header { margin-bottom: 1.5rem; }
 .wiki-article h1 { margin: 0 0 0.5rem; font-size: 1.5rem; }
-.summary { color: #555; font-size: 0.95rem; margin: 0 0 0.75rem; line-height: 1.5; }
+.summary { color: var(--color-text-tertiary); font-size: 0.95rem; margin: 0 0 0.75rem; line-height: 1.5; }
 .meta {
   display: flex;
   gap: 0.5rem;
@@ -160,23 +144,23 @@ useHead({
 .cat-badge {
   font-size: 0.75rem;
   padding: 0.15rem 0.5rem;
-  border-radius: 12px;
+  border-radius: var(--radius-full);
   border: 1px solid;
   font-weight: 500;
 }
-.demo-badge {
+.demo-indicator {
   font-size: 0.75rem;
   padding: 0.15rem 0.5rem;
-  border-radius: 12px;
-  background: #e8f4ff;
-  color: #0066cc;
+  border-radius: var(--radius-full);
+  background: var(--color-paper-bg);
+  color: var(--color-link);
   font-weight: 600;
 }
 
 .demo-section {
   margin: 1.5rem 0;
-  border: 1px solid #eee;
-  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   min-height: 300px;
 }
@@ -184,14 +168,14 @@ useHead({
 .sidebar {
   margin-top: 2rem;
   padding-top: 1.5rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--color-border-light);
 }
 .related-block {
   margin-bottom: 1.25rem;
 }
 .related-block h3 {
   font-size: 0.85rem;
-  color: #555;
+  color: var(--color-text-tertiary);
   margin: 0 0 0.4rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -199,15 +183,15 @@ useHead({
 .related-link {
   display: inline-block;
   font-size: 0.85rem;
-  color: #0066cc;
+  color: var(--color-link);
   text-decoration: none;
   margin-right: 0.75rem;
   margin-bottom: 0.3rem;
 }
 .related-link:hover { text-decoration: underline; }
-.related-link.theorem { color: #7c3aed; }
-.related-link.test { color: #059669; }
-.related-link.paper { color: #d97706; }
+.related-link.theorem { color: var(--color-axiom-accent); }
+.related-link.test { color: var(--color-success); }
+.related-link.paper { color: var(--color-warning); }
 
-.not-found { color: #888; font-style: italic; }
+.not-found { color: var(--color-text-faint); font-style: italic; }
 </style>

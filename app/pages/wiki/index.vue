@@ -11,6 +11,7 @@
             type="text"
             placeholder="Search articles..."
             class="search-input"
+            aria-label="Search wiki articles"
           />
         </div>
       </div>
@@ -141,23 +142,12 @@ useHead({
 </script>
 
 <style scoped>
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
 .wiki-header {
   margin-bottom: 2rem;
 }
 .wiki-header h1 {
   margin: 0 0 0.5rem;
   font-size: 1.5rem;
-}
-.subtitle {
-  color: #555;
-  font-size: 0.95rem;
-  margin: 0 0 1rem;
 }
 .search-bar {
   margin-top: 1rem;
@@ -166,12 +156,14 @@ useHead({
   width: 100%;
   max-width: 480px;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
   font-size: 0.9rem;
   outline: none;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
 }
-.search-input:focus { border-color: #0066cc; }
+.search-input:focus { border-color: var(--color-link); }
 
 .search-results {
   margin-bottom: 2rem;
@@ -179,22 +171,22 @@ useHead({
 .search-results h2 {
   font-size: 1rem;
   margin: 0 0 0.75rem;
-  color: #333;
+  color: var(--color-text-secondary);
 }
 .search-result {
   display: block;
   padding: 0.75rem 1rem;
-  border: 1px solid #eee;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
   margin-bottom: 0.5rem;
   text-decoration: none;
   color: inherit;
 }
-.search-result:hover { border-color: #0066cc; }
+.search-result:hover { border-color: var(--color-link); }
 .result-title { font-weight: 600; font-size: 0.95rem; }
 .result-cat { font-size: 0.8rem; margin-left: 0.5rem; }
-.result-summary { margin: 0.25rem 0 0; font-size: 0.85rem; color: #666; }
-.no-results { color: #888; font-style: italic; }
+.result-summary { margin: 0.25rem 0 0; font-size: 0.85rem; color: var(--color-text-muted); }
+.no-results { color: var(--color-text-faint); font-style: italic; }
 
 .categories-grid {
   display: grid;
@@ -206,11 +198,11 @@ useHead({
 }
 
 .category-card {
-  border: 1px solid #eee;
-  border-left: 4px solid #666;
-  border-radius: 8px;
+  border: 1px solid var(--color-border-light);
+  border-left: 4px solid var(--color-text-muted);
+  border-radius: var(--radius-lg);
   padding: 1rem 1.25rem;
-  background: white;
+  background: var(--color-bg-page);
 }
 .cat-header {
   display: flex;
@@ -222,14 +214,14 @@ useHead({
 .cat-header h2 { margin: 0; font-size: 1rem; flex: 1; }
 .cat-count {
   font-size: 0.75rem;
-  background: #f0f0f0;
+  background: var(--color-bg-hover);
   padding: 0.1rem 0.4rem;
-  border-radius: 8px;
-  color: #666;
+  border-radius: var(--radius-lg);
+  color: var(--color-text-muted);
 }
 .cat-desc {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--color-text-muted);
   margin: 0 0 0.75rem;
 }
 .cat-pages {
@@ -239,7 +231,7 @@ useHead({
 }
 .page-link {
   font-size: 0.85rem;
-  color: #0066cc;
+  color: var(--color-link);
   text-decoration: none;
   padding: 0.15rem 0;
   display: flex;
@@ -249,8 +241,8 @@ useHead({
 .page-link:hover { text-decoration: underline; }
 .demo-badge {
   font-size: 0.65rem;
-  background: #e8f4ff;
-  color: #0066cc;
+  background: var(--color-paper-bg);
+  color: var(--color-link);
   padding: 0.05rem 0.3rem;
   border-radius: 4px;
   font-weight: 600;

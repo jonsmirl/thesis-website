@@ -110,23 +110,19 @@ useHead({ title: 'Download the Tests' })
 </script>
 
 <style scoped>
-.container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-.breadcrumb { font-size: 0.85rem; color: #666; margin-bottom: 1rem; }
-.breadcrumb a { color: #0550ae; text-decoration: none; }
-.breadcrumb a:hover { text-decoration: underline; }
 h2 { margin: 0 0 0.5rem; }
 h3 { margin: 1.5rem 0 0.5rem; font-size: 1.1rem; }
-.intro { color: #444; font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem; }
+.intro { color: var(--color-text-secondary); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem; }
 section { margin-bottom: 0.5rem; }
-p { font-size: 0.9rem; color: #444; line-height: 1.5; margin: 0.4rem 0; }
-ul { font-size: 0.9rem; color: #444; line-height: 1.6; padding-left: 1.5rem; }
-a { color: #0550ae; }
-pre { background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 0.75rem 1rem; overflow-x: auto; margin: 0.5rem 0; }
-code { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace; font-size: 0.85rem; }
-p code, li code { background: #f0f2f5; padding: 0.1rem 0.3rem; border-radius: 3px; }
+p { font-size: 0.9rem; color: var(--color-text-secondary); line-height: 1.5; margin: 0.4rem 0; }
+ul { font-size: 0.9rem; color: var(--color-text-secondary); line-height: 1.6; padding-left: 1.5rem; }
+a { color: var(--color-link-alt); }
+pre { background: var(--color-bg-code); border: 1px solid var(--color-border-medium); border-radius: var(--radius-md); padding: 0.75rem 1rem; overflow-x: auto; margin: 0.5rem 0; }
+code { font-size: 0.85rem; }
+p code, li code { background: var(--color-bg-inset); padding: 0.1rem 0.3rem; border-radius: var(--radius-sm); }
 .data-sources li { margin-bottom: 0.3rem; }
 .folder-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0.5rem 0; }
-.folder-table th, .folder-table td { text-align: left; padding: 0.4rem 0.75rem; border-bottom: 1px solid #eee; }
-.folder-table th { background: #f6f8fa; font-weight: 600; }
+.folder-table th, .folder-table td { text-align: left; padding: 0.4rem 0.75rem; border-bottom: 1px solid var(--color-border-light); }
+.folder-table th { background: var(--color-bg-code); font-weight: 600; }
 .folder-table code { font-size: 0.85rem; }
 </style>
