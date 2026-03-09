@@ -69,6 +69,8 @@
             >{{ slug }}</NuxtLink>
           </div>
         </aside>
+
+        <CommentThread content-type="wiki" :content-slug="slug" />
       </article>
     </main>
     <main class="container" v-else>

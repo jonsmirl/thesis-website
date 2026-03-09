@@ -57,6 +57,7 @@
           <li v-for="ds in test.data_sources" :key="ds">{{ ds }}</li>
         </ul>
       </div>
+      <CommentThread content-type="test" :content-slug="(route.params.slug as string)" />
     </div>
     <div v-else>
       <p>Test not found.</p>

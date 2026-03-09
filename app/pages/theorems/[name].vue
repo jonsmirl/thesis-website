@@ -91,6 +91,7 @@
           </NuxtLink>
         </div>
       </div>
+      <CommentThread content-type="theorem" :content-slug="(route.params.name as string)" />
     </div>
     <div v-else>
       <p>Theorem not found.</p>
