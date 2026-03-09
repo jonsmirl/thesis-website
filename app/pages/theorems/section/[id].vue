@@ -11,7 +11,7 @@
         <span class="section-badge" :style="{ background: section.color }">{{ section.number }}</span>
         <div>
           <h2>{{ section.title }}</h2>
-          <p class="section-desc">{{ section.description }}</p>
+          <p class="section-desc"><MathInline :text="section.description" /></p>
           <div class="section-stats">
             <NuxtLink :to="`/theorems/all?section=${section.number}`" class="stat-link">{{ section.theorem_count }} declarations</NuxtLink>
             <span>{{ section.marquee_count }} key theorems</span>

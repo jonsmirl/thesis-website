@@ -4,7 +4,7 @@
       <span class="section-number" :style="{ color: section.color }">{{ section.number }}</span>
       <div class="card-info">
         <h3 class="card-title">{{ section.title }}</h3>
-        <p class="card-desc">{{ section.description }}</p>
+        <p class="card-desc"><MathInline :text="section.description" /></p>
       </div>
     </div>
     <div class="card-stats">

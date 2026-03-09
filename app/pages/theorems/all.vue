@@ -52,7 +52,7 @@
             <a class="badge paper" v-if="t.paper" href="#" @click.prevent="filterPaper = t.paper">{{ t.paper }}</a>
           </div>
         </div>
-        <p v-if="t.docstring" class="docstring">{{ truncate(t.docstring, 200) }}</p>
+        <p v-if="t.docstring" class="docstring"><MathInline :text="truncate(t.docstring, 200)" /></p>
         <div class="theorem-meta">
           <a :href="githubUrl(t.file_path, t.line_number)" target="_blank" class="file-link">
             {{ t.file_path }}<span v-if="t.line_number">:{{ t.line_number }}</span>

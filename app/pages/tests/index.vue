@@ -54,7 +54,7 @@
             <span class="badge paper" v-if="t.paper">{{ t.paper }}</span>
           </div>
         </div>
-        <p v-if="t.description" class="description">{{ truncate(t.description, 200) }}</p>
+        <p v-if="t.description" class="description"><MathInline :text="truncate(t.description, 200)" /></p>
         <div v-if="t.statistics" class="stats">
           <span v-for="(v, k) in topStats(t.statistics)" :key="k" class="stat-item">
             {{ k }}: {{ typeof v === 'number' ? v.toFixed(4) : v }}

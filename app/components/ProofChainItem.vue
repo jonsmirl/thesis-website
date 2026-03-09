@@ -9,7 +9,7 @@
           <span class="check-comment" v-if="item.check_comment">{{ item.check_comment }}</span>
         </summary>
         <div class="chain-detail">
-          <p v-if="item.docstring" class="docstring">{{ item.docstring }}</p>
+          <MathDoc v-if="item.docstring" :text="item.docstring" class="docstring" />
           <LeanHighlight v-if="item.source_code" :code="item.source_code" />
           <div class="detail-meta">
             <div v-if="item.deps_on && item.deps_on.length" class="dep-list">
