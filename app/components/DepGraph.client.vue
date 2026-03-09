@@ -13,7 +13,7 @@
     <div class="graph-scroll">
       <svg :width="svgW" :height="svgH" :viewBox="`0 0 ${svgW} ${svgH}`" class="dep-svg">
         <defs>
-          <marker id="arrow" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+          <marker id="arrow" viewBox="0 0 10 6" refX="9" refY="3" markerWidth="8" markerHeight="5" orient="auto">
             <path d="M 0 0 L 10 3 L 0 6 z" fill="#999" />
           </marker>
         </defs>
@@ -163,7 +163,7 @@ const edgePaths = computed(() => {
     const to = map.get(e.to)
     if (!from || !to) return []
     const x1 = from.x, y1 = from.y + NODE_H / 2
-    const x2 = to.x, y2 = to.y - NODE_H / 2
+    const x2 = to.x, y2 = to.y - NODE_H / 2 - 8  // stop short for arrowhead
     const cy = (y1 + y2) / 2
     return [{ d: `M ${x1} ${y1} C ${x1} ${cy}, ${x2} ${cy}, ${x2} ${y2}` }]
   })
