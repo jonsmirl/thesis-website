@@ -2,7 +2,7 @@
   <div class="dep-graph-wrap">
     <div class="graph-controls">
       <label>Depth:
-        <select v-model.number="depth" @change="fetchTree">
+        <select v-model.number="depth">
           <option :value="1">1</option>
           <option :value="2">2</option>
           <option :value="3">3</option>
@@ -48,7 +48,7 @@
           <text
             text-anchor="middle"
             dominant-baseline="central"
-            :font-size="n.w > 140 ? 10 : 9"
+            font-size="10"
             :fill="textColor(n.status)"
             class="node-label"
           >{{ truncName(n.name) }}</text>
@@ -92,13 +92,17 @@ async function fetchTree() {
   edges.value = newEdges
 }
 
-const NODE_W = 130
 const NODE_H = 28
 const LAYER_GAP = 60
-const NODE_GAP = 16
+const NODE_GAP = 20
 const PAD = 40
+const CHAR_W = 7.2 // approximate monospace char width at font-size 10
 
-// Layered layout: group by depth, space evenly
+function calcNodeW(name: string) {
+  return Math.max(90, name.length * CHAR_W + 24)
+}
+
+// Layered layout: group by depth, space evenly using actual node widths
 const rawLayout = computed<LayoutNode[]>(() => {
   if (!nodes.value.length) return []
 
@@ -111,16 +115,20 @@ const rawLayout = computed<LayoutNode[]>(() => {
 
   const result: LayoutNode[] = []
   for (const [d, layer] of [...layers.entries()].sort(([a], [b]) => a - b)) {
-    const layerW = layer.length * (NODE_W + NODE_GAP) - NODE_GAP
-    const startX = -layerW / 2 + NODE_W / 2
+    // Calculate total width based on actual node widths
+    const widths = layer.map(n => calcNodeW(n.name))
+    const totalW = widths.reduce((s, w) => s + w, 0) + (layer.length - 1) * NODE_GAP
+    let cx = -totalW / 2
     for (let i = 0; i < layer.length; i++) {
       const n = layer[i]
+      const w = widths[i]
       result.push({
         ...n,
-        x: startX + i * (NODE_W + NODE_GAP),
+        x: cx + w / 2,
         y: d * LAYER_GAP,
-        w: Math.max(80, Math.min(160, n.name.length * 8 + 20)),
+        w,
       })
+      cx += w + NODE_GAP
     }
   }
   return result
@@ -136,8 +144,8 @@ const renderedNodes = computed<LayoutNode[]>(() => {
 
 const svgW = computed(() => {
   if (!renderedNodes.value.length) return 400
-  const xs = renderedNodes.value.map(n => n.x)
-  return Math.max(400, Math.max(...xs) + NODE_W / 2 + PAD)
+  const maxRight = Math.max(...renderedNodes.value.map(n => n.x + n.w / 2))
+  return Math.max(400, maxRight + PAD)
 })
 
 const svgH = computed(() => {
@@ -170,9 +178,10 @@ function nodeStroke(s: string) {
 function textColor(s: string) {
   return s === 'proved' ? '#1a7f37' : s === 'axiom' ? '#6f42c1' : s === 'trivial' ? '#0c5460' : s === 'sorry' ? '#856404' : '#333'
 }
-function truncName(name: string) { return name.length > 18 ? name.slice(0, 16) + '..' : name }
+function truncName(name: string) { return name }
 function navigateTo(name: string) { router.push(`/theorems/${name}`) }
 
+watch(depth, () => { fetchTree() })
 onMounted(() => { fetchTree() })
 </script>
 
