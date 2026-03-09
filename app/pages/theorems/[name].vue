@@ -31,6 +31,12 @@
         <LeanHighlight :code="theorem.source_code" />
       </div>
 
+      <!-- Dependency Graph -->
+      <div v-if="depsOn.length || usedBy.length" class="section">
+        <h3>Dependency Graph</h3>
+        <DepGraph :root-name="theorem.name" />
+      </div>
+
       <!-- Dependencies -->
       <div v-if="depsOn.length" class="section">
         <h3>Depends on</h3>
