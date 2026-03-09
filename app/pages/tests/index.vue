@@ -7,10 +7,6 @@
       <p class="subtitle">{{ tests.length }} tests</p>
     </div>
 
-    <NuxtLink to="/tests/download" class="download-btn">
-      &#8615; Download &amp; Run the Tests
-    </NuxtLink>
-
     <div class="scorecard">
       <div class="score-item consistent">
         <span class="score-count">{{ statusCount('CONSISTENT') }}</span>
@@ -24,9 +20,14 @@
         <span class="score-count">{{ statusCount('INCONSISTENT') }}</span>
         <span class="score-label">Inconsistent</span>
       </div>
-      <div class="score-item pending">
-        <span class="score-count">{{ statusCount('PENDING') }}</span>
-        <span class="score-label">Pending</span>
+      <div class="score-pending-col">
+        <NuxtLink to="/tests/download" class="download-btn">
+          &#8615; Download &amp; Run the Tests
+        </NuxtLink>
+        <div class="score-item pending">
+          <span class="score-count">{{ statusCount('PENDING') }}</span>
+          <span class="score-label">Pending</span>
+        </div>
       </div>
     </div>
 
@@ -141,7 +142,8 @@ function topStats(stats: Record<string, any>) {
 .score-item.ambiguous { background: #fff3cd; }
 .score-item.inconsistent { background: #f8d7da; }
 .score-item.pending { background: #f0f0f0; }
-.download-btn { display: inline-block; margin-bottom: 1rem; padding: 0.5rem 1.25rem; background: #0550ae; color: #fff; text-decoration: none; border-radius: 6px; font-size: 0.9rem; font-weight: 600; transition: background 0.15s; }
+.score-pending-col { flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 0.4rem; }
+.download-btn { display: block; padding: 0.35rem 0.5rem; background: #0550ae; color: #fff; text-decoration: none; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-align: center; transition: background 0.15s; }
 .download-btn:hover { background: #033d8b; }
 .score-count { display: block; font-size: 2rem; font-weight: 700; }
 .score-label { font-size: 0.8rem; color: #555; }
