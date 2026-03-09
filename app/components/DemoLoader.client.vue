@@ -30,7 +30,7 @@ const demoComponents: Record<string, () => ReturnType<typeof defineAsyncComponen
   CrisisSequence: () => defineAsyncComponent(() => import('./demos/CrisisSequence.client.vue')),
   RegimeDiagram: () => defineAsyncComponent(() => import('./demos/RegimeDiagram.client.vue')),
   DampingCancellation: () => defineAsyncComponent(() => import('./demos/DampingCancellation.client.vue')),
-  SmerlCurve: () => defineAsyncComponent(() => import('./demos/SmerlCurve.client.vue')),
+  SmirlCurve: () => defineAsyncComponent(() => import('./demos/SmirlCurve.client.vue')),
 }
 
 const demoComponent = shallowRef<ReturnType<typeof defineAsyncComponent> | null>(null)
