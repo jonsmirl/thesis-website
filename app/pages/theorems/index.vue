@@ -3,8 +3,13 @@
     <NavHeader />
 
     <div class="page-header">
-      <h2>Theorem Explorer</h2>
-      <p class="subtitle">Lean 4 formalization organized by economic concept</p>
+      <div>
+        <h2>Theorem Explorer</h2>
+        <p class="subtitle">Lean 4 formalization organized by economic concept</p>
+      </div>
+      <NuxtLink to="/theorems/download" class="download-btn">
+        &#8615; Download the Proofs
+      </NuxtLink>
     </div>
 
     <div class="stats-banner">
@@ -105,8 +110,10 @@ const enrichedSections = computed(() =>
   padding: 2rem 1rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-.page-header { margin-bottom: 1.5rem; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
 .page-header h2 { margin: 0 0 0.25rem; }
+.download-btn { display: inline-block; padding: 0.5rem 1rem; background: #0550ae; color: #fff; text-decoration: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: background 0.15s; white-space: nowrap; }
+.download-btn:hover { background: #033d8b; }
 .subtitle { color: #666; margin: 0; font-size: 0.9rem; }
 .stats-banner {
   display: grid;
