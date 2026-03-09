@@ -24,6 +24,10 @@
         <span class="score-count">{{ statusCount('PENDING') }}</span>
         <span class="score-label">Pending</span>
       </div>
+      <NuxtLink to="/tests/download" class="score-item download-link">
+        <span class="score-count download-icon">&#8615;</span>
+        <span class="score-label">Download the Tests</span>
+      </NuxtLink>
     </div>
 
     <div class="controls">
@@ -137,6 +141,9 @@ function topStats(stats: Record<string, any>) {
 .score-item.ambiguous { background: #fff3cd; }
 .score-item.inconsistent { background: #f8d7da; }
 .score-item.pending { background: #f0f0f0; }
+.download-link { text-decoration: none; background: #e7f0ff; cursor: pointer; transition: background 0.15s; }
+.download-link:hover { background: #d0e3ff; }
+.download-icon { font-size: 1.8rem; color: #0550ae; }
 .score-count { display: block; font-size: 2rem; font-weight: 700; }
 .score-label { font-size: 0.8rem; color: #555; }
 .controls { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
