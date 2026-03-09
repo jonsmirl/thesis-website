@@ -12,21 +12,11 @@
     </div>
     <div class="graph-scroll">
       <svg :width="svgW" :height="svgH" :viewBox="`0 0 ${svgW} ${svgH}`" class="dep-svg">
-        <defs>
-          <marker id="arrow" viewBox="0 0 10 6" refX="10" refY="3" markerWidth="8" markerHeight="5" orient="auto">
-            <path d="M 0 0 L 10 3 L 0 6 z" fill="#999" />
-          </marker>
-        </defs>
         <!-- Edges -->
-        <path
-          v-for="(e, i) in edgePaths"
-          :key="'e'+i"
-          :d="e.d"
-          fill="none"
-          stroke="#bbb"
-          stroke-width="1.5"
-          marker-end="url(#arrow)"
-        />
+        <template v-for="(e, i) in edgePaths" :key="'e'+i">
+          <path :d="e.line" fill="none" stroke="#bbb" stroke-width="1.5" />
+          <polygon :points="e.arrow" fill="#999" />
+        </template>
         <!-- Nodes -->
         <g
           v-for="n in renderedNodes"
@@ -154,6 +144,9 @@ const svgH = computed(() => {
   return (maxD + 1) * LAYER_GAP + PAD * 2
 })
 
+const ARROW_H = 8
+const ARROW_W = 6
+
 const edgePaths = computed(() => {
   const map = new Map<string, LayoutNode>()
   for (const n of renderedNodes.value) map.set(n.name, n)
@@ -165,7 +158,12 @@ const edgePaths = computed(() => {
     const x1 = from.x, y1 = from.y + NODE_H / 2
     const x2 = to.x, y2 = to.y - NODE_H / 2
     const cy = (y1 + y2) / 2
-    return [{ d: `M ${x1} ${y1} C ${x1} ${cy}, ${x2} ${cy}, ${x2} ${y2}` }]
+    // Line stops at the top of the arrowhead
+    const lineEndY = y2 - ARROW_H
+    const line = `M ${x1} ${y1} C ${x1} ${cy}, ${x2} ${cy}, ${x2} ${lineEndY}`
+    // Triangle: tip at box edge, base at line end
+    const arrow = `${x2},${y2} ${x2 - ARROW_W / 2},${y2 - ARROW_H} ${x2 + ARROW_W / 2},${y2 - ARROW_H}`
+    return [{ line, arrow }]
   })
 })
 
