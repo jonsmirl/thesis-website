@@ -1,24 +1,9 @@
 <template>
   <div class="dep-tree">
-    <div class="tree-toolbar">
-      <div class="toolbar-left">
-        <div class="depth-control">
-          <span class="depth-label">Depth</span>
-          <div class="depth-buttons">
-            <button
-              v-for="d in [1, 2, 3]"
-              :key="d"
-              :class="{ active: depth === d }"
-              @click="setDepth(d)"
-            >{{ d }}</button>
-          </div>
-        </div>
-      </div>
-      <div class="toolbar-right" v-if="treeNodes.length">
-        <span class="stat">{{ nodeCount }} declarations</span>
-        <span class="stat-sep">&middot;</span>
-        <span class="stat">{{ edgeCount }} dependencies</span>
-      </div>
+    <div class="tree-toolbar" v-if="treeNodes.length">
+      <span class="stat">{{ nodeCount }} declarations</span>
+      <span class="stat-sep">&middot;</span>
+      <span class="stat">{{ edgeCount }} dependencies</span>
     </div>
 
     <div class="tree-viewport">
@@ -38,9 +23,12 @@
           <NuxtLink
             :to="`/theorems/${node.name}`"
             class="tree-node"
-            :class="{ 'is-root': node.isRoot }"
+            :class="[
+              { 'is-root': node.isRoot },
+              `kind--${node.kindClass}`,
+            ]"
           >
-            <span class="node-dot" :class="`dot--${node.status}`"></span>
+            <span class="node-dot" :class="`dot--${node.kindClass}`"></span>
             <span class="node-name">{{ node.name }}</span>
             <span class="node-kind">{{ node.kind }}</span>
           </NuxtLink>
@@ -53,7 +41,7 @@
     </div>
 
     <div class="tree-legend" v-if="treeNodes.length">
-      <div class="legend-item" v-for="(cfg, key) in usedStatuses" :key="key">
+      <div class="legend-item" v-for="(cfg, key) in usedKinds" :key="key">
         <span class="legend-dot" :class="`dot--${key}`"></span>
         <span class="legend-label">{{ cfg.label }}</span>
       </div>
@@ -65,16 +53,16 @@
 const props = defineProps<{ rootName: string }>()
 const client = useSupabaseClient()
 
-const depth = ref(2)
 const loading = ref(true)
 
-interface GNode { name: string; status: string; kind: string }
+interface GNode { name: string; status: string; kind: string; depth: number }
 interface GEdge { from: string; to: string }
 interface TreeNode {
   key: string
   name: string
   status: string
   kind: string
+  kindClass: string
   isRoot: boolean
   prefix: string
 }
@@ -85,18 +73,25 @@ const rawEdges = ref<GEdge[]>([])
 const nodeCount = computed(() => rawNodes.value.size)
 const edgeCount = computed(() => rawEdges.value.length)
 
-const statusLabels: Record<string, { label: string }> = {
-  proved:  { label: 'Proved' },
-  axiom:   { label: 'Axiom' },
-  trivial: { label: 'Trivial' },
-  sorry:   { label: 'Sorry' },
+const kindLabels: Record<string, { label: string }> = {
+  theorem:  { label: 'Theorem' },
+  lemma:    { label: 'Lemma' },
+  def:      { label: 'Definition' },
+  structure: { label: 'Structure' },
+  axiom:    { label: 'Axiom' },
+  inductive: { label: 'Inductive' },
+}
+
+function kindClass(kind: string): string {
+  if (kind === 'noncomputable def') return 'def'
+  return kind
 }
 
 async function fetchTree() {
   loading.value = true
   const { data, error } = await client.rpc('get_dep_tree', {
     root_name: props.rootName,
-    max_depth: depth.value,
+    max_depth: 20,
   })
   if (error || !data) { loading.value = false; return }
 
@@ -109,6 +104,7 @@ async function fetchTree() {
         name: row.from_name,
         status: row.status,
         kind: row.kind,
+        depth: Number(row.depth) || 0,
       })
     } else {
       const key = `${row.from_name}\u2192${row.to_name}`
@@ -123,15 +119,17 @@ async function fetchTree() {
   loading.value = false
 }
 
-function setDepth(d: number) {
-  depth.value = d
-  fetchTree()
-}
-
-// Build adjacency: parent → sorted children
+// Build adjacency: parent → sorted children, filtered to only tree edges
+// (child.depth = parent.depth + 1) to avoid cross-level shortcuts
 const childrenOf = computed(() => {
+  const nodes = rawNodes.value
   const map = new Map<string, string[]>()
   for (const e of rawEdges.value) {
+    const parentNode = nodes.get(e.from)
+    const childNode = nodes.get(e.to)
+    if (!parentNode || !childNode) continue
+    // Only include edges that go exactly one level deeper
+    if (childNode.depth !== parentNode.depth + 1) continue
     if (!map.has(e.from)) map.set(e.from, [])
     map.get(e.from)!.push(e.to)
   }
@@ -158,6 +156,7 @@ const treeNodes = computed<TreeNode[]>(() => {
       name: node.name,
       status: node.status,
       kind: node.kind,
+      kindClass: kindClass(node.kind),
       isRoot,
       prefix: prefix + connector,
     })
@@ -175,12 +174,12 @@ const treeNodes = computed<TreeNode[]>(() => {
   return result
 })
 
-const usedStatuses = computed(() => {
+const usedKinds = computed(() => {
   const used = new Set<string>()
-  for (const n of rawNodes.value.values()) used.add(n.status)
+  for (const n of rawNodes.value.values()) used.add(kindClass(n.kind))
   const result: Record<string, { label: string }> = {}
   for (const s of used) {
-    if (statusLabels[s]) result[s] = statusLabels[s]
+    if (kindLabels[s]) result[s] = kindLabels[s]
   }
   return result
 })
@@ -200,48 +199,10 @@ onMounted(() => { fetchTree() })
 .tree-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 0.4rem;
   padding: 0.55rem 0.9rem;
   background: var(--color-bg-toolbar);
   border-bottom: 1px solid var(--color-border-heavy);
-}
-.toolbar-left { display: flex; align-items: center; gap: 0.75rem; }
-.toolbar-right { display: flex; align-items: center; gap: 0.4rem; }
-
-.depth-control {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.depth-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.depth-buttons {
-  display: flex;
-  border: 1px solid var(--color-border-heavy);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-.depth-buttons button {
-  padding: 0.2rem 0.55rem;
-  font-size: 0.78rem;
-  font-weight: 500;
-  border: none;
-  border-right: 1px solid var(--color-border-heavy);
-  background: var(--color-bg-page);
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.depth-buttons button:last-child { border-right: none; }
-.depth-buttons button:hover { background: var(--color-bg-hover); }
-.depth-buttons button.active {
-  background: var(--color-link);
-  color: white;
 }
 
 .stat {
@@ -328,6 +289,12 @@ onMounted(() => { fetchTree() })
   font-weight: 600;
 }
 
+/* De-emphasize structures */
+.tree-node.kind--structure .node-name,
+.tree-node.kind--inductive .node-name {
+  color: var(--color-text-faint);
+}
+
 .node-dot {
   width: 7px;
   height: 7px;
@@ -335,10 +302,14 @@ onMounted(() => { fetchTree() })
   flex-shrink: 0;
   background: var(--color-border-input);
 }
-.dot--proved { background: var(--color-proved-dot, #2da44e); }
-.dot--axiom { background: var(--color-axiom-dot, #8250df); }
-.dot--trivial { background: var(--color-trivial-dot, #0a7b8a); }
-.dot--sorry { background: var(--color-sorry-dot, #b08800); }
+
+/* Kind-based dot colors */
+.dot--theorem { background: var(--color-proved-dot, #2da44e); }
+.dot--lemma   { background: var(--color-proved-dot, #2da44e); }
+.dot--def     { background: #3b82f6; }
+.dot--structure { background: #94a3b8; }
+.dot--inductive { background: #94a3b8; }
+.dot--axiom   { background: var(--color-axiom-dot, #8250df); }
 
 .node-name {
   font-family: var(--font-mono);
