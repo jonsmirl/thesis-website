@@ -2,10 +2,10 @@
   <div class="dep-graph-wrap">
     <div class="graph-controls">
       <label>Depth:
-        <select v-model.number="depth">
-          <option :value="1">1</option>
-          <option :value="2">2</option>
-          <option :value="3">3</option>
+        <select :value="depth" @input="onDepthChange">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
         </select>
       </label>
       <span class="graph-stats" v-if="nodes.length">{{ nodes.length }} nodes, {{ edges.length }} edges</span>
@@ -181,7 +181,11 @@ function textColor(s: string) {
 function truncName(name: string) { return name }
 function navigateTo(name: string) { router.push(`/theorems/${name}`) }
 
-watch(depth, () => { fetchTree() })
+function onDepthChange(e: Event) {
+  depth.value = Number((e.target as HTMLSelectElement).value)
+  fetchTree()
+}
+
 onMounted(() => { fetchTree() })
 </script>
 
