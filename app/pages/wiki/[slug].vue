@@ -12,8 +12,8 @@
 
       <article class="wiki-article">
         <header>
-          <h1>{{ page.title }}</h1>
-          <p class="summary">{{ page.summary }}</p>
+          <h1><InlineMath :text="page.title" /></h1>
+          <p class="summary"><InlineMath :text="page.summary" /></p>
           <div class="meta">
             <span class="cat-badge" v-if="category" :style="{ background: category.color + '20', color: category.color, borderColor: category.color }">
               {{ category.title }}

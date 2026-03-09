@@ -23,11 +23,11 @@
           :to="`/wiki/${page.slug}`"
           class="search-result"
         >
-          <span class="result-title">{{ page.title }}</span>
+          <span class="result-title"><InlineMath :text="page.title" /></span>
           <span class="result-cat" :style="{ color: categoryColor(page.category_id) }">
             {{ categoryTitle(page.category_id) }}
           </span>
-          <p class="result-summary">{{ page.summary }}</p>
+          <p class="result-summary"><InlineMath :text="page.summary" /></p>
         </NuxtLink>
       </div>
 
@@ -55,7 +55,7 @@
               :to="`/wiki/${page.slug}`"
               class="page-link"
             >
-              {{ page.title }}
+              <InlineMath :text="page.title" />
               <span v-if="page.demo_component" class="demo-badge">3D</span>
             </NuxtLink>
           </div>
