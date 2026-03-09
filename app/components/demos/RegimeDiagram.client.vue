@@ -167,14 +167,47 @@ function draw() {
   ctx.fillStyle = '#dc262680'
   ctx.fillText('Collapsed', rhoToX(-0.5), TToY(3.5))
 
-  // Trade school annotations
-  ctx.font = 'italic 10px -apple-system, sans-serif'
-  ctx.fillStyle = '#3b82f6'
-  ctx.fillText('Heckscher-Ohlin', rhoToX(-1.4), TToY(0.8))
-  ctx.fillText('Gravity', rhoToX(-0.8), TToY(1.5))
-  ctx.fillStyle = '#d97706'
-  ctx.fillText('Krugman', rhoToX(1.0), TToY(1.0))
-  ctx.fillText('Melitz', rhoToX(0.6), TToY(2.0))
+  // Trade school SLICES — bounded regions showing each school's domain
+  const schools = [
+    { name: 'Heckscher-Ohlin', rhoMin: -2, rhoMax: -0.5, tMin: 0, tMax: 0.8, color: '#2563eb', desc: 'Factor endowments' },
+    { name: 'Gravity', rhoMin: -1.5, rhoMax: -0.1, tMin: 0.6, tMax: 2.0, color: '#3b82f6', desc: 'Trade ~ size/distance' },
+    { name: 'Krugman', rhoMin: 0.1, rhoMax: 1.5, tMin: 0, tMax: 1.2, color: '#d97706', desc: 'Increasing returns' },
+    { name: 'Melitz', rhoMin: 0.05, rhoMax: 1.2, tMin: 1.0, tMax: 2.8, color: '#b45309', desc: 'Firm heterogeneity' },
+  ]
+
+  for (const s of schools) {
+    const x1 = rhoToX(s.rhoMin)
+    const x2 = rhoToX(s.rhoMax)
+    const y1 = TToY(s.tMax) // tMax = higher T = higher on canvas (lower y)
+    const y2 = TToY(s.tMin)
+
+    // Filled slice region
+    ctx.fillStyle = s.color + '12'
+    ctx.fillRect(x1, y1, x2 - x1, y2 - y1)
+
+    // Dashed border
+    ctx.strokeStyle = s.color + '60'
+    ctx.lineWidth = 1.5
+    ctx.setLineDash([5, 3])
+    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1)
+    ctx.setLineDash([])
+
+    // Label with background pill
+    const labelX = (x1 + x2) / 2
+    const labelY = y1 + 14
+    ctx.font = 'bold 10px -apple-system, sans-serif'
+    const textW = ctx.measureText(s.name).width
+    ctx.fillStyle = 'rgba(255,255,255,0.85)'
+    ctx.fillRect(labelX - textW / 2 - 4, labelY - 9, textW + 8, 13)
+    ctx.fillStyle = s.color
+    ctx.textAlign = 'center'
+    ctx.fillText(s.name, labelX, labelY)
+
+    // Subtitle
+    ctx.font = 'italic 8px -apple-system, sans-serif'
+    ctx.fillStyle = s.color + 'aa'
+    ctx.fillText(s.desc, labelX, labelY + 11)
+  }
 
   // Sector dots
   for (const s of sectors) {
