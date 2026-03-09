@@ -3,8 +3,13 @@
     <NavHeader />
 
     <div class="page-header">
-      <h2>Empirical Test Scorecard</h2>
-      <p class="subtitle">{{ tests.length }} tests</p>
+      <div>
+        <h2>Empirical Test Scorecard</h2>
+        <p class="subtitle">{{ tests.length }} tests</p>
+      </div>
+      <NuxtLink to="/tests/download" class="download-btn">
+        &#8615; Download &amp; Run the Tests
+      </NuxtLink>
     </div>
 
     <div class="scorecard">
@@ -20,14 +25,9 @@
         <span class="score-count">{{ statusCount('INCONSISTENT') }}</span>
         <span class="score-label">Inconsistent</span>
       </div>
-      <div class="score-pending-col">
-        <NuxtLink to="/tests/download" class="download-btn">
-          &#8615; Download &amp; Run the Tests
-        </NuxtLink>
-        <div class="score-item pending">
-          <span class="score-count">{{ statusCount('PENDING') }}</span>
-          <span class="score-label">Pending</span>
-        </div>
+      <div class="score-item pending">
+        <span class="score-count">{{ statusCount('PENDING') }}</span>
+        <span class="score-label">Pending</span>
       </div>
     </div>
 
@@ -133,7 +133,7 @@ function topStats(stats: Record<string, any>) {
 
 <style scoped>
 .container { max-width: 960px; margin: 0 auto; padding: 2rem 1rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-.page-header { margin-bottom: 1rem; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .page-header h2 { margin: 0 0 0.25rem; }
 .subtitle { color: #666; margin: 0; font-size: 0.9rem; }
 .scorecard { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
@@ -142,8 +142,7 @@ function topStats(stats: Record<string, any>) {
 .score-item.ambiguous { background: #fff3cd; }
 .score-item.inconsistent { background: #f8d7da; }
 .score-item.pending { background: #f0f0f0; }
-.score-pending-col { flex: 1; min-width: 120px; display: flex; flex-direction: column; gap: 0.4rem; }
-.download-btn { display: block; padding: 0.35rem 0.5rem; background: #0550ae; color: #fff; text-decoration: none; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-align: center; transition: background 0.15s; }
+.download-btn { display: inline-block; padding: 0.5rem 1rem; background: #0550ae; color: #fff; text-decoration: none; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: background 0.15s; white-space: nowrap; }
 .download-btn:hover { background: #033d8b; }
 .score-count { display: block; font-size: 2rem; font-weight: 700; }
 .score-label { font-size: 0.8rem; color: #555; }
