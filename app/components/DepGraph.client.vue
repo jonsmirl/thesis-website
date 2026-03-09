@@ -1,9 +1,9 @@
 <template>
-  <div class="dep-graph">
-    <div class="graph-toolbar">
+  <div class="dep-tree">
+    <div class="tree-toolbar">
       <div class="toolbar-left">
         <div class="depth-control">
-          <span class="depth-label">Traversal depth</span>
+          <span class="depth-label">Depth</span>
           <div class="depth-buttons">
             <button
               v-for="d in [1, 2, 3]"
@@ -14,122 +14,47 @@
           </div>
         </div>
       </div>
-      <div class="toolbar-right" v-if="nodes.length">
-        <span class="stat">{{ nodes.length }} declarations</span>
+      <div class="toolbar-right" v-if="treeNodes.length">
+        <span class="stat">{{ nodeCount }} declarations</span>
         <span class="stat-sep">&middot;</span>
-        <span class="stat">{{ edges.length }} dependencies</span>
+        <span class="stat">{{ edgeCount }} dependencies</span>
       </div>
     </div>
 
-    <div class="graph-viewport" ref="viewport">
-      <div v-if="loading" class="graph-loading">
+    <div class="tree-viewport">
+      <div v-if="loading" class="tree-loading">
         <div class="loading-dot"></div>
         <div class="loading-dot"></div>
         <div class="loading-dot"></div>
       </div>
 
-      <svg
-        v-else-if="renderedNodes.length"
-        :width="svgW"
-        :height="svgH"
-        :viewBox="`0 0 ${svgW} ${svgH}`"
-        class="graph-svg"
-      >
-        <!-- Edge curves -->
-        <g class="edges-layer">
-          <path
-            v-for="(e, i) in edgePaths"
-            :key="'edge-'+i"
-            :d="e.curve"
-            fill="none"
-            :stroke="e.color"
-            stroke-width="1.5"
-            :opacity="hovered && hovered !== e.from && hovered !== e.to ? 0.15 : 0.5"
-            class="edge-line"
-          />
-        </g>
-
-        <!-- Arrowheads as separate layer (on top of lines, below nodes) -->
-        <g class="arrows-layer">
-          <polygon
-            v-for="(e, i) in edgePaths"
-            :key="'arrow-'+i"
-            :points="e.arrowPoints"
-            :fill="e.color"
-            :opacity="hovered && hovered !== e.from && hovered !== e.to ? 0.15 : 0.65"
-          />
-        </g>
-
-        <!-- Node groups -->
-        <g
-          v-for="n in renderedNodes"
-          :key="n.name"
-          :transform="`translate(${n.x}, ${n.y})`"
-          class="node-group"
-          :class="{ dimmed: hovered && hovered !== n.name }"
-          @mouseenter="hovered = n.name"
-          @mouseleave="hovered = null"
-          @click="navigateTo(n.name)"
+      <div v-else-if="treeNodes.length" class="tree-content">
+        <div
+          v-for="node in treeNodes"
+          :key="node.key"
+          class="tree-row"
         >
-          <!-- Shadow -->
-          <rect
-            :width="n.w"
-            :height="NODE_H"
-            :x="-n.w / 2"
-            :y="-NODE_H / 2 + 2"
-            :rx="NODE_H / 2"
-            fill="black"
-            opacity="0.04"
-          />
-          <!-- Background pill -->
-          <rect
-            :width="n.w"
-            :height="NODE_H"
-            :x="-n.w / 2"
-            :y="-NODE_H / 2"
-            :rx="NODE_H / 2"
-            :fill="statusConfig[n.status]?.bg || '#f5f5f5'"
-            :stroke="n.name === rootName ? statusConfig[n.status]?.accent || '#333' : statusConfig[n.status]?.border || '#ddd'"
-            :stroke-width="n.name === rootName ? 2 : 1"
-          />
-          <!-- Status dot -->
-          <circle
-            :cx="-n.w / 2 + 12"
-            cy="0"
-            r="3"
-            :fill="statusConfig[n.status]?.accent || '#999'"
-          />
-          <!-- Label -->
-          <text
-            :x="1"
-            y="0.5"
-            text-anchor="middle"
-            dominant-baseline="central"
-            class="node-text"
-            :fill="statusConfig[n.status]?.text || '#333'"
-          >{{ n.name }}</text>
-          <!-- Root indicator -->
-          <text
-            v-if="n.name === rootName"
-            :x="n.w / 2 - 10"
-            y="0.5"
-            text-anchor="middle"
-            dominant-baseline="central"
-            class="root-marker"
-            :fill="statusConfig[n.status]?.accent || '#333'"
-          >&#x25C6;</text>
-        </g>
-      </svg>
+          <span class="tree-guide" v-html="node.prefix"></span>
+          <NuxtLink
+            :to="`/theorems/${node.name}`"
+            class="tree-node"
+            :class="{ 'is-root': node.isRoot }"
+          >
+            <span class="node-dot" :class="`dot--${node.status}`"></span>
+            <span class="node-name">{{ node.name }}</span>
+            <span class="node-kind">{{ node.kind }}</span>
+          </NuxtLink>
+        </div>
+      </div>
 
-      <div v-else-if="!loading" class="graph-empty">
+      <div v-else class="tree-empty">
         No dependencies found
       </div>
     </div>
 
-    <!-- Legend -->
-    <div class="graph-legend" v-if="renderedNodes.length">
-      <div class="legend-item" v-for="(cfg, key) in statusConfig" :key="key">
-        <span class="legend-dot" :style="{ background: cfg.accent }"></span>
+    <div class="tree-legend" v-if="treeNodes.length">
+      <div class="legend-item" v-for="(cfg, key) in usedStatuses" :key="key">
+        <span class="legend-dot" :class="`dot--${key}`"></span>
         <span class="legend-label">{{ cfg.label }}</span>
       </div>
     </div>
@@ -138,25 +63,33 @@
 
 <script setup lang="ts">
 const props = defineProps<{ rootName: string }>()
-const router = useRouter()
 const client = useSupabaseClient()
 
 const depth = ref(2)
 const loading = ref(true)
-const hovered = ref<string | null>(null)
 
-interface GNode { name: string; status: string; kind: string; depth: number }
+interface GNode { name: string; status: string; kind: string }
 interface GEdge { from: string; to: string }
-interface LayoutNode extends GNode { x: number; y: number; w: number }
+interface TreeNode {
+  key: string
+  name: string
+  status: string
+  kind: string
+  isRoot: boolean
+  prefix: string
+}
 
-const nodes = ref<GNode[]>([])
-const edges = ref<GEdge[]>([])
+const rawNodes = ref<Map<string, GNode>>(new Map())
+const rawEdges = ref<GEdge[]>([])
 
-const statusConfig: Record<string, { bg: string; border: string; accent: string; text: string; label: string }> = {
-  proved:  { bg: '#f0faf3', border: '#c1e6cd', accent: '#2da44e', text: '#1a5c30', label: 'Proved' },
-  axiom:   { bg: '#f5f0fa', border: '#d4c1e8', accent: '#8250df', text: '#512a85', label: 'Axiom' },
-  trivial: { bg: '#eef8fa', border: '#b8dce4', accent: '#0a7b8a', text: '#065660', label: 'Trivial' },
-  sorry:   { bg: '#fdf8ed', border: '#e8d5a0', accent: '#b08800', text: '#6e5600', label: 'Sorry' },
+const nodeCount = computed(() => rawNodes.value.size)
+const edgeCount = computed(() => rawEdges.value.length)
+
+const statusLabels: Record<string, { label: string }> = {
+  proved:  { label: 'Proved' },
+  axiom:   { label: 'Axiom' },
+  trivial: { label: 'Trivial' },
+  sorry:   { label: 'Sorry' },
 }
 
 async function fetchTree() {
@@ -172,36 +105,21 @@ async function fetchTree() {
   const edgeSet = new Set<string>()
   for (const row of data as any[]) {
     if (row.type === 'node') {
-      nodeMap.set(row.from_name, { name: row.from_name, status: row.status, kind: row.kind, depth: 0 })
+      nodeMap.set(row.from_name, {
+        name: row.from_name,
+        status: row.status,
+        kind: row.kind,
+      })
     } else {
-      const key = `${row.from_name}→${row.to_name}`
+      const key = `${row.from_name}\u2192${row.to_name}`
       if (!edgeSet.has(key)) {
         edgeSet.add(key)
         newEdges.push({ from: row.from_name, to: row.to_name })
       }
     }
   }
-  // Recompute depths via longest-path from root (ensures all edges go downward)
-  const depths = new Map<string, number>()
-  for (const n of nodeMap.keys()) depths.set(n, 0)
-  depths.set(props.rootName, 0)
-  let changed = true
-  while (changed) {
-    changed = false
-    for (const e of newEdges) {
-      const fd = depths.get(e.from) ?? 0
-      const td = depths.get(e.to) ?? 0
-      if (td <= fd) {
-        depths.set(e.to, fd + 1)
-        changed = true
-      }
-    }
-  }
-  for (const [name, node] of nodeMap) {
-    node.depth = depths.get(name) ?? 0
-  }
-  nodes.value = [...nodeMap.values()]
-  edges.value = newEdges
+  rawNodes.value = nodeMap
+  rawEdges.value = newEdges
   loading.value = false
 }
 
@@ -210,110 +128,76 @@ function setDepth(d: number) {
   fetchTree()
 }
 
-// Layout constants
-const NODE_H = 30
-const LAYER_GAP = 72
-const NODE_GAP = 18
-const PAD = 50
-const CHAR_W = 6.8
-const ARROW_H = 7
-const ARROW_W = 7
-
-function calcNodeW(name: string) {
-  // Extra space for status dot + padding
-  return Math.max(100, name.length * CHAR_W + 40)
-}
-
-const rawLayout = computed<LayoutNode[]>(() => {
-  if (!nodes.value.length) return []
-
-  const layers = new Map<number, GNode[]>()
-  for (const n of nodes.value) {
-    if (!layers.has(n.depth)) layers.set(n.depth, [])
-    layers.get(n.depth)!.push(n)
+// Build adjacency: parent → sorted children
+const childrenOf = computed(() => {
+  const map = new Map<string, string[]>()
+  for (const e of rawEdges.value) {
+    if (!map.has(e.from)) map.set(e.from, [])
+    map.get(e.from)!.push(e.to)
   }
-  for (const arr of layers.values()) arr.sort((a, b) => a.name.localeCompare(b.name))
+  for (const arr of map.values()) arr.sort()
+  return map
+})
 
-  const result: LayoutNode[] = []
-  for (const [d, layer] of [...layers.entries()].sort(([a], [b]) => a - b)) {
-    const widths = layer.map(n => calcNodeW(n.name))
-    const totalW = widths.reduce((s, w) => s + w, 0) + (layer.length - 1) * NODE_GAP
-    let cx = -totalW / 2
-    for (let i = 0; i < layer.length; i++) {
-      const w = widths[i]
-      result.push({ ...layer[i], x: cx + w / 2, y: d * LAYER_GAP, w })
-      cx += w + NODE_GAP
-    }
+// Build tree rows with box-drawing prefixes
+const treeNodes = computed<TreeNode[]>(() => {
+  if (!rawNodes.value.has(props.rootName)) return []
+  const result: TreeNode[] = []
+  const visited = new Set<string>()
+
+  function walk(name: string, prefix: string, isLast: boolean, isRoot: boolean) {
+    const node = rawNodes.value.get(name)
+    if (!node) return
+
+    const alreadySeen = visited.has(name)
+    visited.add(name)
+
+    const connector = isRoot ? '' : (isLast ? '└─→&nbsp;' : '├─→&nbsp;')
+    result.push({
+      key: `${result.length}-${name}`,
+      name: node.name,
+      status: node.status,
+      kind: node.kind,
+      isRoot,
+      prefix: prefix + connector,
+    })
+
+    if (alreadySeen) return
+
+    const children = childrenOf.value.get(name) || []
+    const childPrefix = isRoot ? '' : prefix + (isLast ? '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' : '│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;')
+    children.forEach((child, i) => {
+      walk(child, childPrefix, i === children.length - 1, false)
+    })
   }
+
+  walk(props.rootName, '', true, true)
   return result
 })
 
-const renderedNodes = computed<LayoutNode[]>(() => {
-  if (!rawLayout.value.length) return []
-  const minLeft = Math.min(...rawLayout.value.map(n => n.x - n.w / 2))
-  const ox = -minLeft + PAD
-  return rawLayout.value.map(n => ({ ...n, x: n.x + ox, y: n.y + PAD }))
+const usedStatuses = computed(() => {
+  const used = new Set<string>()
+  for (const n of rawNodes.value.values()) used.add(n.status)
+  const result: Record<string, { label: string }> = {}
+  for (const s of used) {
+    if (statusLabels[s]) result[s] = statusLabels[s]
+  }
+  return result
 })
-
-const svgW = computed(() => {
-  if (!renderedNodes.value.length) return 400
-  const maxRight = Math.max(...renderedNodes.value.map(n => n.x + n.w / 2))
-  return Math.max(400, maxRight + PAD)
-})
-
-const svgH = computed(() => {
-  if (!nodes.value.length) return 120
-  const maxD = Math.max(...nodes.value.map(n => n.depth))
-  return (maxD + 1) * LAYER_GAP + PAD * 2
-})
-
-const edgePaths = computed(() => {
-  const map = new Map<string, LayoutNode>()
-  for (const n of renderedNodes.value) map.set(n.name, n)
-
-  return edges.value.flatMap(e => {
-    const from = map.get(e.from)
-    const to = map.get(e.to)
-    if (!from || !to) return []
-
-    const x1 = from.x
-    const y1 = from.y + NODE_H / 2
-    const x2 = to.x
-    const y2 = to.y - NODE_H / 2
-
-    // Bezier: line ends at arrow base
-    const arrowBaseY = y2 - ARROW_H
-    const cy1 = y1 + (arrowBaseY - y1) * 0.4
-    const cy2 = y1 + (arrowBaseY - y1) * 0.6
-    const curve = `M ${x1} ${y1} C ${x1} ${cy1}, ${x2} ${cy2}, ${x2} ${arrowBaseY}`
-
-    // Arrow polygon: tip at box edge, base where line ends
-    const arrowPoints = `${x2},${y2} ${x2 - ARROW_W / 2},${arrowBaseY} ${x2 + ARROW_W / 2},${arrowBaseY}`
-
-    // Color from source node status
-    const color = statusConfig[from.status]?.accent || '#999'
-
-    return [{ curve, arrowPoints, color, from: e.from, to: e.to }]
-  })
-})
-
-function navigateTo(name: string) {
-  router.push(`/theorems/${name}`)
-}
 
 onMounted(() => { fetchTree() })
 </script>
 
 <style scoped>
-.dep-graph {
+.dep-tree {
   border: 1px solid var(--color-border-heavy);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-lg);
   background: var(--color-bg-page);
   overflow: hidden;
 }
 
 /* Toolbar */
-.graph-toolbar {
+.tree-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -368,22 +252,17 @@ onMounted(() => { fetchTree() })
 .stat-sep { color: var(--color-border-heavy); font-size: 0.65rem; }
 
 /* Viewport */
-.graph-viewport {
+.tree-viewport {
   overflow-x: auto;
   overflow-y: auto;
-  max-height: 480px;
-  min-height: 100px;
+  max-height: 520px;
+  min-height: 60px;
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-heavy) transparent;
 }
-.graph-viewport::-webkit-scrollbar { height: 6px; width: 6px; }
-.graph-viewport::-webkit-scrollbar-thumb { background: var(--color-border-heavy); border-radius: 3px; }
-.graph-viewport::-webkit-scrollbar-track { background: transparent; }
-
-.graph-svg { display: block; }
 
 /* Loading */
-.graph-loading {
+.tree-loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -404,8 +283,8 @@ onMounted(() => { fetchTree() })
   40% { opacity: 1; transform: scale(1.1); }
 }
 
-/* Empty state */
-.graph-empty {
+/* Empty */
+.tree-empty {
   padding: 2rem;
   text-align: center;
   color: var(--color-text-faint);
@@ -413,34 +292,67 @@ onMounted(() => { fetchTree() })
   font-style: italic;
 }
 
-/* Edges */
-.edge-line {
-  transition: opacity 0.2s ease;
+/* Tree content */
+.tree-content {
+  padding: 0.75rem 1rem;
 }
 
-/* Nodes */
-.node-group {
-  cursor: pointer;
-  transition: opacity 0.2s ease;
+.tree-row {
+  display: flex;
+  align-items: center;
+  line-height: 1.7;
 }
-.node-group:hover rect:first-of-type { opacity: 0.08; }
-.node-group:hover rect:nth-of-type(2) { filter: brightness(0.96); }
-.node-group.dimmed { opacity: 0.3; }
 
-.node-text {
+.tree-guide {
+  white-space: pre;
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 450;
-  pointer-events: none;
-  letter-spacing: -0.01em;
+  font-size: 0.8rem;
+  color: var(--color-text-faint);
+  user-select: none;
 }
-.root-marker {
-  font-size: 7px;
-  pointer-events: none;
+
+.tree-node {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-decoration: none;
+  color: var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  padding: 0.05rem 0.4rem 0.05rem 0.25rem;
+  transition: background 0.12s ease;
+}
+.tree-node:hover {
+  background: var(--color-bg-hover);
+}
+.tree-node.is-root {
+  font-weight: 600;
+}
+
+.node-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--color-border-input);
+}
+.dot--proved { background: var(--color-proved-dot, #2da44e); }
+.dot--axiom { background: var(--color-axiom-dot, #8250df); }
+.dot--trivial { background: var(--color-trivial-dot, #0a7b8a); }
+.dot--sorry { background: var(--color-sorry-dot, #b08800); }
+
+.node-name {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.node-kind {
+  font-size: 0.68rem;
+  color: var(--color-text-faint);
+  font-style: italic;
 }
 
 /* Legend */
-.graph-legend {
+.tree-legend {
   display: flex;
   align-items: center;
   gap: 1rem;
