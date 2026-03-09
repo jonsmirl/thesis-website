@@ -36,6 +36,40 @@ const rendered = computed(() => {
     '</div>'
 })
 
+// Map ASCII Greek names to LaTeX commands
+const GREEK: Record<string, string> = {
+  alpha: '\\alpha', beta: '\\beta', gamma: '\\gamma', delta: '\\delta',
+  epsilon: '\\epsilon', zeta: '\\zeta', eta: '\\eta', theta: '\\theta',
+  kappa: '\\kappa', lambda: '\\lambda', mu: '\\mu', nu: '\\nu',
+  xi: '\\xi', pi: '\\pi', rho: '\\rho', sigma: '\\sigma',
+  tau: '\\tau', phi: '\\phi', chi: '\\chi', psi: '\\psi', omega: '\\omega',
+  Phi: '\\Phi', Sigma: '\\Sigma', Delta: '\\Delta', Gamma: '\\Gamma',
+  Omega: '\\Omega', Pi: '\\Pi', Lambda: '\\Lambda',
+}
+const GREEK_PAT = Object.keys(GREEK).sort((a, b) => b.length - a.length).join('|')
+
+const K_OPEN = '\x00K<'
+const K_CLOSE = '>\x00'
+
+function texify(expr: string): string {
+  let s = expr
+  s = s.replace(new RegExp(`\\b(${GREEK_PAT})\\b`, 'g'), m => GREEK[m] || m)
+  s = s.replace(/(\w)_\{([^}]+)\}/g, '$1_{$2}')
+  s = s.replace(/(\w)_([A-Za-z0-9]+)/g, '$1_{$2}')
+  s = s.replace(/(\w)\^\{([^}]+)\}/g, '$1^{$2}')
+  s = s.replace(/(\w)\^(\w+)/g, '$1^{$2}')
+  s = s.replace(/->/g, '\\to ')
+  s = s.replace(/\s~\s/g, ' \\approx ')
+  return s
+}
+
+function safeKatex(tex: string): string {
+  try {
+    const html = katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false })
+    return K_OPEN + html + K_CLOSE
+  } catch { return tex }
+}
+
 function renderBlock(text: string) {
   let html = escapeHtml(text)
 
@@ -47,11 +81,42 @@ function renderBlock(text: string) {
   })
 
   // Inline math: $...$  (not preceded/followed by $)
-  html = html.replace(/(?<!\$)\$(?!\$)(.*?)\$/g, (_match, tex) => {
-    try {
-      return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false })
-    } catch { return tex }
+  html = html.replace(/(?<!\$)\$(?!\$)(.*?)\$/g, (_match, tex) => safeKatex(tex))
+
+  // Auto-detect math patterns (same as TestDoc)
+
+  // 1. Formulas: "VAR = EXPR" containing Greek or ^ or _
+  html = html.replace(/\b([A-Za-z_]\w*(?:[_^]\w+)?)\s*=\s*([^,.\n]{3,60}?)(?=[,.\s]|$)/g, (match) => {
+    if (match.includes(K_OPEN)) return match
+    if (new RegExp(`\\b(${GREEK_PAT})\\b`).test(match) || /[\^_]/.test(match)) {
+      return safeKatex(texify(match))
+    }
+    return match
   })
+
+  // 2. Expressions with ^ or _ : "K^2", "sigma^2", "N_eff", "K_eff", "k_{n,n-1}"
+  html = html.replace(/\b([A-Za-z]\w*(?:[_^]\{?[\w,+-]+\}?)+)/g, (match) => {
+    if (match.includes(K_OPEN)) return match
+    return safeKatex(texify(match))
+  })
+
+  // 3. Greek + comparison: "rho < 1", "sigma < 2"
+  html = html.replace(new RegExp(`\\b(${GREEK_PAT})\\s*([<>≤≥≈]=?\\s*-?\\d+\\.?\\d*)`, 'g'),
+    (match) => {
+      if (match.includes(K_OPEN)) return match
+      return safeKatex(texify(match))
+    })
+
+  // 4. Standalone Greek letters not already rendered
+  html = html.replace(new RegExp(`(?<![\\w])\\b(${GREEK_PAT})\\b(?![\\w])`, 'g'),
+    (match, _g, offset) => {
+      const before = html.slice(Math.max(0, offset - 100), offset)
+      if (before.includes(K_OPEN) && !before.includes(K_CLOSE)) return match
+      return safeKatex(texify(match))
+    })
+
+  // Remove sentinels
+  html = html.replace(/\x00K</g, '').replace(/>\x00/g, '')
 
   // Markdown bold **...**
   html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
