@@ -130,15 +130,95 @@ const rendered = computed(() => {
   return html
 })
 
+// Map ASCII Greek names to LaTeX commands
+const GREEK: Record<string, string> = {
+  alpha: '\\alpha', beta: '\\beta', gamma: '\\gamma', delta: '\\delta',
+  epsilon: '\\epsilon', zeta: '\\zeta', eta: '\\eta', theta: '\\theta',
+  kappa: '\\kappa', lambda: '\\lambda', mu: '\\mu', nu: '\\nu',
+  xi: '\\xi', pi: '\\pi', rho: '\\rho', sigma: '\\sigma',
+  tau: '\\tau', phi: '\\phi', chi: '\\chi', psi: '\\psi', omega: '\\omega',
+  Phi: '\\Phi', Sigma: '\\Sigma', Delta: '\\Delta', Gamma: '\\Gamma',
+  Omega: '\\Omega', Pi: '\\Pi', Lambda: '\\Lambda',
+}
+const GREEK_PAT = Object.keys(GREEK).sort((a, b) => b.length - a.length).join('|')
+
+function texify(expr: string): string {
+  // Convert ASCII math to LaTeX: Greek names, subscripts, superscripts
+  let s = expr
+  // Greek letters
+  s = s.replace(new RegExp(`\\b(${GREEK_PAT})\\b`, 'g'), m => GREEK[m] || m)
+  // Subscripts: word_word or word_{...}
+  s = s.replace(/(\w)_\{([^}]+)\}/g, '$1_{$2}')
+  s = s.replace(/(\w)_([A-Za-z0-9]+)/g, '$1_{$2}')
+  // Superscripts: word^word or word^{...}
+  s = s.replace(/(\w)\^\{([^}]+)\}/g, '$1^{$2}')
+  s = s.replace(/(\w)\^(\w+)/g, '$1^{$2}')
+  // Arrows
+  s = s.replace(/->/g, '\\to ')
+  // Tilde as approx
+  s = s.replace(/\s~\s/g, ' \\approx ')
+  return s
+}
+
+function renderKatex(tex: string): string {
+  try {
+    return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false })
+  } catch { return tex }
+}
+
+// Sentinel to mark already-rendered KaTeX spans so we don't double-process
+const K_OPEN = '\x00K<'
+const K_CLOSE = '>\x00'
+
+function safeKatex(tex: string): string {
+  const html = renderKatex(tex)
+  // Wrap with sentinels so subsequent regexes skip rendered spans
+  return K_OPEN + html + K_CLOSE
+}
+
 function renderInline(text: string): string {
   let s = escapeHtml(text)
 
-  // Inline math: $...$
-  s = s.replace(/(?<!\$)\$(?!\$)(.*?)\$/g, (_match: string, tex: string) => {
-    try {
-      return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false })
-    } catch { return tex }
+  // Inline math: $...$  (explicit delimiters — highest priority)
+  s = s.replace(/(?<!\$)\$(?!\$)(.*?)\$/g, (_match: string, tex: string) => safeKatex(tex))
+
+  // Auto-detect math patterns and render with KaTeX
+  // Each replacement uses safeKatex so later patterns skip rendered spans
+
+  // 1. Formulas: "VAR = EXPR" where EXPR contains Greek or ^ or _
+  s = s.replace(/\b([A-Za-z_]\w*(?:[_^]\w+)?)\s*=\s*([^,\n]{3,60}?)(?=[,.\s]|$)/g, (match) => {
+    // Only if it contains math-like content
+    if (match.includes(K_OPEN)) return match  // already rendered
+    if (new RegExp(`\\b(${GREEK_PAT})\\b`).test(match) || /[\^_]/.test(match)) {
+      return safeKatex(texify(match))
+    }
+    return match
   })
+
+  // 2. Expressions with ^ or _ : "K^2", "sigma^2", "N_eff", "K_eff", "tau_{n+1}"
+  s = s.replace(/\b([A-Za-z]\w*(?:[_^]\{?[\w+]+\}?)+)/g, (match) => {
+    if (match.includes(K_OPEN)) return match
+    return safeKatex(texify(match))
+  })
+
+  // 3. Greek + comparison: "rho < 1", "sigma &lt; 2" (note: < is escaped to &lt; by escapeHtml... actually we only escape &)
+  s = s.replace(new RegExp(`\\b(${GREEK_PAT})\\s*([<>]=?\\s*-?\\d+\\.?\\d*)`, 'g'),
+    (match) => {
+      if (match.includes(K_OPEN)) return match
+      return safeKatex(texify(match))
+    })
+
+  // 4. Standalone Greek letters not already rendered
+  s = s.replace(new RegExp(`(?<![\\w])\\b(${GREEK_PAT})\\b(?![\\w])`, 'g'),
+    (match, _g, offset) => {
+      // Check if inside a sentinel-wrapped block
+      const before = s.slice(Math.max(0, offset - 100), offset)
+      if (before.includes(K_OPEN) && !before.includes(K_CLOSE)) return match
+      return safeKatex(texify(match))
+    })
+
+  // Remove sentinels
+  s = s.replace(/\x00K</g, '').replace(/>\x00/g, '')
 
   // Markdown bold **...**
   s = s.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
