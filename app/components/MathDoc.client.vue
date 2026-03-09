@@ -66,6 +66,26 @@ function renderBlock(text: string) {
     return match
   })
 
+  // Markdown tables: detect consecutive lines starting with |
+  html = html.replace(/((?:^|\n)\|[^\n]+(?:\n\|[^\n]+)+)/g, (tableBlock) => {
+    const lines = tableBlock.trim().split('\n').filter(l => l.trim().startsWith('|'))
+    if (lines.length < 2) return tableBlock
+    const parseRow = (line: string) =>
+      line.split('|').slice(1, -1).map(cell => cell.trim())
+    const headers = parseRow(lines[0])
+    // Skip separator line (|---|---|...)
+    const startIdx = lines[1].match(/^\|\s*[-:]+/) ? 2 : 1
+    const bodyRows = lines.slice(startIdx).map(parseRow)
+    let t = '<table class="md-table"><thead><tr>'
+    t += headers.map(h => `<th>${h}</th>`).join('')
+    t += '</tr></thead><tbody>'
+    for (const row of bodyRows) {
+      t += '<tr>' + row.map(c => `<td>${c}</td>`).join('') + '</tr>'
+    }
+    t += '</tbody></table>'
+    return t
+  })
+
   // Paragraphs: double newline
   html = html.replace(/\n\n+/g, '</p><p>')
 
@@ -124,6 +144,25 @@ function escapeHtml(s: string) {
 }
 .proof-body p {
   margin: 0.3rem 0;
+}
+.math-doc :deep(.md-table) {
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.9rem;
+  width: 100%;
+}
+.math-doc :deep(.md-table th),
+.math-doc :deep(.md-table td) {
+  border: 1px solid #e1e4e8;
+  padding: 0.35rem 0.6rem;
+  text-align: left;
+}
+.math-doc :deep(.md-table th) {
+  background: #f6f8fa;
+  font-weight: 600;
+}
+.math-doc :deep(.md-table tr:nth-child(even)) {
+  background: #fafbfc;
 }
 .math-doc :deep(.citation-link) {
   color: #0066cc;
