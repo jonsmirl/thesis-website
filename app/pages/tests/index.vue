@@ -43,7 +43,7 @@
     <div class="test-list">
       <div v-for="t in filtered" :key="t.id" class="test-card">
         <div class="test-header">
-          <NuxtLink :to="`/tests/${t.slug}`" class="test-name">{{ t.name }}</NuxtLink>
+          <NuxtLink :to="`/tests/${t.slug}`" class="test-name">{{ formatName(t.name) }}</NuxtLink>
           <div class="badges">
             <span class="badge" :class="t.status?.toLowerCase()">{{ t.status }}</span>
             <span class="badge paper" v-if="t.paper">{{ t.paper }}</span>
@@ -93,7 +93,31 @@ function statusCount(status: string) {
 }
 
 function truncate(s: string, n: number) {
-  return s.length > n ? s.slice(0, n) + '...' : s
+  // Strip separator lines, extra whitespace
+  let clean = s.replace(/^=+\s*$/gm, '').replace(/\n{2,}/g, '\n').trim()
+  // Take first meaningful line(s)
+  const lines = clean.split('\n').filter(l => l.trim())
+  // Skip the title line, take the description
+  const desc = lines.length > 1 ? lines.slice(1).join(' ') : lines[0] || ''
+  const flat = desc.replace(/\s+/g, ' ').trim()
+  return flat.length > n ? flat.slice(0, n) + '...' : flat
+}
+
+function formatName(name: string): string {
+  return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+    .replace(/\bV(\d)/g, 'v$1')
+    .replace(/\bOecd\b/g, 'OECD')
+    .replace(/\bBea\b/g, 'BEA')
+    .replace(/\bCes\b/g, 'CES')
+    .replace(/\bCpi\b/g, 'CPI')
+    .replace(/\bDid\b/g, 'DID')
+    .replace(/\bImf\b/g, 'IMF')
+    .replace(/\bIo\b/g, 'I/O')
+    .replace(/\bIes\b/g, 'IES')
+    .replace(/\bOos\b/g, 'OOS')
+    .replace(/\bMle\b/g, 'MLE')
+    .replace(/\bMp\b/g, 'MP')
+    .replace(/\bDtc\b/g, 'DTC')
 }
 
 function topStats(stats: Record<string, any>) {
