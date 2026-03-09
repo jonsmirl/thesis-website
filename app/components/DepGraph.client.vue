@@ -35,20 +35,6 @@
         :viewBox="`0 0 ${svgW} ${svgH}`"
         class="graph-svg"
       >
-        <!-- Grid lines for depth layers -->
-        <line
-          v-for="d in depthLayers"
-          :key="'grid-'+d"
-          :x1="0"
-          :y1="d * LAYER_GAP + PAD"
-          :x2="svgW"
-          :y2="d * LAYER_GAP + PAD"
-          stroke="#e8ecf0"
-          stroke-width="1"
-          stroke-dasharray="4 6"
-          opacity="0.6"
-        />
-
         <!-- Edge curves -->
         <g class="edges-layer">
           <path
@@ -183,11 +169,16 @@ async function fetchTree() {
 
   const newNodes: GNode[] = []
   const newEdges: GEdge[] = []
+  const edgeSet = new Set<string>()
   for (const row of data as any[]) {
     if (row.type === 'node') {
       newNodes.push({ name: row.from_name, status: row.status, kind: row.kind, depth: row.depth })
     } else {
-      newEdges.push({ from: row.from_name, to: row.to_name })
+      const key = `${row.from_name}→${row.to_name}`
+      if (!edgeSet.has(key)) {
+        edgeSet.add(key)
+        newEdges.push({ from: row.from_name, to: row.to_name })
+      }
     }
   }
   nodes.value = newNodes
@@ -213,12 +204,6 @@ function calcNodeW(name: string) {
   // Extra space for status dot + padding
   return Math.max(100, name.length * CHAR_W + 40)
 }
-
-const depthLayers = computed(() => {
-  if (!nodes.value.length) return []
-  const maxD = Math.max(...nodes.value.map(n => n.depth))
-  return Array.from({ length: maxD + 1 }, (_, i) => i)
-})
 
 const rawLayout = computed<LayoutNode[]>(() => {
   if (!nodes.value.length) return []
