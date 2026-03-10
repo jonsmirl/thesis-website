@@ -19,8 +19,10 @@
       <span class="legend-item" style="color:#dc2626">T* boundary (collapse)</span>
       <span class="legend-item" style="color:#059669">Cobb-Douglas line</span>
       <template v-if="showTradeSchools">
-        <span class="legend-item" style="color:#2563eb">HO / Gravity</span>
-        <span class="legend-item" style="color:#d97706">Krugman / Melitz</span>
+        <span class="legend-item" style="color:#2563eb">Heckscher-Ohlin (band)</span>
+        <span class="legend-item" style="color:#d97706">Krugman (region)</span>
+        <span class="legend-item" style="color:#b45309">Melitz (region)</span>
+        <span class="legend-item" style="color:#0891b2">Gravity (arrow)</span>
       </template>
     </div>
   </div>
@@ -172,48 +174,101 @@ function draw() {
   ctx.fillStyle = '#dc262680'
   ctx.fillText('Collapsed', rhoToX(-0.5), TToY(3.5))
 
-  // Trade school SLICES — only shown when config.tradeSchools is true
+  // Trade school overlays — only shown when config.tradeSchools is true
   if (showTradeSchools.value) {
-  const schools = [
-    { name: 'Heckscher-Ohlin', rhoMin: -2, rhoMax: -0.5, tMin: 0, tMax: 0.8, color: '#2563eb', desc: 'Factor endowments' },
-    { name: 'Gravity', rhoMin: -1.5, rhoMax: -0.1, tMin: 0.6, tMax: 2.0, color: '#3b82f6', desc: 'Trade ~ size/distance' },
-    { name: 'Krugman', rhoMin: 0.1, rhoMax: 1.5, tMin: 0, tMax: 1.2, color: '#d97706', desc: 'Increasing returns' },
-    { name: 'Melitz', rhoMin: 0.05, rhoMax: 1.2, tMin: 1.0, tMax: 2.8, color: '#b45309', desc: 'Firm heterogeneity' },
-  ]
+    const cdX = rhoToX(0)
 
-  for (const s of schools) {
-    const x1 = rhoToX(s.rhoMin)
-    const x2 = rhoToX(s.rhoMax)
-    const y1 = TToY(s.tMax) // tMax = higher T = higher on canvas (lower y)
-    const y2 = TToY(s.tMin)
-
-    // Filled slice region
-    ctx.fillStyle = s.color + '12'
-    ctx.fillRect(x1, y1, x2 - x1, y2 - y1)
-
-    // Dashed border
-    ctx.strokeStyle = s.color + '60'
+    // --- HO: horizontal band along bottom of complement side (line-like) ---
+    const hoY1 = TToY(0.6)
+    const hoY2 = TToY(0)
+    const hoX1 = rhoToX(-2)
+    ctx.fillStyle = 'rgba(37, 99, 235, 0.10)'
+    ctx.fillRect(hoX1, hoY1, cdX - hoX1, hoY2 - hoY1)
+    ctx.strokeStyle = '#2563eb80'
     ctx.lineWidth = 1.5
-    ctx.setLineDash([5, 3])
-    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1)
+    ctx.setLineDash([6, 3])
+    ctx.beginPath()
+    ctx.moveTo(hoX1, hoY1)
+    ctx.lineTo(cdX, hoY1)
+    ctx.stroke()
     ctx.setLineDash([])
-
-    // Label with background pill
-    const labelX = (x1 + x2) / 2
-    const labelY = y1 + 14
+    // Label
     ctx.font = 'bold 10px -apple-system, sans-serif'
-    const textW = ctx.measureText(s.name).width
-    ctx.fillStyle = 'rgba(255,255,255,0.85)'
-    ctx.fillRect(labelX - textW / 2 - 4, labelY - 9, textW + 8, 13)
-    ctx.fillStyle = s.color
+    ctx.fillStyle = '#2563eb'
     ctx.textAlign = 'center'
-    ctx.fillText(s.name, labelX, labelY)
-
-    // Subtitle
+    ctx.fillText('Heckscher-Ohlin', (hoX1 + cdX) / 2, hoY2 - 8)
     ctx.font = 'italic 8px -apple-system, sans-serif'
-    ctx.fillStyle = s.color + 'aa'
-    ctx.fillText(s.desc, labelX, labelY + 11)
-  }
+    ctx.fillStyle = '#2563ebaa'
+    ctx.fillText('Factor endowments, T \u2248 0', (hoX1 + cdX) / 2, hoY2 + 4)
+
+    // --- Melitz/Krugman threshold: horizontal line in substitute regime ---
+    const melitzT = 1.2
+    const melitzY = TToY(melitzT)
+    const krugX2 = rhoToX(2)
+
+    // Krugman region: rho > 0, T < melitzT
+    ctx.fillStyle = 'rgba(217, 119, 6, 0.08)'
+    ctx.fillRect(cdX, melitzY, krugX2 - cdX, TToY(0) - melitzY)
+    ctx.font = 'bold 10px -apple-system, sans-serif'
+    ctx.fillStyle = '#d97706'
+    ctx.textAlign = 'center'
+    ctx.fillText('Krugman', (cdX + krugX2) / 2, TToY(0.3))
+    ctx.font = 'italic 8px -apple-system, sans-serif'
+    ctx.fillStyle = '#d97706aa'
+    ctx.fillText('Increasing returns, love-of-variety', (cdX + krugX2) / 2, TToY(0.3) + 12)
+
+    // Melitz region: rho > 0, T > melitzT
+    ctx.fillStyle = 'rgba(180, 83, 9, 0.08)'
+    ctx.fillRect(cdX, TToY(3.0), krugX2 - cdX, melitzY - TToY(3.0))
+    ctx.strokeStyle = '#b4530960'
+    ctx.lineWidth = 1.5
+    ctx.setLineDash([6, 3])
+    ctx.beginPath()
+    ctx.moveTo(cdX, melitzY)
+    ctx.lineTo(krugX2, melitzY)
+    ctx.stroke()
+    ctx.setLineDash([])
+    ctx.font = 'bold 10px -apple-system, sans-serif'
+    ctx.fillStyle = '#b45309'
+    ctx.textAlign = 'center'
+    ctx.fillText('Melitz', (cdX + krugX2) / 2, TToY(2.0))
+    ctx.font = 'italic 8px -apple-system, sans-serif'
+    ctx.fillStyle = '#b45309aa'
+    ctx.fillText('Firm selection, heterogeneous productivity', (cdX + krugX2) / 2, TToY(2.0) + 12)
+
+    // --- Gravity: large upward arrow along T axis ---
+    // Gravity operates along the friction dimension — trade decays with distance/T
+    const gravX = rhoToX(-1.6)
+    const gravY1 = TToY(0.5)
+    const gravY2 = TToY(3.5)
+    const arrowW = 14
+
+    // Arrow shaft
+    ctx.strokeStyle = '#0891b2'
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    ctx.moveTo(gravX, gravY1)
+    ctx.lineTo(gravX, gravY2)
+    ctx.stroke()
+
+    // Arrow head
+    ctx.fillStyle = '#0891b2'
+    ctx.beginPath()
+    ctx.moveTo(gravX, gravY2 - 4)
+    ctx.lineTo(gravX - arrowW, gravY2 + 14)
+    ctx.lineTo(gravX + arrowW, gravY2 + 14)
+    ctx.closePath()
+    ctx.fill()
+
+    // Label next to arrow
+    ctx.save()
+    ctx.translate(gravX + 14, (gravY1 + gravY2) / 2)
+    ctx.rotate(-Math.PI / 2)
+    ctx.font = 'bold 10px -apple-system, sans-serif'
+    ctx.fillStyle = '#0891b2'
+    ctx.textAlign = 'center'
+    ctx.fillText('Gravity (trade ~ 1/distance)', 0, 0)
+    ctx.restore()
   } // end if showTradeSchools
 
   // Sector dots
