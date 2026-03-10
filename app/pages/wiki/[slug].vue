@@ -28,14 +28,24 @@
 
         <WikiDoc :text="page.body_md" />
 
-        <div v-if="wikiFigures?.length" class="wiki-figures">
-          <h3>Figures</h3>
-          <div class="figure-grid">
-            <NuxtLink v-for="fig in wikiFigures" :key="fig.slug" :to="`/figures/${fig.slug}`" class="figure-thumb">
-              <img :src="fig.public_url" :alt="fig.title" loading="lazy" />
-              <span class="figure-thumb-title">{{ fig.title }}</span>
-            </NuxtLink>
-          </div>
+        <div v-if="relatedTests?.length" class="empirical-tests">
+          <h3>Empirical Tests</h3>
+          <table class="test-table">
+            <thead>
+              <tr><th>Test</th><th>Status</th><th>Figure</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="t in relatedTests" :key="t.slug">
+                <td><NuxtLink :to="`/tests/${t.slug}`">{{ formatName(t.name) }}</NuxtLink></td>
+                <td><span class="badge" :class="`badge--${t.status?.toLowerCase()}`">{{ t.status }}</span></td>
+                <td>
+                  <NuxtLink v-if="t.figure" :to="`/figures/${t.figure.slug}`" class="test-thumb">
+                    <img :src="t.figure.public_url" :alt="t.figure.title" loading="lazy" />
+                  </NuxtLink>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <aside class="sidebar" v-if="hasRelated">
@@ -59,24 +69,14 @@
             >{{ name }}</NuxtLink>
           </div>
 
-          <div v-if="page.related_test_slugs?.length" class="related-block">
-            <h3>Empirical Tests</h3>
-            <NuxtLink
-              v-for="slug in page.related_test_slugs"
-              :key="slug"
-              :to="`/tests/${slug}`"
-              class="related-link test"
-            >{{ slug }}</NuxtLink>
-          </div>
-
           <div v-if="page.related_paper_slugs?.length" class="related-block">
             <h3>Papers</h3>
             <NuxtLink
-              v-for="slug in page.related_paper_slugs"
-              :key="slug"
-              :to="`/papers/${slug}`"
+              v-for="pslug in page.related_paper_slugs"
+              :key="pslug"
+              :to="`/papers/${pslug}`"
               class="related-link paper"
-            >{{ slug }}</NuxtLink>
+            >{{ pslug }}</NuxtLink>
           </div>
         </aside>
 
@@ -90,6 +90,8 @@
 </template>
 
 <script setup lang="ts">
+import { formatName } from '~/utils/formatting'
+
 const route = useRoute()
 const client = useSupabaseClient()
 const slug = route.params.slug as string
@@ -115,13 +117,31 @@ const { data: category } = await useAsyncData(`wiki-cat-${slug}`, async () => {
   return data
 })
 
-const { data: wikiFigures } = await useAsyncData(`wiki-figures-${slug}`, async () => {
-  const { data } = await client
-    .from('figure_wiki_pages')
-    .select('figure_id, figures(slug, title, public_url)')
-    .eq('wiki_slug', slug)
-    .order('sort_order')
-  return data?.map((fw: any) => fw.figures).filter(Boolean) || []
+const { data: relatedTests } = await useAsyncData(`wiki-tests-${slug}`, async () => {
+  const testSlugs = page.value?.related_test_slugs
+  if (!testSlugs?.length) return []
+
+  // Fetch test details
+  const { data: tests } = await client
+    .from('tests')
+    .select('slug, name, status')
+    .in('slug', testSlugs)
+
+  if (!tests?.length) return []
+
+  // For each test, fetch first linked figure via figure_tests junction
+  const enriched = await Promise.all(tests.map(async (t: any) => {
+    const { data: figs } = await client
+      .from('figure_tests')
+      .select('figure_id, figures(slug, title, public_url)')
+      .eq('test_slug', t.slug)
+      .order('sort_order')
+      .limit(1)
+    const figure = figs?.[0]?.figures || null
+    return { ...t, figure }
+  }))
+
+  return enriched
 })
 
 const { data: relatedPages } = await useAsyncData(`wiki-related-${slug}`, async () => {
@@ -137,7 +157,6 @@ const { data: relatedPages } = await useAsyncData(`wiki-related-${slug}`, async 
 const hasRelated = computed(() => {
   return (relatedPages.value?.length || 0) > 0 ||
     (page.value?.related_theorem_names?.length || 0) > 0 ||
-    (page.value?.related_test_slugs?.length || 0) > 0 ||
     (page.value?.related_paper_slugs?.length || 0) > 0
 })
 
@@ -209,15 +228,17 @@ useHead({
 }
 .related-link:hover { text-decoration: underline; }
 .related-link.theorem { color: var(--color-axiom-accent); }
-.related-link.test { color: var(--color-success); }
 .related-link.paper { color: var(--color-warning); }
 
 .not-found { color: var(--color-text-faint); font-style: italic; }
-.wiki-figures { margin: 2rem 0; }
-.wiki-figures h3 { font-size: 0.85rem; color: var(--color-text-tertiary); margin: 0 0 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }
-.figure-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
-.figure-thumb { display: block; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.15s; }
-.figure-thumb:hover { border-color: var(--color-link); }
-.figure-thumb img { width: 100%; aspect-ratio: 16/10; object-fit: contain; background: var(--color-bg-code); }
-.figure-thumb-title { display: block; padding: 0.4rem 0.6rem; font-size: 0.8rem; font-weight: 500; color: var(--color-text-secondary); }
+
+.empirical-tests { margin: 2rem 0; }
+.empirical-tests h3 { font-size: 0.85rem; color: var(--color-text-tertiary); margin: 0 0 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.test-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.test-table th { text-align: left; font-size: 0.75rem; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.03em; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--color-border-light); }
+.test-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--color-border-light); vertical-align: middle; }
+.test-table td a { color: var(--color-link); text-decoration: none; }
+.test-table td a:hover { text-decoration: underline; }
+.test-thumb { display: block; width: 80px; }
+.test-thumb img { width: 100%; aspect-ratio: 16/10; object-fit: contain; background: var(--color-bg-code); border-radius: var(--radius-sm); border: 1px solid var(--color-border-light); }
 </style>
