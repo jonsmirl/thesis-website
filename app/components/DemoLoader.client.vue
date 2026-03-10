@@ -4,7 +4,8 @@
       <span class="demo-label">Interactive Demo</span>
     </div>
     <div class="demo-canvas">
-      <component :is="demoComponent" v-if="demoComponent" :config="config" />
+      <div v-if="error" class="demo-error">{{ error }}</div>
+      <component :is="demoComponent" v-else-if="demoComponent" :config="config" />
       <div v-else class="demo-loading">Loading...</div>
     </div>
   </div>
@@ -18,19 +19,27 @@ const props = defineProps<{
   config?: Record<string, any> | null
 }>()
 
-const demoComponents: Record<string, () => ReturnType<typeof defineAsyncComponent>> = {
-  CesIsoquant: () => defineAsyncComponent(() => import('./demos/CesIsoquant.client.vue')),
-  CurvatureDegradation: () => defineAsyncComponent(() => import('./demos/CurvatureDegradation.client.vue')),
-  CrisisSequence: () => defineAsyncComponent(() => import('./demos/CrisisSequence.client.vue')),
-  RegimeDiagram: () => defineAsyncComponent(() => import('./demos/RegimeDiagram.client.vue')),
-  DampingCancellation: () => defineAsyncComponent(() => import('./demos/DampingCancellation.client.vue')),
-  SmirlCurve: () => defineAsyncComponent(() => import('./demos/SmirlCurve.client.vue')),
+const error = ref<string | null>(null)
+
+const loaders: Record<string, () => Promise<any>> = {
+  CesIsoquant: () => import('./demos/CesIsoquant.client.vue'),
+  CurvatureDegradation: () => import('./demos/CurvatureDegradation.client.vue'),
+  CrisisSequence: () => import('./demos/CrisisSequence.client.vue'),
+  RegimeDiagram: () => import('./demos/RegimeDiagram.client.vue'),
+  DampingCancellation: () => import('./demos/DampingCancellation.client.vue'),
+  SmirlCurve: () => import('./demos/SmirlCurve.client.vue'),
 }
 
 const demoComponent = shallowRef<ReturnType<typeof defineAsyncComponent> | null>(null)
 
-if (demoComponents[props.name]) {
-  demoComponent.value = demoComponents[props.name]()
+if (loaders[props.name]) {
+  demoComponent.value = defineAsyncComponent({
+    loader: loaders[props.name],
+    onError(err) {
+      console.error(`Demo "${props.name}" failed to load:`, err)
+      error.value = `Failed to load demo: ${err.message}`
+    },
+  })
 }
 </script>
 
@@ -62,5 +71,13 @@ if (demoComponents[props.name]) {
   align-items: center;
   justify-content: center;
   color: var(--color-text-faint);
+}
+.demo-error {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-inconsistent-fg, #c00);
+  font-size: 0.85rem;
 }
 </style>

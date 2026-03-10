@@ -23,7 +23,12 @@
         </header>
 
         <div v-if="page.demo_component" class="demo-section">
-          <DemoLoader :name="page.demo_component" :config="page.demo_config" />
+          <ClientOnly>
+            <DemoLoader :name="page.demo_component" :config="page.demo_config" />
+            <template #fallback>
+              <div class="demo-loading">Loading interactive demo...</div>
+            </template>
+          </ClientOnly>
         </div>
 
         <WikiDoc :text="page.body_md" />
@@ -229,6 +234,15 @@ useHead({
 .related-link:hover { text-decoration: underline; }
 .related-link.theorem { color: var(--color-axiom-accent); }
 .related-link.paper { color: var(--color-warning); }
+
+.demo-loading {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-faint);
+  font-size: 0.9rem;
+}
 
 .not-found { color: var(--color-text-faint); font-style: italic; }
 
