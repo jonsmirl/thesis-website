@@ -50,9 +50,9 @@
           <option value="INCONSISTENT">Inconsistent</option>
           <option value="PENDING">Pending</option>
         </select>
-        <select v-model="filterPaper" class="filter-select">
-          <option value="">All papers</option>
-          <option v-for="p in papers" :key="p" :value="p">{{ p }}</option>
+        <select v-model="filterCategory" class="filter-select">
+          <option value="">All categories</option>
+          <option v-for="c in categories" :key="c" :value="c">{{ CATEGORY_LABELS[c] || c }}</option>
         </select>
       </div>
 
@@ -62,7 +62,7 @@
             <NuxtLink :to="`/tests/${t.slug}`" class="test-name">{{ formatName(t.name) }}</NuxtLink>
             <div class="badges">
               <span class="badge" :class="`badge--${t.status?.toLowerCase()}`">{{ t.status }}</span>
-              <span class="badge badge--paper" v-if="t.paper">{{ t.paper }}</span>
+              <span class="badge badge--paper" v-if="t.category">{{ CATEGORY_LABELS[t.category] || t.category }}</span>
             </div>
           </div>
           <p v-if="t.description" class="description"><MathInline :text="truncate(t.description, 200)" /></p>
@@ -85,25 +85,40 @@ import { formatName } from '~/utils/formatting'
 
 const client = useSupabaseClient()
 
+const CATEGORY_LABELS: Record<string, string> = {
+  'foundations': 'Foundations',
+  'curvature-roles': 'Curvature Roles',
+  'information-geometry': 'Info Geometry',
+  'ces-potential': 'CES Potential',
+  'dynamics-crises': 'Dynamics & Crises',
+  'hierarchy': 'Hierarchy',
+  'trade': 'Trade',
+  'ai-transition': 'AI Transition',
+  'monetary-policy': 'Monetary Policy',
+  'empirical-methods': 'Empirical Methods',
+  'microeconomics': 'Microeconomics',
+  'macroeconomics': 'Macroeconomics',
+}
+
 const filterStatus = ref('')
-const filterPaper = ref('')
+const filterCategory = ref('')
 
 const { data: tests } = await useAsyncData('tests', async () => {
   const { data, error } = await client
     .from('tests')
     .select('*')
-    .order('paper')
+    .order('category')
     .order('name')
   if (error) throw error
   return data || []
 })
 
-const papers = computed(() => [...new Set(tests.value?.map(t => t.paper).filter(Boolean))].sort())
+const categories = computed(() => [...new Set(tests.value?.map(t => t.category).filter(Boolean))].sort())
 
 const filtered = computed(() => {
   let result = tests.value || []
   if (filterStatus.value) result = result.filter(t => t.status === filterStatus.value)
-  if (filterPaper.value) result = result.filter(t => t.paper === filterPaper.value)
+  if (filterCategory.value) result = result.filter(t => t.category === filterCategory.value)
   return result
 })
 

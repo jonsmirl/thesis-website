@@ -11,7 +11,7 @@
         <h2>{{ formatName(test.name) }}</h2>
         <div class="badges">
           <span class="badge" :class="`badge--${test.status?.toLowerCase()}`">{{ test.status }}</span>
-          <span class="badge badge--paper" v-if="test.paper">{{ test.paper }}</span>
+          <span class="badge badge--paper" v-if="test.category">{{ CATEGORY_LABELS[test.category] || test.category }}</span>
         </div>
       </div>
 
@@ -45,6 +45,15 @@
         <code class="script-path">{{ test.script_path }}</code>
       </div>
 
+      <div v-if="test.source_code" class="section">
+        <h3>
+          <button class="collapse-toggle" @click="showCode = !showCode">
+            {{ showCode ? '▾' : '▸' }} Source Code
+          </button>
+        </h3>
+        <PythonHighlight v-if="showCode" :code="test.source_code" />
+      </div>
+
       <div v-if="test.reproduction_steps" class="section">
         <h3>Reproduction Steps</h3>
         <pre class="repro">{{ test.reproduction_steps }}</pre>
@@ -68,6 +77,22 @@
 <script setup lang="ts">
 import { formatName } from '~/utils/formatting'
 
+const CATEGORY_LABELS: Record<string, string> = {
+  'foundations': 'Foundations',
+  'curvature-roles': 'Curvature Roles',
+  'information-geometry': 'Info Geometry',
+  'ces-potential': 'CES Potential',
+  'dynamics-crises': 'Dynamics & Crises',
+  'hierarchy': 'Hierarchy',
+  'trade': 'Trade',
+  'ai-transition': 'AI Transition',
+  'monetary-policy': 'Monetary Policy',
+  'empirical-methods': 'Empirical Methods',
+  'microeconomics': 'Microeconomics',
+  'macroeconomics': 'Macroeconomics',
+}
+
+const showCode = ref(false)
 const route = useRoute()
 const client = useSupabaseClient()
 
@@ -132,4 +157,6 @@ function formatStatVal(v: any): string {
 .repro { background: var(--color-bg-code); border: 1px solid var(--color-border-medium); border-radius: var(--radius-md); padding: 1rem; font-size: 0.85rem; overflow-x: auto; line-height: 1.6; }
 .data-sources { padding-left: 1.5rem; }
 .data-sources li { font-size: 0.9rem; margin: 0.25rem 0; color: var(--color-text-secondary); }
+.collapse-toggle { background: none; border: none; cursor: pointer; font: inherit; color: inherit; padding: 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--color-text-muted); }
+.collapse-toggle:hover { color: var(--color-text-primary); }
 </style>

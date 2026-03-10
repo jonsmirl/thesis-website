@@ -16,7 +16,7 @@
         <div class="badges">
           <NuxtLink :to="`/theorems/all?kind=${theorem.kind}`" class="badge badge--kind">{{ theorem.kind }}</NuxtLink>
           <NuxtLink :to="`/theorems/all?status=${theorem.status}`" class="badge" :class="`badge--${theorem.status}`">{{ theorem.status }}</NuxtLink>
-          <NuxtLink v-if="theorem.paper" :to="`/theorems/all?paper=${theorem.paper}`" class="badge badge--paper">{{ theorem.paper }}</NuxtLink>
+          <NuxtLink v-if="theorem.category" :to="`/theorems/all?category=${theorem.category}`" class="badge badge--paper">{{ CATEGORY_LABELS[theorem.category] || theorem.category }}</NuxtLink>
           <span class="badge badge--marquee" v-if="theorem.is_marquee">key theorem</span>
         </div>
       </div>
@@ -90,6 +90,21 @@
 
 <script setup lang="ts">
 import { githubUrl } from '~/utils/formatting'
+
+const CATEGORY_LABELS: Record<string, string> = {
+  'foundations': 'Foundations',
+  'curvature-roles': 'Curvature Roles',
+  'information-geometry': 'Info Geometry',
+  'ces-potential': 'CES Potential',
+  'dynamics-crises': 'Dynamics & Crises',
+  'hierarchy': 'Hierarchy',
+  'trade': 'Trade',
+  'ai-transition': 'AI Transition',
+  'monetary-policy': 'Monetary Policy',
+  'empirical-methods': 'Empirical Methods',
+  'microeconomics': 'Microeconomics',
+  'macroeconomics': 'Macroeconomics',
+}
 
 const route = useRoute()
 const client = useSupabaseClient()

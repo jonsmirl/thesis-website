@@ -21,9 +21,9 @@
         <option value="">All kinds</option>
         <option v-for="k in kinds" :key="k" :value="k">{{ k }}</option>
       </select>
-      <select v-model="filterPaper" class="filter-select">
-        <option value="">All papers</option>
-        <option v-for="p in papers" :key="p" :value="p">{{ p }}</option>
+      <select v-model="filterCategory" class="filter-select">
+        <option value="">All categories</option>
+        <option v-for="c in categories" :key="c" :value="c">{{ CATEGORY_LABELS[c] || c }}</option>
       </select>
       <select v-model="filterStatus" class="filter-select">
         <option value="">All statuses</option>
@@ -33,7 +33,7 @@
         <option value="trivial">trivial</option>
       </select>
       <label v-if="filterMarquee" class="marquee-label"><input type="checkbox" v-model="filterMarquee" /> Key only</label>
-      <button v-if="searchInput || filterKind || filterPaper || filterStatus || filterMarquee" class="clear-btn" @click="clearFilters">Clear</button>
+      <button v-if="searchInput || filterKind || filterCategory || filterStatus || filterMarquee" class="clear-btn" @click="clearFilters">Clear</button>
     </div>
 
     <div class="stats-bar">
@@ -50,7 +50,7 @@
           <div class="badges">
             <a class="badge badge--kind" href="#" @click.prevent="filterKind = t.kind">{{ t.kind }}</a>
             <a class="badge" :class="`badge--${t.status}`" href="#" @click.prevent="filterStatus = t.status">{{ t.status }}</a>
-            <a class="badge badge--paper" v-if="t.paper" href="#" @click.prevent="filterPaper = t.paper">{{ t.paper }}</a>
+            <a class="badge badge--paper" v-if="t.category" href="#" @click.prevent="filterCategory = t.category">{{ CATEGORY_LABELS[t.category] || t.category }}</a>
           </div>
         </div>
         <p v-if="t.docstring" class="docstring"><MathInline :text="truncate(t.docstring, 200)" /></p>
@@ -79,7 +79,7 @@ const client = useSupabaseClient()
 const searchInput = ref('')
 const search = ref('')
 const filterKind = ref((route.query.kind as string) || '')
-const filterPaper = ref((route.query.paper as string) || '')
+const filterCategory = ref((route.query.category as string) || '')
 const filterStatus = ref((route.query.status as string) || '')
 const filterMarquee = ref((route.query.marquee as string) === 'true')
 const page = ref(1)
@@ -98,8 +98,23 @@ if (route.query.q) {
   search.value = route.query.q as string
 }
 
+const CATEGORY_LABELS: Record<string, string> = {
+  'foundations': 'Foundations',
+  'curvature-roles': 'Curvature Roles',
+  'information-geometry': 'Info Geometry',
+  'ces-potential': 'CES Potential',
+  'dynamics-crises': 'Dynamics & Crises',
+  'hierarchy': 'Hierarchy',
+  'trade': 'Trade',
+  'ai-transition': 'AI Transition',
+  'monetary-policy': 'Monetary Policy',
+  'empirical-methods': 'Empirical Methods',
+  'microeconomics': 'Microeconomics',
+  'macroeconomics': 'Macroeconomics',
+}
+
 const kinds = ['axiom', 'def', 'inductive', 'lemma', 'noncomputable def', 'structure', 'theorem']
-const papers = ['applications', 'curvature_roles', 'dynamics', 'entry_exit', 'foundations', 'hierarchy', 'macro_extension', 'potential', 'two_world']
+const categories = Object.keys(CATEGORY_LABELS)
 
 const { data: totals } = await useAsyncData('theorems-totals', async () => {
   const { count, error } = await client
@@ -112,7 +127,7 @@ const { data: totals } = await useAsyncData('theorems-totals', async () => {
 const totalCount = computed(() => totals.value?.total || 0)
 
 const isFiltered = computed(() =>
-  !!(search.value || filterKind.value || filterPaper.value || filterStatus.value || filterMarquee.value)
+  !!(search.value || filterKind.value || filterCategory.value || filterStatus.value || filterMarquee.value)
 )
 
 function buildQuery(countOnly = false) {
@@ -121,7 +136,7 @@ function buildQuery(countOnly = false) {
     .select(
       countOnly
         ? '*'
-        : 'id, name, display_name, file_path, paper, kind, docstring, status, line_number, is_marquee',
+        : 'id, name, display_name, file_path, category, kind, docstring, status, line_number, is_marquee',
       countOnly ? { count: 'exact', head: true } : { count: 'exact' }
     )
 
@@ -130,7 +145,7 @@ function buildQuery(countOnly = false) {
     q = q.or(`name.ilike.${pattern},display_name.ilike.${pattern},docstring.ilike.${pattern}`)
   }
   if (filterKind.value) q = q.eq('kind', filterKind.value)
-  if (filterPaper.value) q = q.eq('paper', filterPaper.value)
+  if (filterCategory.value) q = q.eq('category', filterCategory.value)
   if (filterStatus.value) q = q.eq('status', filterStatus.value)
   if (filterMarquee.value) q = q.eq('is_marquee', true)
 
@@ -149,14 +164,14 @@ const { data: result, refresh } = await useAsyncData(
     if (error) throw error
     return { rows: data || [], count: count || 0 }
   },
-  { watch: [search, filterKind, filterPaper, filterStatus, filterMarquee, page] }
+  { watch: [search, filterKind, filterCategory, filterStatus, filterMarquee, page] }
 )
 
 const rows = computed(() => result.value?.rows || [])
 const filteredCount = computed(() => result.value?.count || 0)
 const totalPages = computed(() => Math.ceil(filteredCount.value / perPage))
 
-watch([search, filterKind, filterPaper, filterStatus, filterMarquee], () => { page.value = 1 })
+watch([search, filterKind, filterCategory, filterStatus, filterMarquee], () => { page.value = 1 })
 
 function truncate(s: string, n: number) {
   let text = s
@@ -171,7 +186,7 @@ function clearFilters() {
   searchInput.value = ''
   search.value = ''
   filterKind.value = ''
-  filterPaper.value = ''
+  filterCategory.value = ''
   filterStatus.value = ''
   filterMarquee.value = false
 }
