@@ -10,6 +10,7 @@
       </nav>
       <div class="user-bar" v-if="user">
         <span class="email">{{ user.email }}</span>
+        <NuxtLink to="/account" class="account-link">Password</NuxtLink>
         <button @click="handleLogout">Sign out</button>
       </div>
     </div>
@@ -84,4 +85,6 @@ nav a.router-link-active {
   color: var(--color-text-tertiary);
 }
 .user-bar button:hover { background: var(--color-bg-hover); }
+.account-link { color: var(--color-text-tertiary); text-decoration: none; font-size: 0.75rem; padding: 0.25rem 0.5rem; border: 1px solid var(--color-border-input); border-radius: 4px; }
+.account-link:hover { background: var(--color-bg-hover); }
 </style>
