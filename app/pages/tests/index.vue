@@ -119,7 +119,7 @@ const filtered = computed(() => {
   let result = tests.value || []
   if (filterStatus.value) result = result.filter(t => t.status === filterStatus.value)
   if (filterCategory.value) result = result.filter(t => t.category === filterCategory.value)
-  return result
+  return [...result].sort((a, b) => formatName(a.name).localeCompare(formatName(b.name)))
 })
 
 function statusCount(status: string) {
