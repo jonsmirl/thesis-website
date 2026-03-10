@@ -14,10 +14,14 @@
       <p>{{ tooltip.desc }}</p>
     </div>
     <div class="legend-row">
-      <span class="legend-item" style="color:#3b82f6">Complements (HO/gravity)</span>
-      <span class="legend-item" style="color:#f59e0b">Substitutes (Krugman)</span>
+      <span class="legend-item" style="color:#3b82f6">Complements</span>
+      <span class="legend-item" style="color:#f59e0b">Substitutes</span>
       <span class="legend-item" style="color:#dc2626">T* boundary (collapse)</span>
       <span class="legend-item" style="color:#059669">Cobb-Douglas line</span>
+      <template v-if="showTradeSchools">
+        <span class="legend-item" style="color:#2563eb">HO / Gravity</span>
+        <span class="legend-item" style="color:#d97706">Krugman / Melitz</span>
+      </template>
     </div>
   </div>
 </template>
@@ -25,7 +29,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch } from 'vue'
 
-defineProps<{ config?: Record<string, any> | null }>()
+const props = defineProps<{ config?: Record<string, any> | null }>()
+const showTradeSchools = computed(() => props.config?.tradeSchools === true)
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const tooltip = ref<{ x: number; y: number; title: string; desc: string } | null>(null)
@@ -167,7 +172,8 @@ function draw() {
   ctx.fillStyle = '#dc262680'
   ctx.fillText('Collapsed', rhoToX(-0.5), TToY(3.5))
 
-  // Trade school SLICES — bounded regions showing each school's domain
+  // Trade school SLICES — only shown when config.tradeSchools is true
+  if (showTradeSchools.value) {
   const schools = [
     { name: 'Heckscher-Ohlin', rhoMin: -2, rhoMax: -0.5, tMin: 0, tMax: 0.8, color: '#2563eb', desc: 'Factor endowments' },
     { name: 'Gravity', rhoMin: -1.5, rhoMax: -0.1, tMin: 0.6, tMax: 2.0, color: '#3b82f6', desc: 'Trade ~ size/distance' },
@@ -208,6 +214,7 @@ function draw() {
     ctx.fillStyle = s.color + 'aa'
     ctx.fillText(s.desc, labelX, labelY + 11)
   }
+  } // end if showTradeSchools
 
   // Sector dots
   for (const s of sectors) {
