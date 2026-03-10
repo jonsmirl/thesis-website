@@ -3,15 +3,78 @@
 </template>
 
 <script setup lang="ts">
-import { escapeHtml, renderKatex, safeKatex, texify, autoDetectMath, GREEK_PAT } from '~/utils/math-render'
+import katex from 'katex'
 import { citationRegex, getCitationUrl } from '~/utils/citations'
 
 const props = defineProps<{ text: string }>()
 
+// Local math rendering (katex must be imported directly in .client.vue)
+const GREEK: Record<string, string> = {
+  alpha: '\\alpha', beta: '\\beta', gamma: '\\gamma', delta: '\\delta',
+  epsilon: '\\epsilon', zeta: '\\zeta', eta: '\\eta', theta: '\\theta',
+  kappa: '\\kappa', lambda: '\\lambda', mu: '\\mu', nu: '\\nu',
+  xi: '\\xi', pi: '\\pi', rho: '\\rho', sigma: '\\sigma',
+  tau: '\\tau', phi: '\\phi', chi: '\\chi', psi: '\\psi', omega: '\\omega',
+  Phi: '\\Phi', Sigma: '\\Sigma', Delta: '\\Delta', Gamma: '\\Gamma',
+  Omega: '\\Omega', Pi: '\\Pi', Lambda: '\\Lambda',
+}
+const GREEK_PAT = Object.keys(GREEK).sort((a, b) => b.length - a.length).join('|')
+const K_OPEN = '\x00K<'
+const K_CLOSE = '>\x00'
+
+function texify(expr: string): string {
+  let s = expr
+  s = s.replace(new RegExp(`\\b(${GREEK_PAT})\\b`, 'g'), m => GREEK[m] || m)
+  s = s.replace(/(\w)_\{([^}]+)\}/g, '$1_{$2}')
+  s = s.replace(/(\w)_([A-Za-z0-9]+)/g, '$1_{$2}')
+  s = s.replace(/(\w)\^\{([^}]+)\}/g, '$1^{$2}')
+  s = s.replace(/(\w)\^(\w+)/g, '$1^{$2}')
+  s = s.replace(/->/g, '\\to ')
+  s = s.replace(/\s~\s/g, ' \\approx ')
+  return s
+}
+
+function escapeHtml(s: string) {
+  return s.replace(/&/g, '&amp;')
+}
+
+function safeKatex(tex: string): string {
+  try {
+    const html = katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false })
+    return K_OPEN + html + K_CLOSE
+  } catch { return tex }
+}
+
+function autoDetectMath(html: string): string {
+  html = html.replace(/\b([A-Za-z_]\w*(?:[_^]\w+)?)\s*=\s*([^,.\n]{3,60}?)(?=[,.\s]|$)/g, (match) => {
+    if (match.includes(K_OPEN)) return match
+    if (new RegExp(`\\b(${GREEK_PAT})\\b`).test(match) || /[\^_]/.test(match)) {
+      return safeKatex(texify(match))
+    }
+    return match
+  })
+  html = html.replace(/\b([A-Za-z]\w*(?:[_^]\{?[\w,+-]+\}?)+)/g, (match) => {
+    if (match.includes(K_OPEN)) return match
+    return safeKatex(texify(match))
+  })
+  html = html.replace(new RegExp(`\\b(${GREEK_PAT})\\s*([<>≤≥≈]=?\\s*-?\\d+\\.?\\d*)`, 'g'),
+    (match) => {
+      if (match.includes(K_OPEN)) return match
+      return safeKatex(texify(match))
+    })
+  html = html.replace(new RegExp(`(?<![\\w])\\b(${GREEK_PAT})\\b(?![\\w])`, 'g'),
+    (match, _g, offset) => {
+      const before = html.slice(Math.max(0, offset - 100), offset)
+      if (before.includes(K_OPEN) && !before.includes(K_CLOSE)) return match
+      return safeKatex(texify(match))
+    })
+  html = html.replace(/\x00K</g, '').replace(/>\x00/g, '')
+  return html
+}
+
 const rendered = computed(() => {
   if (!props.text) return ''
 
-  // Split on **Proof.** to separate statement from proof sketch
   const proofMarker = '**Proof.**'
   const markerIdx = props.text.indexOf(proofMarker)
 
@@ -39,7 +102,11 @@ function renderBlock(text: string) {
   let html = escapeHtml(text)
 
   // Display math: $$...$$
-  html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_match, tex) => renderKatex(tex, true))
+  html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_match, tex) => {
+    try {
+      return katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false })
+    } catch { return tex }
+  })
 
   // Inline math: $...$
   html = html.replace(/(?<!\$)\$(?!\$)(.*?)\$/g, (_match, tex) => safeKatex(tex))
