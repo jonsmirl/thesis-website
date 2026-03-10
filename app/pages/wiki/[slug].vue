@@ -237,7 +237,7 @@ useHead({
 .test-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
 .test-table th { text-align: left; font-size: 0.75rem; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.03em; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--color-border-light); }
 .test-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--color-border-light); vertical-align: middle; }
-.test-table td a { color: var(--color-link); text-decoration: none; }
+.test-table td a { color: var(--color-success); text-decoration: none; }
 .test-table td a:hover { text-decoration: underline; }
 .test-thumb { display: block; width: 80px; }
 .test-thumb img { width: 100%; aspect-ratio: 16/10; object-fit: contain; background: var(--color-bg-code); border-radius: var(--radius-sm); border: 1px solid var(--color-border-light); }
