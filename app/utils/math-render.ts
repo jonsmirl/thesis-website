@@ -30,9 +30,9 @@ export function texify(expr: string): string {
   return s
 }
 
-/** Escape only ampersands (trusted content like Lean docstrings) */
+/** Escape HTML entities (ampersands, angle brackets) */
 export function escapeHtml(s: string): string {
-  return s.replace(/&/g, '&amp;')
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 /** Escape all HTML entities (untrusted content) */
@@ -44,10 +44,15 @@ export function escapeHtmlFull(s: string): string {
     .replace(/"/g, '&quot;')
 }
 
+/** Unescape HTML entities back to raw characters (for KaTeX input) */
+export function unescapeHtml(s: string): string {
+  return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+}
+
 /** Render LaTeX to HTML via KaTeX */
 export function renderKatex(tex: string, displayMode = false): string {
   try {
-    return katex.renderToString(tex.trim(), {
+    return katex.renderToString(unescapeHtml(tex.trim()), {
       displayMode,
       throwOnError: false,
       output: 'html',
@@ -79,11 +84,13 @@ export function autoDetectMath(html: string): string {
     return safeKatex(texify(match))
   })
 
-  // 3. Greek + comparison: "rho < 1", "sigma < 2"
-  html = html.replace(new RegExp(`\\b(${GREEK_PAT})\\s*([<>≤≥≈]=?\\s*-?\\d+\\.?\\d*)`, 'g'),
+  // 3. Greek + comparison: "rho < 1", "sigma < 2" (handles both raw and HTML-escaped angle brackets)
+  html = html.replace(new RegExp(`\\b(${GREEK_PAT})\\s*(?:(&lt;|&gt;|[<>≤≥≈])=?\\s*-?\\d+\\.?\\d*)`, 'g'),
     (match) => {
       if (match.includes(K_OPEN)) return match
-      return safeKatex(texify(match))
+      // Unescape HTML entities before texifying
+      const raw = match.replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      return safeKatex(texify(raw))
     })
 
   // 4. Standalone Greek letters not already rendered
