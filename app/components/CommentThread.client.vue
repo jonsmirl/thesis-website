@@ -53,7 +53,7 @@ const props = defineProps<{
   contentSlug: string
 }>()
 
-const user = useSupabaseUser()
+const { user } = useAuth()
 const { comments, myVotes, loading, fetchComments, addComment, editComment, deleteComment, vote, flag } =
   useComments(props.contentType, props.contentSlug)
 

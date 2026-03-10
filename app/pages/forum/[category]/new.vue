@@ -67,7 +67,7 @@
 <script setup lang="ts">
 const route = useRoute()
 const router = useRouter()
-const user = useSupabaseUser()
+const { user } = useAuth()
 const { fetchCategories, createTopic } = useForum()
 
 const categorySlug = computed(() => route.params.category as string)

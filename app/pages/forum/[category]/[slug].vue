@@ -111,7 +111,7 @@
 import { autoDetectMath } from '~/utils/math-render'
 
 const route = useRoute()
-const user = useSupabaseUser()
+const { user } = useAuth()
 const { fetchTopic, fetchPosts, fetchMyVotes, createPost, updateTopic, updatePost, vote: castVote } = useForum()
 
 const topic = ref<any>(null)

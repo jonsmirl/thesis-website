@@ -31,8 +31,8 @@
         </form>
       </template>
       <template v-else-if="mode === 'confirming'">
-        <h1>Confirming...</h1>
-        <p class="subtitle">Processing your authentication link.</p>
+        <h1>Signing you in...</h1>
+        <p class="subtitle">Processing your authentication.</p>
         <p v-if="error" class="error">{{ error }}</p>
       </template>
       <template v-else>
@@ -46,7 +46,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: false })
 
-const client = useSupabaseClient()
+const cookieClient = useSupabaseClient()
 const mode = ref<'confirming' | 'recovery' | 'done'>('confirming')
 const newPassword = ref('')
 const confirmPassword = ref('')
@@ -55,28 +55,71 @@ const error = ref('')
 const success = ref('')
 
 onMounted(async () => {
-  // Supabase sends recovery tokens via URL hash fragment:
-  // /confirm#access_token=...&type=recovery
   const hash = window.location.hash.substring(1)
   const params = new URLSearchParams(hash)
   const type = params.get('type')
+  const accessToken = params.get('access_token')
+  const refreshToken = params.get('refresh_token')
 
+  // Recovery flow (password reset)
   if (type === 'recovery') {
-    // Supabase client auto-detects the hash and sets the session
-    // Wait for it to process
-    const { data, error: err } = await client.auth.getSession()
+    const { data, error: err } = await cookieClient.auth.getSession()
     if (err || !data.session) {
       error.value = 'Recovery link expired or invalid. Please request a new one.'
       return
     }
     mode.value = 'recovery'
-  } else {
-    // Regular email confirmation — redirect to home
-    const { data } = await client.auth.getSession()
-    if (data.session) {
-      mode.value = 'done'
-      navigateTo('/')
+    return
+  }
+
+  // OAuth implicit flow — access_token in hash fragment
+  if (accessToken) {
+    try {
+      const authClient = useAuthClient()
+
+      // Set session from hash tokens
+      const { data, error: setErr } = await authClient.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken || '',
+      })
+
+      if (data?.session?.user) {
+        // Ensure community profile exists via Edge Function
+        try {
+          const config = useRuntimeConfig()
+          await $fetch(`${config.public.supabase.url}/functions/v1/ensure-profile`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${data.session.access_token}`,
+              'Content-Type': 'application/json',
+              'apikey': config.public.supabase.key,
+            },
+          })
+        } catch (e) {
+          // Profile may already exist, not fatal
+          console.warn('[Confirm] ensure-profile:', e)
+        }
+
+        mode.value = 'done'
+        navigateTo('/')
+        return
+      }
+
+      if (setErr) {
+        error.value = 'Authentication failed. Please try again.'
+        return
+      }
+    } catch (err: any) {
+      error.value = err.message || 'Authentication failed.'
+      return
     }
+  }
+
+  // Regular email confirmation
+  const { data } = await cookieClient.auth.getSession()
+  if (data.session) {
+    mode.value = 'done'
+    navigateTo('/')
   }
 })
 
@@ -94,7 +137,7 @@ async function handleReset() {
   }
 
   loading.value = true
-  const { error: err } = await client.auth.updateUser({
+  const { error: err } = await cookieClient.auth.updateUser({
     password: newPassword.value,
   })
   if (err) {

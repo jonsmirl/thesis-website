@@ -88,7 +88,7 @@ const emit = defineEmits<{
   edit: [id: string, body: string]
 }>()
 
-const user = useSupabaseUser()
+const { user } = useAuth()
 const canVote = computed(() => !!user.value)
 
 const showReply = ref(false)

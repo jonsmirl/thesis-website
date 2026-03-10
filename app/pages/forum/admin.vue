@@ -7,7 +7,7 @@
       <h1>Forum Moderation</h1>
 
       <div v-if="!isMod" class="access-denied">
-        Moderator access required.
+        Editor or superuser access required.
       </div>
 
       <template v-else>
@@ -74,15 +74,15 @@
 </template>
 
 <script setup lang="ts">
-const client = useSupabaseClient()
-const user = useSupabaseUser()
+const { getClient } = useAuth()
+const { isEditor, isSuperuser } = useRole()
 const { moderate } = useForum()
 
 const tab = ref<'topics' | 'posts'>('topics')
 const topics = ref<any[]>([])
 const recentPosts = ref<any[]>([])
 const loading = ref(true)
-const isMod = ref(false)
+const isMod = computed(() => isEditor.value || isSuperuser.value)
 
 function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + '...' : s
@@ -103,6 +103,7 @@ function timeAgo(dateStr: string) {
 async function loadData() {
   loading.value = true
   try {
+    const client = await getClient()
     const { data: t } = await client
       .from('forum_topics')
       .select('*, community_profiles(handle), forum_categories(slug)')
@@ -130,16 +131,17 @@ async function doModerate(action: string, targetType: string, targetId: string) 
 }
 
 onMounted(async () => {
-  if (user.value) {
-    const { data } = await client
-      .from('community_profiles')
-      .select('role')
-      .eq('user_id', user.value.id)
-      .maybeSingle()
-    isMod.value = data?.role === 'moderator' || data?.role === 'admin'
+  // Wait for role check to resolve
+  const checkAndLoad = async () => {
+    if (isMod.value) {
+      await loadData()
+    } else {
+      loading.value = false
+    }
   }
-  if (isMod.value) await loadData()
-  else loading.value = false
+
+  // Give role check time to complete
+  setTimeout(checkAndLoad, 500)
 })
 
 useHead({ title: 'Forum Admin — CES Formalization' })

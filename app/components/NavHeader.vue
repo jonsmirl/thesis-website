@@ -3,15 +3,18 @@
     <div class="nav-inner">
       <NuxtLink to="/" class="logo">CES Formalization</NuxtLink>
       <nav>
-        <NuxtLink to="/wiki">Wiki</NuxtLink>
         <NuxtLink to="/papers">Papers</NuxtLink>
+        <NuxtLink to="/wiki">Wiki</NuxtLink>
         <NuxtLink to="/theorems">Theorems</NuxtLink>
         <NuxtLink to="/tests">Tests</NuxtLink>
         <NuxtLink to="/forum">Forum</NuxtLink>
       </nav>
-      <div class="user-bar" v-if="user">
-        <span class="email">{{ user.email }}</span>
-        <NuxtLink to="/account" class="account-link">Password</NuxtLink>
+      <div class="user-bar" v-if="currentUser">
+        <span class="email">{{ displayName }}</span>
+        <span v-if="isSuperuser" class="role-badge superuser">superuser</span>
+        <span v-else-if="isEditor" class="role-badge editor">editor</span>
+        <NuxtLink v-if="isSuperuser" to="/admin/users" class="account-link">Admin</NuxtLink>
+        <NuxtLink to="/account" class="account-link">Account</NuxtLink>
         <button @click="handleLogout">Sign out</button>
       </div>
     </div>
@@ -19,11 +22,24 @@
 </template>
 
 <script setup lang="ts">
-const user = useSupabaseUser()
-const client = useSupabaseClient()
+const { getUser, signOut } = useAuth()
+const { isSuperuser, isEditor } = useRole()
+
+const currentUser = ref<any>(null)
+const displayName = computed(() => currentUser.value?.email || '')
+
+onMounted(async () => {
+  currentUser.value = await getUser()
+})
+
+// Also watch cookie user for reactivity on email login
+const cookieUser = useSupabaseUser()
+watch(cookieUser, async () => {
+  currentUser.value = await getUser()
+})
 
 async function handleLogout() {
-  await client.auth.signOut()
+  await signOut()
   navigateTo('/login')
 }
 </script>
@@ -76,6 +92,22 @@ nav a.router-link-active {
   font-size: 0.8rem;
 }
 .email { color: var(--color-text-faint); }
+.role-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  padding: 0.1rem 0.35rem;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.role-badge.superuser {
+  background: var(--color-marquee-bg);
+  color: var(--color-marquee-fg);
+}
+.role-badge.editor {
+  background: var(--color-pending-bg);
+  color: var(--color-pending-fg);
+}
 .user-bar button {
   padding: 0.25rem 0.5rem;
   background: none;

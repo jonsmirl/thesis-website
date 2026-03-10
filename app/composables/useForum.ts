@@ -1,16 +1,10 @@
 export function useForum() {
-  const client = useSupabaseClient()
-  const user = useSupabaseUser()
+  const { getClient, getAuthHeaders: getUnifiedAuthHeaders, getUser } = useAuth()
+  // Keep a cookie client reference for non-auth reads (public forum data)
+  const cookieClient = useSupabaseClient()
 
   async function getAuthHeaders() {
-    const config = useRuntimeConfig()
-    const { data: { session } } = await client.auth.getSession()
-    if (!session) throw new Error('Not authenticated')
-    return {
-      'Authorization': `Bearer ${session.access_token}`,
-      'Content-Type': 'application/json',
-      'apikey': config.public.supabase.key,
-    }
+    return await getUnifiedAuthHeaders()
   }
 
   function getBaseUrl() {
@@ -21,7 +15,7 @@ export function useForum() {
   // ── Categories ────────────────────────────────────────────
 
   async function fetchCategories() {
-    const { data, error } = await client
+    const { data, error } = await cookieClient
       .from('forum_categories')
       .select('*')
       .order('sort_order', { ascending: true })
@@ -29,14 +23,14 @@ export function useForum() {
 
     // Get topic counts per category
     const categories = await Promise.all((data || []).map(async (cat: any) => {
-      const { count } = await client
+      const { count } = await cookieClient
         .from('forum_topics')
         .select('*', { count: 'exact', head: true })
         .eq('category_id', cat.id)
         .eq('is_deleted', false)
 
       // Get latest topic
-      const { data: latest } = await client
+      const { data: latest } = await cookieClient
         .from('forum_topics')
         .select('title, slug, last_activity_at')
         .eq('category_id', cat.id)
@@ -63,14 +57,14 @@ export function useForum() {
     const { sort = 'active', page = 1, limit = 25 } = opts
 
     // Resolve category
-    const { data: cat } = await client
+    const { data: cat } = await cookieClient
       .from('forum_categories')
       .select('id')
       .eq('slug', categorySlug)
       .single()
     if (!cat) throw new Error('Category not found')
 
-    let query = client
+    let query = cookieClient
       .from('forum_topics')
       .select('*, community_profiles(handle, display_name)', { count: 'exact' })
       .eq('category_id', cat.id)
@@ -89,7 +83,7 @@ export function useForum() {
   }
 
   async function fetchTopic(categorySlug: string, topicSlug: string) {
-    const { data: topic, error } = await client
+    const { data: topic, error } = await cookieClient
       .from('forum_topics')
       .select('*, community_profiles(handle, display_name), forum_categories(name, slug)')
       .eq('slug', topicSlug)
@@ -98,7 +92,7 @@ export function useForum() {
     if (error) throw error
 
     // Increment view count (fire-and-forget)
-    client
+    cookieClient
       .from('forum_topics')
       .update({ view_count: (topic.view_count || 0) + 1 })
       .eq('id', topic.id)
@@ -108,7 +102,7 @@ export function useForum() {
   }
 
   async function fetchPosts(topicId: string) {
-    const { data, error } = await client
+    const { data, error } = await cookieClient
       .from('forum_posts')
       .select('*, community_profiles(handle, display_name)')
       .eq('topic_id', topicId)
@@ -119,11 +113,13 @@ export function useForum() {
   }
 
   async function fetchMyVotes(targetType: 'topic' | 'post', targetIds: string[]) {
-    if (!user.value || !targetIds.length) return {}
+    const user = await getUser()
+    if (!user || !targetIds.length) return {}
+    const client = await getClient()
     const { data } = await client
       .from('forum_votes')
       .select('target_id, value')
-      .eq('user_id', user.value.id)
+      .eq('user_id', user.id)
       .eq('target_type', targetType)
       .in('target_id', targetIds)
     const map: Record<string, number> = {}
@@ -200,7 +196,7 @@ export function useForum() {
   // ── Cross-linking helper ──────────────────────────────────
 
   async function fetchRelatedTopics(relatedType: string, relatedSlug: string) {
-    const { data, error } = await client
+    const { data, error } = await cookieClient
       .from('forum_topics')
       .select('id, title, slug, reply_count, vote_score, forum_categories(slug)')
       .eq('related_type', relatedType)

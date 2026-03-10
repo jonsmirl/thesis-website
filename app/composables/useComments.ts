@@ -1,6 +1,6 @@
 export function useComments(contentType: string, contentSlug: string) {
   const client = useSupabaseClient()
-  const user = useSupabaseUser()
+  const { user } = useAuth()
 
   const comments = ref<any[]>([])
   const myVotes = ref<Record<string, number>>({})
