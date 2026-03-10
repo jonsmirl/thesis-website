@@ -62,7 +62,7 @@
 
         <!-- Right sidebar: Related content -->
         <aside class="related-sidebar" v-if="hasRelated || paper.body_md">
-          <div v-if="paper.body_md" class="related-block">
+          <div v-if="paper.body_md && paper.target_journal !== 'Introductory'" class="related-block">
             <a :href="`/papers/pdf/${slug}.pdf`" class="pdf-btn" download>PDF Download</a>
           </div>
 
