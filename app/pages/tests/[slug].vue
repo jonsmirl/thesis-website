@@ -20,6 +20,14 @@
         <TestDoc :text="test.description" />
       </div>
 
+      <div v-if="testFigures?.length" class="section test-figures">
+        <h3>Figures</h3>
+        <NuxtLink v-for="fig in testFigures" :key="fig.slug" :to="`/figures/${fig.slug}`" class="test-figure">
+          <img :src="fig.public_url" :alt="fig.title" loading="lazy" />
+          <span class="test-figure-caption">{{ fig.title }}</span>
+        </NuxtLink>
+      </div>
+
       <div v-if="predictionVerdicts && Object.keys(predictionVerdicts).length" class="section">
         <h3>Prediction Verdicts</h3>
         <div class="verdict-grid">
@@ -64,16 +72,6 @@
         <ul class="data-sources">
           <li v-for="ds in test.data_sources" :key="ds">{{ ds }}</li>
         </ul>
-      </div>
-
-      <div v-if="testFigures?.length" class="section">
-        <h3>Figures</h3>
-        <div class="figure-grid">
-          <NuxtLink v-for="fig in testFigures" :key="fig.slug" :to="`/figures/${fig.slug}`" class="figure-thumb">
-            <img :src="fig.public_url" :alt="fig.title" loading="lazy" />
-            <span class="figure-thumb-title">{{ fig.title }}</span>
-          </NuxtLink>
-        </div>
       </div>
 
       <CommentThread content-type="test" :content-slug="(route.params.slug as string)" />
@@ -180,9 +178,8 @@ function formatStatVal(v: any): string {
 .data-sources li { font-size: 0.9rem; margin: 0.25rem 0; color: var(--color-text-secondary); }
 .collapse-toggle { background: none; border: none; cursor: pointer; font: inherit; color: inherit; padding: 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--color-text-muted); }
 .collapse-toggle:hover { color: var(--color-text-primary); }
-.figure-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
-.figure-thumb { display: block; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.15s; }
-.figure-thumb:hover { border-color: var(--color-link); }
-.figure-thumb img { width: 100%; aspect-ratio: 16/10; object-fit: contain; background: var(--color-bg-code); }
-.figure-thumb-title { display: block; padding: 0.4rem 0.6rem; font-size: 0.8rem; font-weight: 500; color: var(--color-text-secondary); }
+.test-figures { margin-top: 1rem; }
+.test-figure { display: block; margin-bottom: 1.5rem; text-decoration: none; color: inherit; }
+.test-figure img { width: 100%; border-radius: var(--radius-md); border: 1px solid var(--color-border-light); background: var(--color-bg-code); }
+.test-figure-caption { display: block; margin-top: 0.4rem; font-size: 0.85rem; color: var(--color-text-tertiary); font-style: italic; }
 </style>
