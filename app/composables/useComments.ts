@@ -10,7 +10,7 @@ export function useComments(contentType: string, contentSlug: string) {
     loading.value = true
     const { data } = await client
       .from('comments')
-      .select('*, community_profiles(display_name, institution, reputation)')
+      .select('*, community_profiles!comments_user_id_profile_fkey(handle, display_name, institution, reputation)')
       .eq('content_type', contentType)
       .eq('content_slug', contentSlug)
       .eq('is_deleted', false)
@@ -33,24 +33,42 @@ export function useComments(contentType: string, contentSlug: string) {
 
   async function addComment(body: string, parentId?: string) {
     if (!user.value) return
-    const row: any = {
-      content_type: contentType,
-      content_slug: contentSlug,
-      user_id: user.value.id,
-      body,
-    }
-    if (parentId) row.parent_id = parentId
-    const { error } = await client.from('comments').insert(row)
-    if (error) throw error
+
+    const config = useRuntimeConfig()
+    const { data: { session } } = await client.auth.getSession()
+    if (!session) throw new Error('Not authenticated')
+
+    await $fetch(`${config.public.supabase.url}/functions/v1/create-comment`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+        'apikey': config.public.supabase.key,
+      },
+      body: {
+        content_type: contentType,
+        content_slug: contentSlug,
+        parent_id: parentId,
+        body,
+      },
+    })
     await fetchComments()
   }
 
   async function editComment(id: string, body: string) {
-    const { error } = await client
-      .from('comments')
-      .update({ body, is_edited: true, edited_at: new Date().toISOString() })
-      .eq('id', id)
-    if (error) throw error
+    const config = useRuntimeConfig()
+    const { data: { session } } = await client.auth.getSession()
+    if (!session) throw new Error('Not authenticated')
+
+    await $fetch(`${config.public.supabase.url}/functions/v1/update-comment`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json',
+        'apikey': config.public.supabase.key,
+      },
+      body: { comment_id: id, body },
+    })
     await fetchComments()
   }
 
@@ -68,7 +86,7 @@ export function useComments(contentType: string, contentSlug: string) {
     const existing = myVotes.value[commentId]
 
     if (existing === value) {
-      // Toggle off — remove vote
+      // Toggle off
       await client
         .from('comment_votes')
         .delete()
@@ -77,7 +95,6 @@ export function useComments(contentType: string, contentSlug: string) {
       delete myVotes.value[commentId]
     } else {
       if (existing) {
-        // Remove old vote first, then insert new
         await client
           .from('comment_votes')
           .delete()

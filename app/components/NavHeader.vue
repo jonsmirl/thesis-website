@@ -7,6 +7,7 @@
         <NuxtLink to="/papers">Papers</NuxtLink>
         <NuxtLink to="/theorems">Theorems</NuxtLink>
         <NuxtLink to="/tests">Tests</NuxtLink>
+        <NuxtLink to="/forum">Forum</NuxtLink>
       </nav>
       <div class="user-bar" v-if="user">
         <span class="email">{{ user.email }}</span>
