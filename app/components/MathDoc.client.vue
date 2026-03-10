@@ -40,7 +40,7 @@ function escapeHtml(s: string) {
 
 function safeKatex(tex: string): string {
   try {
-    const html = katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false })
+    const html = katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false, output: 'html' })
     return K_OPEN + html + K_CLOSE
   } catch { return tex }
 }
@@ -104,7 +104,7 @@ function renderBlock(text: string) {
   // Display math: $$...$$
   html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_match, tex) => {
     try {
-      return katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false })
+      return katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false, output: 'html' })
     } catch { return tex }
   })
 

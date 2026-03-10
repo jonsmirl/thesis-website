@@ -50,6 +50,7 @@ export function renderKatex(tex: string, displayMode = false): string {
     return katex.renderToString(tex.trim(), {
       displayMode,
       throwOnError: false,
+      output: 'html',
     })
   } catch {
     return tex
