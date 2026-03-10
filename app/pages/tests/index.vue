@@ -24,19 +24,19 @@
 
     <template v-else>
       <div class="scorecard">
-        <div class="score-item score-item--consistent">
+        <div class="score-item score-item--consistent" :class="{ 'score-item--active': filterStatus === 'CONSISTENT' }" @click="toggleStatus('CONSISTENT')">
           <span class="score-count">{{ statusCount('CONSISTENT') }}</span>
           <span class="score-label">Consistent</span>
         </div>
-        <div class="score-item score-item--ambiguous">
+        <div class="score-item score-item--ambiguous" :class="{ 'score-item--active': filterStatus === 'AMBIGUOUS' }" @click="toggleStatus('AMBIGUOUS')">
           <span class="score-count">{{ statusCount('AMBIGUOUS') }}</span>
           <span class="score-label">Ambiguous</span>
         </div>
-        <div class="score-item score-item--inconsistent">
+        <div class="score-item score-item--inconsistent" :class="{ 'score-item--active': filterStatus === 'INCONSISTENT' }" @click="toggleStatus('INCONSISTENT')">
           <span class="score-count">{{ statusCount('INCONSISTENT') }}</span>
           <span class="score-label">Inconsistent</span>
         </div>
-        <div class="score-item score-item--pending">
+        <div class="score-item score-item--pending" :class="{ 'score-item--active': filterStatus === 'PENDING' }" @click="toggleStatus('PENDING')">
           <span class="score-count">{{ statusCount('PENDING') }}</span>
           <span class="score-label">Pending</span>
         </div>
@@ -122,6 +122,10 @@ const filtered = computed(() => {
   return [...result].sort((a, b) => formatName(a.name).localeCompare(formatName(b.name)))
 })
 
+function toggleStatus(status: string) {
+  filterStatus.value = filterStatus.value === status ? '' : status
+}
+
 function statusCount(status: string) {
   return (tests.value || []).filter(t => t.status === status).length
 }
@@ -143,7 +147,9 @@ function topStats(stats: Record<string, any>) {
 <style scoped>
 .page-header--flex { display: flex; justify-content: space-between; align-items: center; }
 .scorecard { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
-.score-item { flex: 1; min-width: 120px; padding: 1rem; border-radius: var(--radius-lg); text-align: center; }
+.score-item { flex: 1; min-width: 120px; padding: 1rem; border-radius: var(--radius-lg); text-align: center; cursor: pointer; transition: box-shadow 0.15s, transform 0.15s; }
+.score-item:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.score-item--active { box-shadow: 0 0 0 2px var(--color-text-primary); }
 .score-item--consistent { background: var(--color-consistent-bg); }
 .score-item--ambiguous { background: var(--color-ambiguous-bg); }
 .score-item--inconsistent { background: var(--color-inconsistent-bg); }
