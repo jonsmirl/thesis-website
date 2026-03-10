@@ -61,7 +61,11 @@
         </article>
 
         <!-- Right sidebar: Related content -->
-        <aside class="related-sidebar" v-if="hasRelated">
+        <aside class="related-sidebar" v-if="hasRelated || paper.body_md">
+          <div v-if="paper.body_md" class="related-block">
+            <a :href="`/papers/pdf/${slug}.pdf`" class="pdf-btn" download>PDF Download</a>
+          </div>
+
           <div v-if="relatedWiki?.length" class="related-block">
             <h3>Related Wiki Articles</h3>
             <NuxtLink
@@ -359,6 +363,21 @@ useHead({
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border-light);
 }
+
+.pdf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #fff;
+  background: var(--color-link);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+.pdf-btn:hover { opacity: 0.85; }
 
 .not-found { color: var(--color-text-faint); font-style: italic; }
 
