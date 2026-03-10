@@ -28,6 +28,16 @@
 
         <WikiDoc :text="page.body_md" />
 
+        <div v-if="wikiFigures?.length" class="wiki-figures">
+          <h3>Figures</h3>
+          <div class="figure-grid">
+            <NuxtLink v-for="fig in wikiFigures" :key="fig.slug" :to="`/figures/${fig.slug}`" class="figure-thumb">
+              <img :src="fig.public_url" :alt="fig.title" loading="lazy" />
+              <span class="figure-thumb-title">{{ fig.title }}</span>
+            </NuxtLink>
+          </div>
+        </div>
+
         <aside class="sidebar" v-if="hasRelated">
           <div v-if="relatedPages?.length" class="related-block">
             <h3>Related Articles</h3>
@@ -103,6 +113,15 @@ const { data: category } = await useAsyncData(`wiki-cat-${slug}`, async () => {
     .single()
   if (error) return null
   return data
+})
+
+const { data: wikiFigures } = await useAsyncData(`wiki-figures-${slug}`, async () => {
+  const { data } = await client
+    .from('figure_wiki_pages')
+    .select('figure_id, figures(slug, title, public_url)')
+    .eq('wiki_slug', slug)
+    .order('sort_order')
+  return data?.map((fw: any) => fw.figures).filter(Boolean) || []
 })
 
 const { data: relatedPages } = await useAsyncData(`wiki-related-${slug}`, async () => {
@@ -194,4 +213,11 @@ useHead({
 .related-link.paper { color: var(--color-warning); }
 
 .not-found { color: var(--color-text-faint); font-style: italic; }
+.wiki-figures { margin: 2rem 0; }
+.wiki-figures h3 { font-size: 0.85rem; color: var(--color-text-tertiary); margin: 0 0 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }
+.figure-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
+.figure-thumb { display: block; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.15s; }
+.figure-thumb:hover { border-color: var(--color-link); }
+.figure-thumb img { width: 100%; aspect-ratio: 16/10; object-fit: contain; background: var(--color-bg-code); }
+.figure-thumb-title { display: block; padding: 0.4rem 0.6rem; font-size: 0.8rem; font-weight: 500; color: var(--color-text-secondary); }
 </style>

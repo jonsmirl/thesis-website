@@ -65,6 +65,17 @@
           <li v-for="ds in test.data_sources" :key="ds">{{ ds }}</li>
         </ul>
       </div>
+
+      <div v-if="testFigures?.length" class="section">
+        <h3>Figures</h3>
+        <div class="figure-grid">
+          <NuxtLink v-for="fig in testFigures" :key="fig.slug" :to="`/figures/${fig.slug}`" class="figure-thumb">
+            <img :src="fig.public_url" :alt="fig.title" loading="lazy" />
+            <span class="figure-thumb-title">{{ fig.title }}</span>
+          </NuxtLink>
+        </div>
+      </div>
+
       <CommentThread content-type="test" :content-slug="(route.params.slug as string)" />
     </div>
     <div v-else>
@@ -104,6 +115,16 @@ const { data: test } = await useAsyncData(`test-${route.params.slug}`, async () 
     .single()
   if (error) return null
   return data
+})
+
+const { data: testFigures } = await useAsyncData(`test-figures-${route.params.slug}`, async () => {
+  if (!test.value) return []
+  const { data } = await client
+    .from('figure_tests')
+    .select('figure_id, figures(slug, title, public_url)')
+    .eq('test_slug', route.params.slug)
+    .order('sort_order')
+  return data?.map((ft: any) => ft.figures).filter(Boolean) || []
 })
 
 const predictionVerdicts = computed(() => {
@@ -159,4 +180,9 @@ function formatStatVal(v: any): string {
 .data-sources li { font-size: 0.9rem; margin: 0.25rem 0; color: var(--color-text-secondary); }
 .collapse-toggle { background: none; border: none; cursor: pointer; font: inherit; color: inherit; padding: 0; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; color: var(--color-text-muted); }
 .collapse-toggle:hover { color: var(--color-text-primary); }
+.figure-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 0.75rem; }
+.figure-thumb { display: block; border: 1px solid var(--color-border-light); border-radius: var(--radius-md); overflow: hidden; text-decoration: none; color: inherit; transition: border-color 0.15s; }
+.figure-thumb:hover { border-color: var(--color-link); }
+.figure-thumb img { width: 100%; aspect-ratio: 16/10; object-fit: contain; background: var(--color-bg-code); }
+.figure-thumb-title { display: block; padding: 0.4rem 0.6rem; font-size: 0.8rem; font-weight: 500; color: var(--color-text-secondary); }
 </style>
