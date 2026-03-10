@@ -13,7 +13,24 @@ const rendered = computed(() => {
 })
 
 function renderMarkdown(text: string) {
-  let html = escapeHtml(text)
+  // Extract images before escapeHtml (they contain URLs that shouldn't be escaped)
+  const imagePlaceholders: string[] = []
+  let processed = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_match, alt, url) => {
+    const idx = imagePlaceholders.length
+    const caption = alt || ''
+    imagePlaceholders.push(
+      `<figure class="wiki-figure">` +
+      `<img src="${url}" alt="${caption}" loading="lazy">` +
+      (caption ? `<figcaption>${caption}</figcaption>` : '') +
+      `</figure>`
+    )
+    return `%%IMG_${idx}%%`
+  })
+
+  let html = escapeHtml(processed)
+
+  // Restore image placeholders
+  html = html.replace(/%%IMG_(\d+)%%/g, (_match, idx) => imagePlaceholders[parseInt(idx)])
 
   // Display math: $$...$$
   html = html.replace(/\$\$([\s\S]*?)\$\$/g, (_match, tex) => renderKatex(tex, true))
@@ -113,6 +130,22 @@ function renderMarkdown(text: string) {
 }
 .wiki-doc .wiki-link:hover {
   border-bottom-style: solid;
+}
+.wiki-doc .wiki-figure {
+  margin: 1.25rem 0;
+  text-align: center;
+}
+.wiki-doc .wiki-figure img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-light);
+}
+.wiki-doc .wiki-figure figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
 }
 .wiki-doc .wiki-table {
   border-collapse: collapse;
