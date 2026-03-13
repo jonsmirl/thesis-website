@@ -115,7 +115,7 @@ const scoreMap = computed(() => {
   return map
 })
 
-const sortByImpact = ref(false)
+const sortByImpact = ref(true)
 
 function scoreBadgeClass(score: number) {
   if (score >= 80) return 'badge--score-high'
