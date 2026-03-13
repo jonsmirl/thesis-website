@@ -19,8 +19,34 @@
               {{ category.title }}
             </span>
             <span class="demo-indicator" v-if="page.demo_component">Interactive Demo</span>
+            <span v-if="score" class="badge" :class="scoreBadgeClass">{{ score.impact_score.toFixed(1) }}</span>
           </div>
         </header>
+
+        <details v-if="score" class="score-panel">
+          <summary class="score-panel__toggle">Impact Score</summary>
+          <div class="score-panel__body">
+            <ScoreBar label="Economic Importance" :value="score.economic_importance" />
+            <ScoreBar label="Novelty" :value="score.novelty" />
+            <ScoreBar label="Theoretical Coverage" :value="score.theoretical_coverage" />
+            <ScoreBar label="Empirical Coverage" :value="score.empirical_coverage" />
+            <ScoreBar label="Article Quality" :value="score.article_quality" />
+          </div>
+          <details v-if="score.importance_reasoning || score.novelty_reasoning || score.quality_reasoning" class="score-reasoning">
+            <summary class="score-reasoning__toggle">Score Reasoning</summary>
+            <dl class="score-reasoning__list">
+              <template v-if="score.importance_reasoning">
+                <dt>Importance</dt><dd>{{ score.importance_reasoning }}</dd>
+              </template>
+              <template v-if="score.novelty_reasoning">
+                <dt>Novelty</dt><dd>{{ score.novelty_reasoning }}</dd>
+              </template>
+              <template v-if="score.quality_reasoning">
+                <dt>Quality</dt><dd>{{ score.quality_reasoning }}</dd>
+              </template>
+            </dl>
+          </details>
+        </details>
 
         <div v-if="page.demo_component" class="demo-section">
           <ClientOnly>
@@ -120,6 +146,23 @@ const { data: category } = await useAsyncData(`wiki-cat-${slug}`, async () => {
     .single()
   if (error) return null
   return data
+})
+
+const { data: score } = await useAsyncData(`wiki-score-${slug}`, async () => {
+  const { data, error } = await client
+    .from('wiki_scores')
+    .select('*')
+    .eq('wiki_slug', slug)
+    .single()
+  if (error) return null
+  return data
+})
+
+const scoreBadgeClass = computed(() => {
+  const s = score.value?.impact_score ?? 0
+  if (s >= 8) return 'badge--score-high'
+  if (s >= 5) return 'badge--score-medium'
+  return 'badge--score-low'
 })
 
 const { data: relatedTests } = await useAsyncData(`wiki-tests-${slug}`, async () => {
@@ -245,6 +288,52 @@ useHead({
 }
 
 .not-found { color: var(--color-text-faint); font-style: italic; }
+
+.score-panel {
+  margin: 1rem 0 1.5rem;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+}
+.score-panel__toggle {
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  user-select: none;
+}
+.score-panel__body {
+  padding: 0.5rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.score-reasoning {
+  border-top: 1px solid var(--color-border-light);
+}
+.score-reasoning__toggle {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  user-select: none;
+}
+.score-reasoning__list {
+  padding: 0 1rem 0.75rem;
+  margin: 0;
+  font-size: 0.8rem;
+}
+.score-reasoning__list dt {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-top: 0.4rem;
+}
+.score-reasoning__list dd {
+  margin: 0.1rem 0 0;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
 
 .empirical-tests { margin: 2rem 0; }
 .empirical-tests h3 { font-size: 0.85rem; color: var(--color-text-tertiary); margin: 0 0 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; }

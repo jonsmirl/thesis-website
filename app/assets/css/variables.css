@@ -88,6 +88,17 @@
   --color-confidence-low-fg: #9d174d;
   --color-confidence-low-border: #f9a8d4;
 
+  /* ── Colors: impact scores ── */
+  --color-score-high: #d97706;
+  --color-score-high-bg: #fef3c7;
+  --color-score-high-fg: #92400e;
+  --color-score-medium: #2563eb;
+  --color-score-medium-bg: #dbeafe;
+  --color-score-medium-fg: #1e40af;
+  --color-score-low: #059669;
+  --color-score-low-bg: #d1fae5;
+  --color-score-low-fg: #065f46;
+
   /* ── Colors: interactive ── */
   --color-btn-primary: #111;
   --color-btn-primary-hover: #333;
@@ -211,6 +222,16 @@
     --color-confidence-low-bg: #3d1232;
     --color-confidence-low-fg: #f9a8d4;
     --color-confidence-low-border: #9d174d;
+
+    --color-score-high: #f59e0b;
+    --color-score-high-bg: #3b2e00;
+    --color-score-high-fg: #fbbf24;
+    --color-score-medium: #60a5fa;
+    --color-score-medium-bg: #172554;
+    --color-score-medium-fg: #93c5fd;
+    --color-score-low: #34d399;
+    --color-score-low-bg: #022c22;
+    --color-score-low-fg: #6ee7b7;
 
     --color-btn-primary: #e6edf3;
     --color-btn-primary-hover: #c9d1d9;

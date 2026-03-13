@@ -5,14 +5,19 @@
       <div class="wiki-header">
         <h1>Economics Wiki</h1>
         <p class="subtitle">CES curvature theory explained for economists — interactive demos, cross-linked articles, no login required</p>
-        <div class="search-bar">
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search articles..."
-            class="search-input"
-            aria-label="Search wiki articles"
-          />
+        <div class="search-sort-row">
+          <div class="search-bar">
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search articles..."
+              class="search-input"
+              aria-label="Search wiki articles"
+            />
+          </div>
+          <button class="sort-toggle" @click="sortByImpact = !sortByImpact" :class="{ active: sortByImpact }">
+            {{ sortByImpact ? 'By Impact' : 'A\u2013Z' }}
+          </button>
         </div>
       </div>
 
@@ -51,13 +56,16 @@
           <p class="cat-desc" v-if="cat.description">{{ cat.description }}</p>
           <div class="cat-pages">
             <NuxtLink
-              v-for="page in pagesByCategory[cat.id]"
+              v-for="page in sortedPages(cat.id)"
               :key="page.slug"
               :to="`/wiki/${page.slug}`"
               class="page-link"
             >
               <InlineMath :text="page.title" />
               <span v-if="page.demo_component" class="demo-badge">3D</span>
+              <span v-if="scoreMap[page.slug]" class="badge" :class="scoreBadgeClass(scoreMap[page.slug])">
+                {{ scoreMap[page.slug].toFixed(1) }}
+              </span>
             </NuxtLink>
           </div>
         </div>
@@ -86,6 +94,36 @@ const { data: allPages } = await useAsyncData('wiki-pages-index', async () => {
   if (error) throw error
   return data || []
 })
+
+const { data: allScores } = await useAsyncData('wiki-scores-index', async () => {
+  const { data, error } = await client
+    .from('wiki_scores')
+    .select('wiki_slug, impact_score')
+  if (error) return []
+  return data || []
+})
+
+const scoreMap = computed(() => {
+  const map: Record<string, number> = {}
+  for (const s of allScores.value || []) {
+    map[s.wiki_slug] = s.impact_score
+  }
+  return map
+})
+
+const sortByImpact = ref(false)
+
+function scoreBadgeClass(score: number) {
+  if (score >= 8) return 'badge--score-high'
+  if (score >= 5) return 'badge--score-medium'
+  return 'badge--score-low'
+}
+
+function sortedPages(catId: number) {
+  const pages = pagesByCategory.value[catId] || []
+  if (!sortByImpact.value) return pages
+  return [...pages].sort((a, b) => (scoreMap.value[b.slug] || 0) - (scoreMap.value[a.slug] || 0))
+}
 
 const pagesByCategory = computed(() => {
   const map: Record<number, any[]> = {}
@@ -149,8 +187,14 @@ useHead({
   margin: 0 0 0.5rem;
   font-size: 1.5rem;
 }
-.search-bar {
+.search-sort-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   margin-top: 1rem;
+}
+.search-bar {
+  flex: 1;
 }
 .search-input {
   width: 100%;
@@ -164,6 +208,19 @@ useHead({
   color: var(--color-text-primary);
 }
 .search-input:focus { border-color: var(--color-link); }
+.sort-toggle {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border-input);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-page);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s, color 0.15s;
+}
+.sort-toggle:hover { border-color: var(--color-link); color: var(--color-text-primary); }
+.sort-toggle.active { border-color: var(--color-link); color: var(--color-link); font-weight: 600; }
 
 .search-results {
   margin-bottom: 2rem;

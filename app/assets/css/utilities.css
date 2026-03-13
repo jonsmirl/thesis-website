@@ -45,6 +45,9 @@
 .badge--confidence-high { background: var(--color-confidence-high-bg); color: var(--color-confidence-high-fg); border: 1px solid var(--color-confidence-high-border); }
 .badge--confidence-medium { background: var(--color-confidence-medium-bg); color: var(--color-confidence-medium-fg); border: 1px solid var(--color-confidence-medium-border); }
 .badge--confidence-low { background: var(--color-confidence-low-bg); color: var(--color-confidence-low-fg); border: 1px solid var(--color-confidence-low-border); }
+.badge--score-high { background: var(--color-score-high-bg); color: var(--color-score-high-fg); font-weight: 600; }
+.badge--score-medium { background: var(--color-score-medium-bg); color: var(--color-score-medium-fg); }
+.badge--score-low { background: var(--color-score-low-bg); color: var(--color-score-low-fg); }
 
 /* ── Pills (rounded badges) ── */
 .pill {
