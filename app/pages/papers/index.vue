@@ -18,6 +18,11 @@
         :class="{ active: activeTab === 'academic' }"
         @click="activeTab = 'academic'"
       >Academic Papers</button>
+      <button
+        class="tab"
+        :class="{ active: activeTab === 'speculative' }"
+        @click="activeTab = 'speculative'"
+      >Speculative</button>
     </div>
 
     <div class="paper-list">
@@ -57,7 +62,10 @@ const filteredPapers = computed(() => {
   if (activeTab.value === 'introductory') {
     return papers.value.filter((p: any) => p.target_journal === 'Introductory')
   }
-  return papers.value.filter((p: any) => p.target_journal !== 'Introductory')
+  if (activeTab.value === 'speculative') {
+    return papers.value.filter((p: any) => p.target_journal === 'Speculative')
+  }
+  return papers.value.filter((p: any) => p.target_journal !== 'Introductory' && p.target_journal !== 'Speculative')
 })
 
 function truncate(s: string, n: number) {
