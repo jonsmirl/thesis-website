@@ -54,20 +54,24 @@
             <span class="cat-count">{{ pageCounts[cat.id] || 0 }}</span>
           </div>
           <p class="cat-desc" v-if="cat.description">{{ cat.description }}</p>
-          <div class="cat-pages">
-            <NuxtLink
-              v-for="page in sortedPages(cat.id)"
-              :key="page.slug"
-              :to="`/wiki/${page.slug}`"
-              class="page-link"
-            >
-              <InlineMath :text="page.title" />
-              <span v-if="page.demo_component" class="demo-badge">3D</span>
-              <span v-if="scoreMap[page.slug]" class="badge" :class="scoreBadgeClass(scoreMap[page.slug])">
-                {{ scoreMap[page.slug].toFixed(1) }}
-              </span>
-            </NuxtLink>
-          </div>
+          <table class="cat-table">
+            <tbody>
+              <tr v-for="page in sortedPages(cat.id)" :key="page.slug">
+                <td class="score-col">
+                  <span v-if="scoreMap[page.slug]" class="badge" :class="scoreBadgeClass(scoreMap[page.slug])">
+                    {{ scoreMap[page.slug].toFixed(1) }}
+                  </span>
+                  <span v-else class="score-empty">&mdash;</span>
+                </td>
+                <td>
+                  <NuxtLink :to="`/wiki/${page.slug}`" class="page-link">
+                    <InlineMath :text="page.title" />
+                    <span v-if="page.demo_component" class="demo-badge">3D</span>
+                  </NuxtLink>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </main>
@@ -281,17 +285,28 @@ useHead({
   color: var(--color-text-muted);
   margin: 0 0 0.75rem;
 }
-.cat-pages {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+.cat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.cat-table td {
+  padding: 0.15rem 0;
+  vertical-align: middle;
+}
+.score-col {
+  width: 2.5rem;
+  text-align: center;
+  padding-right: 0.4rem !important;
+}
+.score-empty {
+  font-size: 0.7rem;
+  color: var(--color-text-ghost);
 }
 .page-link {
   font-size: 0.85rem;
   color: var(--color-link);
   text-decoration: none;
-  padding: 0.15rem 0;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.35rem;
 }
