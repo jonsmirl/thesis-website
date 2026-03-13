@@ -59,7 +59,7 @@
               <tr v-for="page in sortedPages(cat.id)" :key="page.slug">
                 <td class="score-col">
                   <span v-if="scoreMap[page.slug]" class="badge" :class="scoreBadgeClass(scoreMap[page.slug])">
-                    {{ scoreMap[page.slug].toFixed(1) }}
+                    {{ Math.round(scoreMap[page.slug]) }}
                   </span>
                   <span v-else class="score-empty">&mdash;</span>
                 </td>
@@ -118,8 +118,8 @@ const scoreMap = computed(() => {
 const sortByImpact = ref(false)
 
 function scoreBadgeClass(score: number) {
-  if (score >= 8) return 'badge--score-high'
-  if (score >= 5) return 'badge--score-medium'
+  if (score >= 80) return 'badge--score-high'
+  if (score >= 50) return 'badge--score-medium'
   return 'badge--score-low'
 }
 

@@ -19,7 +19,7 @@
               {{ category.title }}
             </span>
             <span class="demo-indicator" v-if="page.demo_component">Interactive Demo</span>
-            <span v-if="score" class="badge" :class="scoreBadgeClass">{{ score.impact_score.toFixed(1) }}</span>
+            <span v-if="score" class="badge" :class="scoreBadgeClass">{{ Math.round(score.impact_score) }}</span>
           </div>
         </header>
 
@@ -160,8 +160,8 @@ const { data: score } = await useAsyncData(`wiki-score-${slug}`, async () => {
 
 const scoreBadgeClass = computed(() => {
   const s = score.value?.impact_score ?? 0
-  if (s >= 8) return 'badge--score-high'
-  if (s >= 5) return 'badge--score-medium'
+  if (s >= 80) return 'badge--score-high'
+  if (s >= 50) return 'badge--score-medium'
   return 'badge--score-low'
 })
 
