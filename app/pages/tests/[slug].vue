@@ -12,6 +12,7 @@
         <div class="badges">
           <span class="badge" :class="`badge--${test.status?.toLowerCase()}`">{{ test.status }}</span>
           <span class="badge badge--paper" v-if="test.category">{{ CATEGORY_LABELS[test.category] || test.category }}</span>
+          <span v-if="test.confidence" class="badge" :class="`badge--confidence-${test.confidence.toLowerCase()}`">{{ test.confidence }} confidence</span>
         </div>
       </div>
 

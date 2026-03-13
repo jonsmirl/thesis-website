@@ -78,6 +78,16 @@
   --color-pending-bg: #f0f0f0;
   --color-pending-fg: #555;
 
+  --color-confidence-high-bg: #e0f2fe;
+  --color-confidence-high-fg: #0369a1;
+  --color-confidence-high-border: #7dd3fc;
+  --color-confidence-medium-bg: #fef9c3;
+  --color-confidence-medium-fg: #a16207;
+  --color-confidence-medium-border: #fde047;
+  --color-confidence-low-bg: #fce7f3;
+  --color-confidence-low-fg: #9d174d;
+  --color-confidence-low-border: #f9a8d4;
+
   /* ── Colors: interactive ── */
   --color-btn-primary: #111;
   --color-btn-primary-hover: #333;
@@ -191,6 +201,16 @@
 
     --color-pending-bg: #21262d;
     --color-pending-fg: #8b949e;
+
+    --color-confidence-high-bg: #0c2d48;
+    --color-confidence-high-fg: #7dd3fc;
+    --color-confidence-high-border: #0369a1;
+    --color-confidence-medium-bg: #3b2e00;
+    --color-confidence-medium-fg: #fde047;
+    --color-confidence-medium-border: #a16207;
+    --color-confidence-low-bg: #3d1232;
+    --color-confidence-low-fg: #f9a8d4;
+    --color-confidence-low-border: #9d174d;
 
     --color-btn-primary: #e6edf3;
     --color-btn-primary-hover: #c9d1d9;

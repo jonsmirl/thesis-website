@@ -54,6 +54,12 @@
           <option value="">All categories</option>
           <option v-for="c in categories" :key="c" :value="c">{{ CATEGORY_LABELS[c] || c }}</option>
         </select>
+        <select v-model="filterConfidence" class="filter-select">
+          <option value="">All confidence</option>
+          <option value="HIGH">High</option>
+          <option value="MEDIUM">Medium</option>
+          <option value="LOW">Low</option>
+        </select>
       </div>
 
       <div class="test-list">
@@ -63,6 +69,7 @@
             <div class="badges">
               <span class="badge" :class="`badge--${t.status?.toLowerCase()}`">{{ t.status }}</span>
               <span class="badge badge--paper" v-if="t.category">{{ CATEGORY_LABELS[t.category] || t.category }}</span>
+              <span v-if="t.confidence" class="badge" :class="`badge--confidence-${t.confidence.toLowerCase()}`">{{ t.confidence }}</span>
             </div>
           </div>
           <p v-if="t.description" class="description"><MathInline :text="truncate(t.description, 200)" /></p>
@@ -102,6 +109,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const filterStatus = ref('')
 const filterCategory = ref('')
+const filterConfidence = ref('')
 
 const { data: tests } = await useAsyncData('tests', async () => {
   const { data, error } = await client
@@ -119,6 +127,7 @@ const filtered = computed(() => {
   let result = tests.value || []
   if (filterStatus.value) result = result.filter(t => t.status === filterStatus.value)
   if (filterCategory.value) result = result.filter(t => t.category === filterCategory.value)
+  if (filterConfidence.value) result = result.filter(t => t.confidence === filterConfidence.value)
   return [...result].sort((a, b) => formatName(a.name).localeCompare(formatName(b.name)))
 })
 
