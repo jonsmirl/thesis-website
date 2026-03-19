@@ -7,15 +7,16 @@ const aiAvailable = ref(false)
 let session: any = null
 
 // Check if Chrome built-in AI is available
+// API is the global LanguageModel (not window.ai.languageModel)
 onMounted(async () => {
   if (import.meta.client) {
     try {
-      const ai = (window as any).ai
-      if (ai?.languageModel) {
-        const caps = await ai.languageModel.capabilities()
+      const LM = (globalThis as any).LanguageModel
+      if (LM) {
+        const caps = await LM.capabilities()
         aiAvailable.value = caps.available === 'readily' || caps.available === 'after-download'
         if (aiAvailable.value) {
-          session = await ai.languageModel.create({
+          session = await LM.create({
             systemPrompt: `You are a search query preprocessor. Given a raw user query, respond with ONLY a JSON object (no markdown, no backticks) with these fields:
 - corrected: the spell-corrected query
 - ambiguous: boolean, true if the query is short/vague with multiple possible meanings
