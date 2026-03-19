@@ -1,211 +1,150 @@
 <script setup lang="ts">
-interface Entry {
-  id: string
-  query: string
-  markdown?: string | null
-  script?: string | null
-  nano_prompt?: string | null
-  required_permissions?: string[]
-  required_tokens?: string[]
-  fetch_allowlist?: string[]
-  follow_ups?: string[]
-  timestamp?: string
-}
-
-const history = ref<Entry[]>([])
-const currentIndex = ref(-1) // -1 = hero/empty state
 const loading = ref(false)
-const lastSource = ref<'cache' | 'miss' | ''>('')
-const resultView = ref<HTMLElement | null>(null)
-const rejection = ref<{ rejected: boolean; candidates?: Array<{ query: string; score: number }> } | null>(null)
+const rawQuery = ref('')
+const result = ref<any>(null)
+const error = ref('')
+const aiAvailable = ref(false)
+let session: any = null
 
-const config = useRuntimeConfig()
-const API_URL = config.public.apiUrl || 'http://localhost:8787'
-const CDN_URL = config.public.cdnUrl || 'https://cdn.cesclaw.com'
-const { modelReady, modelLoading, indexSize, search, loadIndex } = useSearch()
-
-const currentEntry = computed(() => {
-  if (currentIndex.value < 0 || currentIndex.value >= history.value.length) return null
-  return history.value[currentIndex.value]
+// Check if Chrome built-in AI is available
+onMounted(async () => {
+  if (import.meta.client) {
+    try {
+      const ai = (window as any).ai
+      if (ai?.languageModel) {
+        const caps = await ai.languageModel.capabilities()
+        aiAvailable.value = caps.available === 'readily' || caps.available === 'after-download'
+        if (aiAvailable.value) {
+          session = await ai.languageModel.create({
+            systemPrompt: `You are a search query preprocessor. Given a raw user query, respond with ONLY a JSON object (no markdown, no backticks) with these fields:
+- corrected: the spell-corrected query
+- ambiguous: boolean, true if the query is short/vague with multiple possible meanings
+- classification: one of "gibberish", "ambiguous", "clear"
+- meanings: if ambiguous, array of possible meanings (max 5), each with {topic, description}
+- expanded: the query expanded with enough context to be unambiguous for embedding search
+- confidence: 0-1 how confident you are in the interpretation`
+          })
+        }
+      }
+    } catch (e) {
+      console.warn('Chrome AI not available:', e)
+    }
+  }
 })
 
-const showHero = computed(() => currentIndex.value < 0 && !loading.value && !rejection.value)
-
 async function handleQuery(query: string) {
+  rawQuery.value = query
   loading.value = true
-  lastSource.value = ''
-  rejection.value = null
+  error.value = ''
+  result.value = null
 
   try {
-    const match = await search(query)
-    let entry: Entry
-
-    // Gibberish rejection from Worker
-    if (match && match.rejected) {
-      rejection.value = {
-        rejected: true,
-        candidates: match.candidates,
-      }
-      loading.value = false
+    if (!session) {
+      error.value = 'Chrome built-in AI not available. Enable chrome://flags/#optimization-guide-on-device-model'
       return
     }
 
-    if (match && match.match && match.has_article && match.url) {
-      // Index hit WITH article — fetch from R2 CDN (instant)
-      const resp = await fetch(match.url)
-      if (resp.ok) {
-        entry = await resp.json()
-        entry.query = query
-        lastSource.value = 'cache'
+    const response = await session.prompt(`Preprocess this search query: "${query}"`)
+
+    // Try to parse as JSON
+    try {
+      result.value = JSON.parse(response)
+    } catch {
+      // If it wrapped in markdown code block, strip it
+      const cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+      try {
+        result.value = JSON.parse(cleaned)
+      } catch {
+        result.value = { raw: response }
       }
-      else {
-        // Article fetch failed — generate fresh
-        entry = await callMiss(query)
-        lastSource.value = 'miss'
-      }
     }
-    else if (match && match.match && !match.has_article) {
-      // Index hit WITHOUT article — query is known but no page yet
-      entry = await callMiss(query)
-      lastSource.value = 'miss'
-    }
-    else {
-      // Recognizable or no match — generate via /miss
-      entry = await callMiss(query)
-      lastSource.value = 'miss'
-    }
-
-    // Trim any forward history if we navigated back then searched
-    if (currentIndex.value < history.value.length - 1) {
-      history.value = history.value.slice(0, currentIndex.value + 1)
-    }
-
-    history.value.push(entry)
-    currentIndex.value = history.value.length - 1
-
-    // Push browser history state
-    window.history.pushState({ idx: currentIndex.value }, '', `/?q=${encodeURIComponent(query)}`)
-
-    // Scroll result area to top
-    await nextTick()
-    resultView.value?.scrollTo(0, 0)
-  }
-  catch (err: any) {
-    console.error('Query failed:', err)
-    // Check if it was a server 422 (rejected by server)
-    const is422 = err?.message?.includes('422')
-    history.value.push({
-      id: crypto.randomUUID(),
-      query,
-      markdown: is422
-        ? '**Could not process this query.** Try rephrasing or searching for something else.'
-        : '**Error**: Could not generate a response. Please try again.',
-      follow_ups: [],
-    })
-    currentIndex.value = history.value.length - 1
-    window.history.pushState({ idx: currentIndex.value }, '', `/?q=${encodeURIComponent(query)}`)
-  }
-  finally {
+  } catch (e: any) {
+    error.value = e?.message || 'Query preprocessing failed'
+  } finally {
     loading.value = false
   }
-}
-
-function handleFollowUp(query: string) {
-  handleQuery(query)
-}
-
-async function callMiss(query: string): Promise<Entry> {
-  const res = await fetch(`${API_URL}/miss`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
-  })
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`Server error ${res.status}: ${err}`)
-  }
-  return await res.json()
-}
-
-// Handle browser back/forward
-if (import.meta.client) {
-  onMounted(() => {
-    window.addEventListener('popstate', (e) => {
-      if (e.state && typeof e.state.idx === 'number') {
-        currentIndex.value = e.state.idx
-      }
-      else {
-        currentIndex.value = -1
-      }
-      nextTick(() => resultView.value?.scrollTo(0, 0))
-    })
-  })
 }
 </script>
 
 <template>
   <div class="page">
-    <!-- Empty state: centered branding -->
-    <div v-if="showHero" class="hero">
+    <!-- Hero -->
+    <div v-if="!result && !loading && !error" class="hero">
       <div class="hero-glow" />
       <h1 class="hero-title">
         <span class="hero-ces">ces</span><span class="hero-accent">Claw</span>
       </h1>
-      <p class="hero-sub">
-        No install. No API keys. Just ask.
-      </p>
-      <p v-if="modelLoading" class="hero-status">
-        <span class="status-dot status-dot--loading" /> Loading search model...
-      </p>
-      <p v-else-if="modelReady && indexSize > 0" class="hero-status">
-        <span class="status-dot status-dot--ready" /> {{ indexSize }} entries indexed
-      </p>
-      <p v-else-if="modelReady" class="hero-status">
-        <span class="status-dot status-dot--ready" /> Search ready
-      </p>
-      <p v-else class="hero-status">
-        <span class="status-dot status-dot--off" /> Search unavailable
+      <p class="hero-sub">Query Preprocessor Lab</p>
+      <p class="hero-status">
+        <span class="status-dot" :class="aiAvailable ? 'status-dot--ready' : 'status-dot--off'" />
+        {{ aiAvailable ? 'Gemini Nano ready' : 'Chrome AI not available' }}
       </p>
     </div>
 
-    <!-- Gibberish rejection -->
-    <div v-else-if="rejection" class="result-view">
-      <div class="rejection">
-        <p class="rejection-msg">This doesn't look like a search query.</p>
-        <div v-if="rejection.candidates?.length" class="rejection-suggestions">
-          <p class="rejection-hint">Did you mean:</p>
-          <button
-            v-for="c in rejection.candidates"
-            :key="c.query"
-            class="suggestion-chip"
-            @click="rejection = null; handleQuery(c.query)"
-          >
-            {{ c.query }}
-          </button>
+    <!-- Result -->
+    <div v-else-if="result" class="result-view">
+      <div class="result-card">
+        <div class="result-header">
+          <span class="result-label">Raw query</span>
+          <span class="result-value query-value">{{ rawQuery }}</span>
         </div>
+
+        <div v-if="result.corrected" class="result-row">
+          <span class="result-label">Corrected</span>
+          <span class="result-value">{{ result.corrected }}</span>
+        </div>
+
+        <div v-if="result.classification" class="result-row">
+          <span class="result-label">Classification</span>
+          <span class="result-badge" :class="`badge--${result.classification}`">
+            {{ result.classification }}
+          </span>
+        </div>
+
+        <div v-if="result.ambiguous !== undefined" class="result-row">
+          <span class="result-label">Ambiguous</span>
+          <span class="result-value">{{ result.ambiguous ? 'Yes' : 'No' }}</span>
+        </div>
+
+        <div v-if="result.expanded" class="result-row">
+          <span class="result-label">Expanded</span>
+          <span class="result-value">{{ result.expanded }}</span>
+        </div>
+
+        <div v-if="result.confidence !== undefined" class="result-row">
+          <span class="result-label">Confidence</span>
+          <span class="result-value">{{ (result.confidence * 100).toFixed(0) }}%</span>
+        </div>
+
+        <div v-if="result.meanings?.length" class="meanings">
+          <span class="result-label">Possible meanings</span>
+          <div v-for="(m, i) in result.meanings" :key="i" class="meaning-row">
+            <span class="meaning-topic">{{ m.topic }}</span>
+            <span class="meaning-desc">{{ m.description }}</span>
+          </div>
+        </div>
+
+        <details class="raw-json">
+          <summary>Raw JSON</summary>
+          <pre>{{ JSON.stringify(result, null, 2) }}</pre>
+        </details>
       </div>
     </div>
 
-    <!-- Single result view -->
-    <div v-else-if="currentEntry" ref="resultView" class="result-view">
-      <EntryResult
-        :key="currentEntry.id"
-        :entry="currentEntry"
-        @follow-up="handleFollowUp"
-      />
-    </div>
-
-    <!-- Loading skeleton -->
+    <!-- Loading -->
     <div v-else-if="loading" class="result-view">
-      <div class="skeleton">
-        <div class="skeleton-bar skeleton-bar--short" />
-        <div class="skeleton-bar" />
-        <div class="skeleton-bar" />
-        <div class="skeleton-bar skeleton-bar--medium" />
+      <div class="loading-state">
+        <span class="prompt-spinner" />
+        <span>Processing with Gemini Nano...</span>
       </div>
     </div>
 
-    <!-- Prompt input pinned to bottom -->
+    <!-- Error -->
+    <div v-else-if="error" class="result-view">
+      <div class="error-card">{{ error }}</div>
+    </div>
+
+    <!-- Prompt input -->
     <div class="prompt-area">
       <PromptInput :loading="loading" @submit="handleQuery" />
     </div>
@@ -221,7 +160,6 @@ if (import.meta.client) {
   overflow: hidden;
 }
 
-/* ─── Hero (empty state) ─── */
 .hero {
   flex: 1;
   display: flex;
@@ -294,16 +232,11 @@ if (import.meta.client) {
   box-shadow: 0 0 6px var(--c-glow);
 }
 
-.status-dot--loading {
-  background: var(--c-warning);
-  animation: breathe 1.5s ease-in-out infinite;
-}
-
 .status-dot--off {
   background: var(--c-drift);
 }
 
-/* ─── Result view (single entry, scrollable) ─── */
+/* ─── Result ─── */
 .result-view {
   flex: 1;
   max-width: var(--max-content);
@@ -313,78 +246,154 @@ if (import.meta.client) {
   overflow-y: auto;
 }
 
-/* ─── Loading skeleton ─── */
-.skeleton {
+.result-card {
+  background: var(--c-deep);
+  border: 1px solid var(--c-trench);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-5);
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
+  gap: var(--sp-4);
   animation: fadeInUp var(--dur-slow) var(--ease-out) both;
 }
 
-.skeleton-bar {
-  height: 14px;
-  background: linear-gradient(
-    90deg,
-    var(--c-deep) 25%,
-    var(--c-trench) 50%,
-    var(--c-deep) 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: var(--radius-sm);
-  width: 100%;
-}
-
-.skeleton-bar--short {
-  width: 40%;
-}
-
-.skeleton-bar--medium {
-  width: 70%;
-}
-
-/* ─── Rejection state ─── */
-.rejection {
+.result-header {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sp-4);
-  padding: var(--sp-8) 0;
-  text-align: center;
+  align-items: baseline;
+  gap: var(--sp-3);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--c-trench);
 }
 
-.rejection-msg {
-  font-size: var(--fs-lg);
+.result-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-3);
+}
+
+.result-label {
+  font-size: var(--fs-xs);
   color: var(--c-drift);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  min-width: 8rem;
+  flex-shrink: 0;
 }
 
-.rejection-suggestions {
+.result-value {
+  font-size: var(--fs-base);
+  color: var(--c-foam);
+}
+
+.query-value {
+  font-family: var(--font-brand);
+  color: var(--c-glow);
+  font-size: var(--fs-md);
+}
+
+.result-badge {
+  font-size: var(--fs-xs);
+  padding: var(--sp-1) var(--sp-2);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge--clear {
+  background: #0d2818;
+  color: #56d364;
+}
+
+.badge--ambiguous {
+  background: #3b2e00;
+  color: #e3b341;
+}
+
+.badge--gibberish {
+  background: #3d1117;
+  color: #f85149;
+}
+
+.meanings {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--sp-2);
 }
 
-.rejection-hint {
-  font-size: var(--fs-sm);
-  color: var(--c-shelf);
-  margin-bottom: var(--sp-1);
+.meaning-row {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--c-abyss);
+  border-radius: var(--radius-sm);
+  margin-left: 8rem;
 }
 
-.suggestion-chip {
-  background: var(--c-trench);
-  color: var(--c-foam);
-  border: 1px solid var(--c-shelf);
-  border-radius: var(--radius-md);
-  padding: var(--sp-2) var(--sp-4);
+.meaning-topic {
+  font-weight: 600;
+  color: var(--c-crest);
   font-size: var(--fs-sm);
+  min-width: 10rem;
+  flex-shrink: 0;
+}
+
+.meaning-desc {
+  font-size: var(--fs-sm);
+  color: var(--c-drift);
+}
+
+.raw-json {
+  margin-top: var(--sp-2);
+}
+
+.raw-json summary {
+  font-size: var(--fs-xs);
+  color: var(--c-drift);
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
 }
 
-.suggestion-chip:hover {
-  background: var(--c-deep);
-  border-color: var(--c-glow);
+.raw-json pre {
+  font-size: var(--fs-xs);
+  color: var(--c-foam);
+  background: var(--c-abyss);
+  padding: var(--sp-3);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  margin-top: var(--sp-2);
+}
+
+/* ─── Loading ─── */
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  color: var(--c-drift);
+  font-size: var(--fs-sm);
+  padding: var(--sp-8) 0;
+}
+
+.prompt-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--c-drift);
+  border-top-color: var(--c-glow);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Error ─── */
+.error-card {
+  padding: var(--sp-4);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-md);
+  color: var(--c-drift);
+  font-size: var(--fs-sm);
 }
 
 /* ─── Prompt area ─── */
@@ -394,22 +403,13 @@ if (import.meta.client) {
   background: linear-gradient(to top, var(--c-void) 60%, transparent);
 }
 
-/* ─── Responsive ─── */
 @media (max-width: 640px) {
-  .hero-title {
-    font-size: var(--fs-2xl);
-  }
-
-  .hero-sub {
-    font-size: var(--fs-base);
-  }
-
-  .page {
-    padding: 0 var(--sp-3);
-  }
-
-  .prompt-area {
-    padding: var(--sp-3) 0 var(--sp-4);
-  }
+  .hero-title { font-size: var(--fs-2xl); }
+  .hero-sub { font-size: var(--fs-base); }
+  .page { padding: 0 var(--sp-3); }
+  .prompt-area { padding: var(--sp-3) 0 var(--sp-4); }
+  .result-row { flex-direction: column; gap: var(--sp-1); }
+  .result-label { min-width: unset; }
+  .meaning-row { margin-left: 0; }
 }
 </style>
