@@ -13,8 +13,8 @@ onMounted(async () => {
     try {
       const LM = (globalThis as any).LanguageModel
       if (LM) {
-        const caps = await LM.capabilities()
-        aiAvailable.value = caps.available === 'readily' || caps.available === 'after-download'
+        const avail = await LM.availability()
+        aiAvailable.value = avail === 'readily' || avail === 'after-download'
         if (aiAvailable.value) {
           session = await LM.create({
             systemPrompt: `You are a search query preprocessor. Given a raw user query, respond with ONLY a JSON object (no markdown, no backticks) with these fields:
