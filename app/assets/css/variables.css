@@ -31,9 +31,9 @@
   --color-text-secondary: var(--c-foam);
   --color-text-tertiary: var(--c-drift);
   --color-text-muted: var(--c-drift);
-  --color-text-faint: var(--c-shelf);
-  --color-text-ghost: var(--c-shelf);
-  --color-text-placeholder: var(--c-shelf);
+  --color-text-faint: #6272a4;
+  --color-text-ghost: #4a5580;
+  --color-text-placeholder: #4a5580;
 
   /* Links */
   --color-link: var(--c-glow);
