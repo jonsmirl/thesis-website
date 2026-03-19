@@ -3,7 +3,7 @@ import type { CompiledSkill } from '~/composables/useSkills'
 import SkillEditor from '~/components/SkillEditor.vue'
 import SkillLibrary from '~/components/SkillLibrary.vue'
 
-const user = useSupabaseUser()
+const { user } = useAuth()
 const editorRef = ref<InstanceType<typeof SkillEditor> | null>(null)
 const libraryRef = ref<InstanceType<typeof SkillLibrary> | null>(null)
 
