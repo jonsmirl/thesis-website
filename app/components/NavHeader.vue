@@ -19,6 +19,9 @@
         <NuxtLink to="/account" class="account-link">Account</NuxtLink>
         <button @click="handleLogout">Sign out</button>
       </div>
+      <div class="user-bar" v-else>
+        <NuxtLink to="/login" class="account-link">Sign in</NuxtLink>
+      </div>
     </div>
   </header>
 </template>
