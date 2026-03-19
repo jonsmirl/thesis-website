@@ -1,37 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <template v-if="mode === 'recovery'">
-        <h1>Set New Password</h1>
-        <p class="subtitle">Enter your new password below.</p>
-        <form @submit.prevent="handleReset">
-          <input
-            v-model="newPassword"
-            type="password"
-            placeholder="New password"
-            required
-            minlength="8"
-            :disabled="loading"
-            aria-label="New password"
-          />
-          <input
-            v-model="confirmPassword"
-            type="password"
-            placeholder="Confirm password"
-            required
-            minlength="8"
-            :disabled="loading"
-            aria-label="Confirm password"
-          />
-          <button type="submit" :disabled="loading">
-            {{ loading ? 'Updating...' : 'Update password' }}
-          </button>
-          <p v-if="error" class="error">{{ error }}</p>
-          <p v-if="success" class="success">{{ success }}</p>
-        </form>
-      </template>
-      <template v-else>
-        <h1>CES Formalization</h1>
+        <h1>cesClaw</h1>
         <p class="subtitle">Sign in to continue.</p>
 
         <!-- OAuth Providers -->
@@ -64,36 +34,7 @@
           </button>
         </div>
 
-        <!-- Divider -->
-        <div class="divider">
-          <span>or sign in with email</span>
-        </div>
-
-        <!-- Email/Password Form -->
-        <form @submit.prevent="handleLogin">
-          <input
-            v-model="email"
-            type="email"
-            placeholder="Email"
-            required
-            :disabled="loading"
-            aria-label="Email address"
-          />
-          <input
-            v-model="password"
-            type="password"
-            placeholder="Password"
-            required
-            :disabled="loading"
-            aria-label="Password"
-          />
-          <button type="submit" :disabled="loading">
-            {{ loading ? 'Signing in...' : 'Sign in' }}
-          </button>
-        </form>
-
         <p v-if="error" class="error">{{ error }}</p>
-      </template>
     </div>
   </div>
 </template>
@@ -101,83 +42,20 @@
 <script setup lang="ts">
 definePageMeta({ layout: false })
 
-const { signInWithOAuth, signInWithEmail } = useAuth()
-const client = useSupabaseClient()
+const { signInWithOAuth } = useAuth()
 
-const mode = ref<'login' | 'recovery'>('login')
-const email = ref('')
-const password = ref('')
-const newPassword = ref('')
-const confirmPassword = ref('')
-const loading = ref(false)
 const oauthLoading = ref(false)
 const error = ref('')
-const success = ref('')
-
-onMounted(async () => {
-  const hash = window.location.hash.substring(1)
-  const params = new URLSearchParams(hash)
-  const type = params.get('type')
-
-  if (type === 'recovery' && params.get('access_token')) {
-    const { data, error: err } = await client.auth.getSession()
-    if (!err && data.session) {
-      mode.value = 'recovery'
-    } else {
-      error.value = 'Recovery link expired or invalid. Please request a new one.'
-    }
-  }
-})
-
-async function handleLogin() {
-  loading.value = true
-  error.value = ''
-  try {
-    await signInWithEmail(email.value, password.value)
-    navigateTo('/')
-  } catch (err: any) {
-    error.value = err.message || 'Sign in failed.'
-  } finally {
-    loading.value = false
-  }
-}
 
 async function handleOAuth(provider: 'google' | 'github') {
   oauthLoading.value = true
   error.value = ''
   try {
     await signInWithOAuth(provider)
-    // Browser will redirect to provider
   } catch (err: any) {
-    error.value = err.message || 'OAuth sign in failed.'
+    error.value = err.message || 'Sign in failed.'
     oauthLoading.value = false
   }
-}
-
-async function handleReset() {
-  error.value = ''
-  success.value = ''
-
-  if (newPassword.value !== confirmPassword.value) {
-    error.value = 'Passwords do not match.'
-    return
-  }
-  if (newPassword.value.length < 8) {
-    error.value = 'Password must be at least 8 characters.'
-    return
-  }
-
-  loading.value = true
-  const { error: err } = await client.auth.updateUser({
-    password: newPassword.value,
-  })
-  if (err) {
-    error.value = err.message
-  } else {
-    success.value = 'Password updated. Redirecting...'
-    setTimeout(() => navigateTo('/'), 1500)
-  }
-  loading.value = false
 }
 </script>
 
@@ -235,59 +113,8 @@ h1 {
 .oauth-btn.github:hover { background: #1b1f23; }
 .oauth-icon { width: 1.1rem; height: 1.1rem; flex-shrink: 0; }
 
-/* Divider */
-.divider {
-  position: relative;
-  margin: 1rem 0;
-  text-align: center;
-}
-.divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  border-top: 1px solid var(--color-border-light);
-}
-.divider span {
-  position: relative;
-  padding: 0 0.75rem;
-  background: var(--color-bg-page);
-  color: var(--color-text-faint);
-  font-size: 0.78rem;
-}
-
-input {
-  display: block;
-  width: 100%;
-  padding: 0.6rem 0.75rem;
-  margin-bottom: 0.75rem;
-  border: 1px solid var(--color-border-input);
-  border-radius: 4px;
-  font-size: 0.95rem;
-  box-sizing: border-box;
-  background: var(--color-bg-page);
-  color: var(--color-text-primary);
-}
-button[type="submit"] {
-  width: 100%;
-  padding: 0.6rem;
-  background: var(--color-btn-primary);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-button[type="submit"]:hover { background: var(--color-btn-primary-hover); }
-button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
 .error {
   color: var(--color-error);
-  margin: 0.75rem 0 0;
-  font-size: 0.85rem;
-}
-.success {
-  color: var(--color-consistent-fg);
   margin: 0.75rem 0 0;
   font-size: 0.85rem;
 }
