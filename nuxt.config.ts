@@ -32,6 +32,17 @@ export default defineNuxtConfig({
     },
   },
 
+  runtimeConfig: {
+    public: {
+      apiUrl: process.env.CLAWLESS_API_URL || 'https://api.cesproofs.org',
+      cdnUrl: process.env.CLAWLESS_CDN_URL || 'https://cdn.cesproofs.org',
+      searchUrl: process.env.CLAWLESS_SEARCH_URL || 'https://clawless-search.jonsmirl.workers.dev',
+      googleClientId: process.env.CLAWLESS_GOOGLE_CLIENT_ID || '',
+      githubClientId: process.env.CLAWLESS_GITHUB_CLIENT_ID || '',
+      microsoftClientId: process.env.CLAWLESS_MICROSOFT_CLIENT_ID || '',
+    },
+  },
+
   supabase: {
     url: process.env.SUPABASE_URL,
     key: process.env.SUPABASE_KEY,
@@ -40,5 +51,11 @@ export default defineNuxtConfig({
 
   nitro: {
     preset: 'cloudflare_pages',
+  },
+
+  vite: {
+    worker: {
+      format: 'es',
+    },
   },
 })

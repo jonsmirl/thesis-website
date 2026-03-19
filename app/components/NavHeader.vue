@@ -8,6 +8,8 @@
         <NuxtLink to="/theorems">Theorems</NuxtLink>
         <NuxtLink to="/tests">Tests</NuxtLink>
         <NuxtLink to="/forum">Forum</NuxtLink>
+        <NuxtLink to="/skills">Skills</NuxtLink>
+        <NuxtLink to="/settings">Settings</NuxtLink>
       </nav>
       <div class="user-bar" v-if="currentUser">
         <span class="email">{{ displayName }}</span>
