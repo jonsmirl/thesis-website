@@ -34,9 +34,6 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiUrl: process.env.CLAWLESS_API_URL || 'https://api.cesclaw.com',
-      cdnUrl: process.env.CLAWLESS_CDN_URL || 'https://cdn.cesclaw.com',
-      searchUrl: process.env.CLAWLESS_SEARCH_URL || 'https://clawless-search.jonsmirl.workers.dev',
       googleClientId: process.env.CLAWLESS_GOOGLE_CLIENT_ID || '',
       githubClientId: process.env.CLAWLESS_GITHUB_CLIENT_ID || '',
       microsoftClientId: process.env.CLAWLESS_MICROSOFT_CLIENT_ID || '',
