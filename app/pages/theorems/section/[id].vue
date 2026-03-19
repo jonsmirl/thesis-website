@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <NavHeader />
 
     <div v-if="section">
       <div class="breadcrumb">

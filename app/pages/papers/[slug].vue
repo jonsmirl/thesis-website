@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavHeader />
     <main class="container" v-if="paper">
       <nav class="breadcrumb">
         <NuxtLink to="/papers">Papers</NuxtLink>

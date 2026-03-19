@@ -1,6 +1,5 @@
 <template>
   <div class="container--reading">
-    <NavHeader />
 
     <div v-if="figure">
       <div class="breadcrumb">

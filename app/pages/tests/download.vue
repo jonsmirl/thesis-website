@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <NavHeader />
 
     <div class="breadcrumb">
       <NuxtLink to="/tests">Tests</NuxtLink> &rsaquo; Download

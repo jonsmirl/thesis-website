@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <NavHeader />
 
     <div class="page-header page-header--flex">
       <div>

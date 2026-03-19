@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavHeader />
     <main class="container--narrow">
       <NuxtLink to="/wiki" class="card">
         <h2>Economics Wiki</h2>

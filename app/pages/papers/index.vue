@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <NavHeader />
 
     <div class="page-header">
       <h2>Papers</h2>

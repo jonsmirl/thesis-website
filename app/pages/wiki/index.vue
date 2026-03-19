@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavHeader />
     <main class="container">
       <div class="wiki-header">
         <h1>Economics Wiki</h1>

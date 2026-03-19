@@ -1,6 +1,5 @@
 <template>
   <div class="forum-page">
-    <NavHeader />
     <main class="forum-container">
       <ForumBreadcrumb :category-slug="categorySlug" :category-name="categoryName" topic-title="New Topic" />
 

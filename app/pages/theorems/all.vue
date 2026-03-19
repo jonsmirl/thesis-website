@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <NavHeader />
 
     <div class="page-header">
       <h2>All Lean 4 Declarations</h2>

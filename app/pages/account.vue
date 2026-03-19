@@ -1,6 +1,5 @@
 <template>
   <div class="container--reading">
-    <NavHeader />
     <div class="account-card">
       <h2>Account</h2>
 

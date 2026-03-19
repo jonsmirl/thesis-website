@@ -1,6 +1,5 @@
 <template>
   <div>
-    <NavHeader />
     <main class="container" v-if="page">
       <nav class="breadcrumb">
         <NuxtLink to="/wiki">Wiki</NuxtLink>

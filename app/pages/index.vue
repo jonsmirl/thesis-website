@@ -144,7 +144,6 @@ if (import.meta.client) {
 </script>
 
 <template>
-  <NavHeader />
   <div class="page">
     <!-- Empty state: centered branding -->
     <div v-if="showHero" class="hero">

@@ -1,6 +1,5 @@
 <template>
   <div class="forum-page">
-    <NavHeader />
     <main class="forum-container">
       <ForumBreadcrumb
         :category-slug="topic?.forum_categories?.slug"

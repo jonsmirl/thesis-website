@@ -1,6 +1,5 @@
 <template>
   <div class="forum-page">
-    <NavHeader />
     <main class="forum-container">
       <div class="forum-header">
         <h1>Forum</h1>

@@ -1,6 +1,5 @@
 <template>
   <div class="forum-page">
-    <NavHeader />
     <main class="forum-container">
       <h1>User Management</h1>
 

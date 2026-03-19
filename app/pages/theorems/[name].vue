@@ -1,6 +1,5 @@
 <template>
   <div class="container--narrow">
-    <NavHeader />
 
     <div v-if="theorem">
       <div class="breadcrumb">
