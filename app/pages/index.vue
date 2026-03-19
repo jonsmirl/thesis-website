@@ -18,7 +18,7 @@ onMounted(async () => {
           expectedOutputs: [{ type: 'text', languages: ['en'] }],
         }
         const avail = await LM.availability(sessionOpts)
-        aiAvailable.value = avail === 'readily' || avail === 'after-download' || avail === 'downloadable'
+        aiAvailable.value = avail !== 'unavailable' && avail !== 'no'
         if (aiAvailable.value) {
           session = await LM.create({
             ...sessionOpts,
