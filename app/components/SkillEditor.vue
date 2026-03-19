@@ -36,8 +36,96 @@ const skillClass = ref<CompiledSkill['skill_class'] | null>(null)
 const activeSkillId = ref<string | undefined>()
 
 const { compileSkill } = useSkills()
+const importNotice = ref('')
+
+/**
+ * Detect and convert OpenClaw SKILL.md format to CesClaw format.
+ * OpenClaw skills have: version, metadata.openclaw, bins, disable-model-invocation, emoji
+ * CesClaw skills have: command_dispatch, fetch_allowlist, required_tokens, skill_class
+ */
+function detectAndConvertOpenClaw(text: string): string | null {
+  // Quick check — does it look like OpenClaw?
+  const hasFrontmatter = text.trimStart().startsWith('---')
+  if (!hasFrontmatter) return null
+
+  const parts = text.split('---')
+  if (parts.length < 3) return null
+
+  const yaml = parts[1]
+
+  // OpenClaw indicators
+  const isOpenClaw = yaml.includes('version:') ||
+    yaml.includes('metadata:') ||
+    yaml.includes('bins:') ||
+    yaml.includes('disable-model-invocation:') ||
+    yaml.includes('emoji:') ||
+    yaml.includes('primaryEnv:')
+
+  // Already CesClaw format
+  const isCesClaw = yaml.includes('command_dispatch:') ||
+    yaml.includes('fetch_allowlist:') ||
+    yaml.includes('required_tokens:') ||
+    yaml.includes('skill_class:')
+
+  if (!isOpenClaw || isCesClaw) return null
+
+  // Parse OpenClaw fields
+  const lines = yaml.split('\n')
+  let name = 'imported-skill'
+  let description = ''
+  let userInvocable = true
+  let modelInvocable = true
+  const env: string[] = []
+  let hasBins = false
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (trimmed.startsWith('name:')) name = trimmed.slice(5).trim()
+    if (trimmed.startsWith('description:')) description = trimmed.slice(12).trim()
+    if (trimmed.startsWith('user-invocable:')) userInvocable = trimmed.includes('true')
+    if (trimmed.startsWith('disable-model-invocation:')) modelInvocable = !trimmed.includes('true')
+    if (trimmed.startsWith('bins:')) hasBins = true
+  }
+
+  // Extract body (everything after second ---)
+  const body = parts.slice(2).join('---').trim()
+
+  // Build CesClaw frontmatter
+  const converted = `---
+name: ${name}
+description: ${description}
+services: []
+user_invocable: ${userInvocable}
+model_invocable: ${modelInvocable}
+command_dispatch: model
+env: [${env.join(', ')}]
+fetch_allowlist: []
+required_tokens: []
+required_permissions: []
+---
+
+${body}
+`
+
+  if (hasBins) {
+    importNotice.value = 'Imported from OpenClaw format. Warning: this skill referenced binary dependencies (bins) which are not supported — it runs in a JS sandbox.'
+  } else {
+    importNotice.value = 'Imported from OpenClaw format.'
+  }
+
+  return converted
+}
+
+// Watch for paste/edit that looks like OpenClaw
+watch(source, (newVal) => {
+  const converted = detectAndConvertOpenClaw(newVal)
+  if (converted) {
+    source.value = converted
+  }
+})
 
 function reset() {
+  importNotice.value = ''
   source.value = TEMPLATE
   compiledScript.value = null
   compileStatus.value = 'idle'
@@ -126,6 +214,9 @@ defineExpose({ reset, loadSkill, activeSkillId })
           />
           {{ compileStatus === 'compiling' ? 'Compiling...' : 'Compile' }}
         </button>
+      </div>
+      <div v-if="importNotice" class="import-notice">
+        {{ importNotice }}
       </div>
       <div v-if="compileError" class="compile-error">
         <span class="compile-error-icon">&#9888;</span>
@@ -283,6 +374,16 @@ defineExpose({ reset, loadSkill, activeSkillId })
 
 .compile-dot--error {
   background: var(--c-error);
+}
+
+.import-notice {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--c-glow-faint);
+  border: 1px solid var(--c-glow-dim);
+  border-radius: var(--radius-md);
+  font-size: var(--fs-xs);
+  color: var(--c-glow);
 }
 
 .compile-error {
