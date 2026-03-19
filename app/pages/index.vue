@@ -3,43 +3,8 @@ const loading = ref(false)
 const rawQuery = ref('')
 const result = ref<any>(null)
 const error = ref('')
-const aiAvailable = ref(false)
-let session: any = null
 
-// Check if Chrome built-in AI is available
-// API is the global LanguageModel (not window.ai.languageModel)
-onMounted(async () => {
-  if (import.meta.client) {
-    try {
-      const LM = (globalThis as any).LanguageModel
-      if (LM) {
-        const sessionOpts = {
-          expectedInputs: [{ type: 'text', languages: ['en'] }],
-          expectedOutputs: [{ type: 'text', languages: ['en'] }],
-        }
-        const avail = await LM.availability(sessionOpts)
-        aiAvailable.value = avail !== 'unavailable' && avail !== 'no'
-        if (aiAvailable.value) {
-          session = await LM.create({
-            ...sessionOpts,
-            systemPrompt: `You are a search query preprocessor. You receive raw search queries and analyze them.
-
-ALWAYS respond with a JSON object. Never ask clarifying questions. Never refuse. Treat every input as a search query to analyze.
-
-JSON format:
-{"corrected":"spell-corrected query","ambiguous":true/false,"classification":"gibberish|ambiguous|clear","meanings":[{"topic":"Name","description":"Brief description"}],"expanded":"query expanded with enough context to be unambiguous","confidence":0.0-1.0}
-
-If the query is clear and unambiguous, set ambiguous to false and meanings to an empty array.
-If the query is short or has multiple meanings, set ambiguous to true and list up to 5 meanings.
-If the query is random characters, set classification to gibberish.`
-          })
-        }
-      }
-    } catch (e) {
-      console.warn('Chrome AI not available:', e)
-    }
-  }
-})
+const client = useSupabaseClient()
 
 async function handleQuery(query: string) {
   rawQuery.value = query
@@ -48,25 +13,16 @@ async function handleQuery(query: string) {
   result.value = null
 
   try {
-    if (!session) {
-      error.value = 'Chrome built-in AI not available. Enable chrome://flags/#optimization-guide-on-device-model'
+    const { data, error: fnError } = await client.functions.invoke('preprocess-query', {
+      body: { query },
+    })
+
+    if (fnError) {
+      error.value = fnError.message || 'Edge function error'
       return
     }
 
-    const response = await session.prompt(`Analyze this search query and respond with JSON only: ${query}`)
-
-    // Try to parse as JSON
-    try {
-      result.value = JSON.parse(response)
-    } catch {
-      // If it wrapped in markdown code block, strip it
-      const cleaned = response.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-      try {
-        result.value = JSON.parse(cleaned)
-      } catch {
-        result.value = { raw: response }
-      }
-    }
+    result.value = data
   } catch (e: any) {
     error.value = e?.message || 'Query preprocessing failed'
   } finally {
@@ -85,8 +41,8 @@ async function handleQuery(query: string) {
       </h1>
       <p class="hero-sub">Query Preprocessor Lab</p>
       <p class="hero-status">
-        <span class="status-dot" :class="aiAvailable ? 'status-dot--ready' : 'status-dot--off'" />
-        {{ aiAvailable ? 'Gemini Nano ready' : 'Chrome AI not available' }}
+        <span class="status-dot status-dot--ready" />
+        Gemini Flash Lite
       </p>
     </div>
 
@@ -144,7 +100,7 @@ async function handleQuery(query: string) {
     <div v-else-if="loading" class="result-view">
       <div class="loading-state">
         <span class="prompt-spinner" />
-        <span>Processing with Gemini Nano...</span>
+        <span>Processing with Gemini Flash...</span>
       </div>
     </div>
 
@@ -239,10 +195,6 @@ async function handleQuery(query: string) {
 .status-dot--ready {
   background: var(--c-glow);
   box-shadow: 0 0 6px var(--c-glow);
-}
-
-.status-dot--off {
-  background: var(--c-drift);
 }
 
 /* ─── Result ─── */
