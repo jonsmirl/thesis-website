@@ -13,12 +13,15 @@ onMounted(async () => {
     try {
       const LM = (globalThis as any).LanguageModel
       if (LM) {
-        const avail = await LM.availability()
+        const sessionOpts = {
+          expectedInputs: [{ type: 'text', languages: ['en'] }],
+          expectedOutputs: [{ type: 'text', languages: ['en'] }],
+        }
+        const avail = await LM.availability(sessionOpts)
         aiAvailable.value = avail === 'readily' || avail === 'after-download'
         if (aiAvailable.value) {
           session = await LM.create({
-            expectedInputs: [{ type: 'text', languages: ['en'] }],
-            expectedOutputs: [{ type: 'text', languages: ['en'] }],
+            ...sessionOpts,
             systemPrompt: `You are a search query preprocessor. You receive raw search queries and analyze them.
 
 ALWAYS respond with a JSON object. Never ask clarifying questions. Never refuse. Treat every input as a search query to analyze.
