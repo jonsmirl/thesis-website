@@ -1,13 +1,18 @@
 <script setup lang="ts">
+import { marked } from 'marked'
+
 const loading = ref(false)
-const rawQuery = ref('')
 const result = ref<any>(null)
 const error = ref('')
 
 const client = useSupabaseClient()
 
+const renderedHtml = computed(() => {
+  if (!result.value?.markdown) return ''
+  return marked.parse(result.value.markdown) as string
+})
+
 async function handleQuery(query: string) {
-  rawQuery.value = query
   loading.value = true
   error.value = ''
   result.value = null
@@ -22,12 +27,21 @@ async function handleQuery(query: string) {
       return
     }
 
+    if (data?.gibberish) {
+      error.value = 'That doesn\'t look like a search query. Try something else.'
+      return
+    }
+
     result.value = data
   } catch (e: any) {
-    error.value = e?.message || 'Query preprocessing failed'
+    error.value = e?.message || 'Query failed'
   } finally {
     loading.value = false
   }
+}
+
+function handleFollowUp(query: string) {
+  handleQuery(query)
 }
 </script>
 
@@ -39,68 +53,55 @@ async function handleQuery(query: string) {
       <h1 class="hero-title">
         <span class="hero-ces">ces</span><span class="hero-accent">Claw</span>
       </h1>
-      <p class="hero-sub">Query Preprocessor Lab</p>
+      <p class="hero-sub">No install. No API keys. Just ask.</p>
       <p class="hero-status">
         <span class="status-dot status-dot--ready" />
         Gemini Flash Lite
       </p>
     </div>
 
-    <!-- Result -->
+    <!-- Article result -->
     <div v-else-if="result" class="result-view">
-      <div class="result-card">
-        <div class="result-header">
-          <span class="result-label">Raw query</span>
-          <span class="result-value query-value">{{ rawQuery }}</span>
+      <article class="entry">
+        <div class="entry-query">
+          <span class="entry-query-icon">&#x2192;</span>
+          {{ result.query }}
         </div>
 
-        <div v-if="result.corrected" class="result-row">
-          <span class="result-label">Corrected</span>
-          <span class="result-value">{{ result.corrected }}</span>
-        </div>
-
-        <div v-if="result.classification" class="result-row">
-          <span class="result-label">Classification</span>
-          <span class="result-badge" :class="`badge--${result.classification}`">
-            {{ result.classification }}
-          </span>
-        </div>
-
-        <div v-if="result.ambiguous !== undefined" class="result-row">
-          <span class="result-label">Ambiguous</span>
-          <span class="result-value">{{ result.ambiguous ? 'Yes' : 'No' }}</span>
-        </div>
-
-        <div v-if="result.expanded" class="result-row">
-          <span class="result-label">Expanded</span>
-          <span class="result-value">{{ result.expanded }}</span>
-        </div>
-
-        <div v-if="result.confidence !== undefined" class="result-row">
-          <span class="result-label">Confidence</span>
-          <span class="result-value">{{ (result.confidence * 100).toFixed(0) }}%</span>
-        </div>
-
-        <div v-if="result.meanings?.length" class="meanings">
-          <span class="result-label">Possible meanings</span>
+        <!-- Disambiguation meanings -->
+        <div v-if="result.ambiguous && result.meanings?.length" class="meanings">
           <div v-for="(m, i) in result.meanings" :key="i" class="meaning-row">
-            <span class="meaning-topic">{{ m.topic }}</span>
+            <button class="meaning-topic" @click="handleFollowUp(m.topic)">{{ m.topic }}</button>
             <span class="meaning-desc">{{ m.description }}</span>
           </div>
         </div>
 
-        <details class="raw-json">
-          <summary>Raw JSON</summary>
-          <pre>{{ JSON.stringify(result, null, 2) }}</pre>
-        </details>
-      </div>
+        <!-- Article content -->
+        <div v-if="renderedHtml" class="entry-content" v-html="renderedHtml" />
+
+        <!-- Follow-ups -->
+        <div v-if="result.follow_ups?.length" class="entry-followups">
+          <button
+            v-for="followUp in result.follow_ups"
+            :key="followUp"
+            class="followup-chip"
+            @click="handleFollowUp(followUp)"
+          >
+            {{ followUp }}
+          </button>
+        </div>
+
+        <div class="entry-meta">
+          {{ result.generated_by }} &middot; {{ new Date(result.timestamp).toLocaleString() }}
+        </div>
+      </article>
     </div>
 
     <!-- Loading -->
     <div v-else-if="loading" class="result-view">
       <div class="loading-state">
         <span class="prompt-spinner" />
-        <span>Processing with Gemini Flash...</span>
+        <span>Generating...</span>
       </div>
     </div>
 
@@ -156,15 +157,8 @@ async function handleQuery(query: string) {
   z-index: 1;
 }
 
-.hero-ces {
-  font-variant: small-caps;
-  text-transform: lowercase;
-}
-
-.hero-accent {
-  color: var(--c-glow);
-  font-weight: 400;
-}
+.hero-ces { font-variant: small-caps; text-transform: lowercase; }
+.hero-accent { color: var(--c-glow); font-weight: 400; }
 
 .hero-sub {
   font-size: var(--fs-md);
@@ -185,17 +179,8 @@ async function handleQuery(query: string) {
   gap: var(--sp-2);
 }
 
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.status-dot--ready {
-  background: var(--c-glow);
-  box-shadow: 0 0 6px var(--c-glow);
-}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.status-dot--ready { background: var(--c-glow); box-shadow: 0 0 6px var(--c-glow); }
 
 /* ─── Result ─── */
 .result-view {
@@ -207,121 +192,95 @@ async function handleQuery(query: string) {
   overflow-y: auto;
 }
 
-.result-card {
-  background: var(--c-deep);
-  border: 1px solid var(--c-trench);
-  border-radius: var(--radius-lg);
-  padding: var(--sp-5);
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
+.entry {
   animation: fadeInUp var(--dur-slow) var(--ease-out) both;
 }
 
-.result-header {
+.entry-query {
   display: flex;
   align-items: baseline;
-  gap: var(--sp-3);
-  padding-bottom: var(--sp-4);
-  border-bottom: 1px solid var(--c-trench);
-}
-
-.result-row {
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-3);
-}
-
-.result-label {
-  font-size: var(--fs-xs);
-  color: var(--c-drift);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-  min-width: 8rem;
-  flex-shrink: 0;
-}
-
-.result-value {
-  font-size: var(--fs-base);
-  color: var(--c-foam);
-}
-
-.query-value {
+  gap: var(--sp-2);
   font-family: var(--font-brand);
-  color: var(--c-glow);
   font-size: var(--fs-md);
+  color: var(--c-glow);
+  margin-bottom: var(--sp-5);
+  letter-spacing: -0.01em;
 }
 
-.result-badge {
-  font-size: var(--fs-xs);
-  padding: var(--sp-1) var(--sp-2);
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  text-transform: uppercase;
-}
+.entry-query-icon { flex-shrink: 0; opacity: 0.5; font-size: var(--fs-sm); }
 
-.badge--clear {
-  background: #0d2818;
-  color: #56d364;
-}
+.entry-content { color: var(--c-foam); line-height: var(--lh-relaxed); }
+.entry-content :deep(h1), .entry-content :deep(h2), .entry-content :deep(h3) { color: var(--c-crest); }
+.entry-content :deep(a) { color: var(--c-glow); text-decoration: underline; text-underline-offset: 3px; }
+.entry-content :deep(a:hover) { color: var(--c-glow-bright); }
+.entry-content :deep(ul), .entry-content :deep(ol) { padding-left: var(--sp-6); }
+.entry-content :deep(li) { margin-bottom: var(--sp-2); }
 
-.badge--ambiguous {
-  background: #3b2e00;
-  color: #e3b341;
-}
-
-.badge--gibberish {
-  background: #3d1117;
-  color: #f85149;
-}
-
+/* ─── Disambiguation meanings ─── */
 .meanings {
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
+  margin-bottom: var(--sp-5);
 }
 
 .meaning-row {
   display: flex;
   gap: var(--sp-3);
   padding: var(--sp-2) var(--sp-3);
-  background: var(--c-abyss);
+  background: var(--c-deep);
   border-radius: var(--radius-sm);
-  margin-left: 8rem;
 }
 
 .meaning-topic {
   font-weight: 600;
-  color: var(--c-crest);
+  color: var(--c-glow);
   font-size: var(--fs-sm);
   min-width: 10rem;
   flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-body);
+  padding: 0;
 }
 
-.meaning-desc {
+.meaning-topic:hover { color: var(--c-glow-bright); }
+
+.meaning-desc { font-size: var(--fs-sm); color: var(--c-drift); }
+
+/* ─── Follow-ups ─── */
+.entry-followups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-5);
+}
+
+.followup-chip {
+  font-family: var(--font-body);
   font-size: var(--fs-sm);
   color: var(--c-drift);
-}
-
-.raw-json {
-  margin-top: var(--sp-2);
-}
-
-.raw-json summary {
-  font-size: var(--fs-xs);
-  color: var(--c-drift);
+  background: var(--c-deep);
+  border: 1px solid var(--c-trench);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-full);
   cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+  white-space: nowrap;
 }
 
-.raw-json pre {
+.followup-chip:hover {
+  color: var(--c-glow);
+  border-color: var(--c-glow-dim);
+  background: var(--c-glow-faint);
+}
+
+.entry-meta {
+  margin-top: var(--sp-5);
   font-size: var(--fs-xs);
-  color: var(--c-foam);
-  background: var(--c-abyss);
-  padding: var(--sp-3);
-  border-radius: var(--radius-sm);
-  overflow-x: auto;
-  margin-top: var(--sp-2);
+  color: var(--c-shelf);
 }
 
 /* ─── Loading ─── */
@@ -343,9 +302,7 @@ async function handleQuery(query: string) {
   animation: spin 0.7s linear infinite;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
+@keyframes spin { to { transform: rotate(360deg); } }
 
 /* ─── Error ─── */
 .error-card {
@@ -369,8 +326,7 @@ async function handleQuery(query: string) {
   .hero-sub { font-size: var(--fs-base); }
   .page { padding: 0 var(--sp-3); }
   .prompt-area { padding: var(--sp-3) 0 var(--sp-4); }
-  .result-row { flex-direction: column; gap: var(--sp-1); }
-  .result-label { min-width: unset; }
-  .meaning-row { margin-left: 0; }
+  .meaning-row { flex-direction: column; gap: var(--sp-1); }
+  .meaning-topic { min-width: unset; }
 }
 </style>
