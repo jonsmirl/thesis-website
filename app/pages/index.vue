@@ -17,13 +17,18 @@ onMounted(async () => {
         aiAvailable.value = avail === 'readily' || avail === 'after-download'
         if (aiAvailable.value) {
           session = await LM.create({
-            systemPrompt: `You are a search query preprocessor. Given a raw user query, respond with ONLY a JSON object (no markdown, no backticks) with these fields:
-- corrected: the spell-corrected query
-- ambiguous: boolean, true if the query is short/vague with multiple possible meanings
-- classification: one of "gibberish", "ambiguous", "clear"
-- meanings: if ambiguous, array of possible meanings (max 5), each with {topic, description}
-- expanded: the query expanded with enough context to be unambiguous for embedding search
-- confidence: 0-1 how confident you are in the interpretation`
+            expectedInputs: [{ type: 'text', languages: ['en'] }],
+            expectedOutputs: [{ type: 'text', languages: ['en'] }],
+            systemPrompt: `You are a search query preprocessor. You receive raw search queries and analyze them.
+
+ALWAYS respond with a JSON object. Never ask clarifying questions. Never refuse. Treat every input as a search query to analyze.
+
+JSON format:
+{"corrected":"spell-corrected query","ambiguous":true/false,"classification":"gibberish|ambiguous|clear","meanings":[{"topic":"Name","description":"Brief description"}],"expanded":"query expanded with enough context to be unambiguous","confidence":0.0-1.0}
+
+If the query is clear and unambiguous, set ambiguous to false and meanings to an empty array.
+If the query is short or has multiple meanings, set ambiguous to true and list up to 5 meanings.
+If the query is random characters, set classification to gibberish.`
           })
         }
       }
@@ -45,7 +50,7 @@ async function handleQuery(query: string) {
       return
     }
 
-    const response = await session.prompt(`Preprocess this search query: "${query}"`)
+    const response = await session.prompt(`Analyze this search query and respond with JSON only: ${query}`)
 
     // Try to parse as JSON
     try {
