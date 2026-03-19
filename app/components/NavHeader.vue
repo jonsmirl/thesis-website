@@ -1,7 +1,7 @@
 <template>
   <header class="nav-header">
     <div class="nav-inner">
-      <NuxtLink to="/" class="logo"><span class="logo-ces">ces</span>Claw</NuxtLink>
+      <NuxtLink to="/" class="logo"><span class="logo-ces">ces</span><span class="logo-claw">Claw</span></NuxtLink>
       <nav>
         <NuxtLink to="/papers">Papers</NuxtLink>
         <NuxtLink to="/wiki">Wiki</NuxtLink>
@@ -77,6 +77,9 @@ async function handleLogout() {
 .logo-ces {
   font-variant: small-caps;
   text-transform: lowercase;
+}
+.logo-claw {
+  color: var(--c-glow);
 }
 nav {
   display: flex;
