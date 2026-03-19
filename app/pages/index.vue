@@ -149,7 +149,7 @@ if (import.meta.client) {
     <div v-if="showHero" class="hero">
       <div class="hero-glow" />
       <h1 class="hero-title">
-        Ces<span class="hero-accent">Claw</span>
+        <span class="hero-ces">ces</span><span class="hero-accent">Claw</span>
       </h1>
       <p class="hero-sub">
         No install. No API keys. Just ask.
@@ -251,6 +251,11 @@ if (import.meta.client) {
   color: var(--c-crest);
   position: relative;
   z-index: 1;
+}
+
+.hero-ces {
+  font-variant: small-caps;
+  text-transform: lowercase;
 }
 
 .hero-accent {
