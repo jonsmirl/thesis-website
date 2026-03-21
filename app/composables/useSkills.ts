@@ -73,16 +73,12 @@ export function useSkills() {
 
   async function compileSkill(skillMarkdown: string): Promise<CompileResponse> {
     const config = useRuntimeConfig()
-    const { data: { session } } = await client.auth.getSession()
-    if (!session) throw new Error('Not authenticated — please sign in first')
+    const { getAuthHeaders } = useAuth()
+    const headers = await getAuthHeaders()
 
     const data = await $fetch(`${config.public.supabase.url}/functions/v1/compile-skill`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${session.access_token}`,
-        'Content-Type': 'application/json',
-        'apikey': config.public.supabase.key,
-      },
+      headers,
       body: { skill_markdown: skillMarkdown },
     })
 
