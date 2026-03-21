@@ -56,13 +56,14 @@ export interface CompileResponse {
 }
 
 export function useSkills() {
-  const client = useSupabaseClient()
+  const { getClient } = useAuth()
 
-  // Helper to access the openclaw schema
-  const openclaw = () => client.schema('openclaw')
+  // Helper to access the openclaw schema — uses the auth-aware client
+  const openclaw = async () => (await getClient()).schema('openclaw')
 
   async function listSkills(): Promise<CompiledSkill[]> {
-    const { data, error } = await openclaw()
+    const db = await openclaw()
+    const { data, error } = await db
       .from('compiled_skills')
       .select('*')
       .order('updated_at', { ascending: false })
@@ -86,7 +87,8 @@ export function useSkills() {
   }
 
   async function deleteSkill(id: string): Promise<void> {
-    const { error } = await openclaw()
+    const db = await openclaw()
+    const { error } = await db
       .from('compiled_skills')
       .delete()
       .eq('id', id)
