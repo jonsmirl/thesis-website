@@ -647,10 +647,7 @@ defineExpose({ reset, loadSkill, activeSkillId })
 
     <!-- Compiled tab -->
     <div v-show="activeTab === 'compiled'" class="tab-panel">
-      <div v-if="skillClass === 'llm_required'" class="compiled-warning">
-        This skill is classified as LLM Required and cannot be compiled to deterministic JavaScript.
-      </div>
-      <div v-else-if="compiledScript" class="compiled-output">
+      <div v-if="compiledScript" class="compiled-output">
         <!-- Tier badge -->
         <div v-if="llmTier" class="tier-row">
           <span class="tier-label">On-device tier:</span>
@@ -728,6 +725,9 @@ defineExpose({ reset, loadSkill, activeSkillId })
             </div>
           </div>
         </div>
+      </div>
+      <div v-else-if="skillClass === 'llm_required' && !compiledScript" class="compiled-warning">
+        This skill could not be decomposed into compilable steps. It requires a full LLM at runtime.
       </div>
       <div v-else class="compiled-empty">
         No compiled output yet. Write a skill and click Compile.
