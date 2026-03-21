@@ -33,6 +33,15 @@ async function handleDelete() {
       <div class="skill-desc">{{ skill.description }}</div>
       <div class="skill-meta">
         <SkillClassBadge :skill-class="skill.skill_class" />
+        <span
+          v-if="skill.skill_type === 'workflow'"
+          class="workflow-badge"
+        >workflow &middot; {{ skill.step_count }} steps</span>
+        <span
+          v-if="skill.schedule"
+          class="schedule-badge"
+          :title="skill.schedule"
+        >scheduled</span>
         <span class="status-dot" :class="skill.verified ? 'status-dot--verified' : 'status-dot--unverified'" />
       </div>
     </div>
@@ -111,6 +120,30 @@ async function handleDelete() {
 
 .status-dot--unverified {
   background: var(--c-shelf);
+}
+
+.workflow-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--c-glow);
+  background: var(--c-glow-faint);
+  border: 1px solid var(--c-glow-dim);
+  border-radius: var(--radius-full);
+  padding: 1px var(--sp-2);
+  white-space: nowrap;
+}
+
+.schedule-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--c-warning);
+  background: #f59e0b11;
+  border: 1px solid #f59e0b33;
+  border-radius: var(--radius-full);
+  padding: 1px var(--sp-2);
+  white-space: nowrap;
 }
 
 .skill-actions {

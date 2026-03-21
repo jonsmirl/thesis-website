@@ -63,7 +63,7 @@ defineExpose({ refresh })
     </div>
 
     <button class="new-skill-btn" @click="emit('new-skill')">
-      + New Skill
+      + New Skill / Workflow
     </button>
   </div>
 </template>
