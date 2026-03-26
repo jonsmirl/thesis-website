@@ -77,13 +77,20 @@ export function useAuth() {
   /**
    * Sign in with OAuth provider (Google, GitHub)
    */
-  const signInWithOAuth = async (provider: 'google' | 'github') => {
+  /**
+   * Sign in with OAuth provider (Google, GitHub).
+   * If deviceRedirectUrl is provided (e.g. http://localhost:9876/callback),
+   * Supabase redirects there after auth — used by Linux/desktop app.
+   */
+  const signInWithOAuth = async (provider: 'google' | 'github', deviceRedirectUrl?: string) => {
     if (!import.meta.client) return
 
     const authClient = getLocalStorageClient()
     if (!authClient) throw new Error('Auth client not available')
 
-    const redirectUrl = `${window.location.origin}/confirm`
+    // Device app login: redirect tokens to localhost callback
+    // Website login: redirect to /confirm on this origin
+    const redirectUrl = deviceRedirectUrl || `${window.location.origin}/confirm`
     const { error } = await authClient.auth.signInWithOAuth({
       provider,
       options: { redirectTo: redirectUrl },

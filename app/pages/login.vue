@@ -43,15 +43,26 @@
 definePageMeta({ layout: false })
 
 const { signInWithOAuth } = useAuth()
+const route = useRoute()
 
 const oauthLoading = ref(false)
 const error = ref('')
+
+// Linux/desktop app passes redirect_to=http://localhost:PORT/callback
+const deviceRedirect = computed(() => {
+  const r = route.query.redirect_to as string | undefined
+  // Only allow localhost redirects (security: prevent open redirect)
+  if (r && /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\//.test(r)) {
+    return r
+  }
+  return null
+})
 
 async function handleOAuth(provider: 'google' | 'github') {
   oauthLoading.value = true
   error.value = ''
   try {
-    await signInWithOAuth(provider)
+    await signInWithOAuth(provider, deviceRedirect.value ?? undefined)
   } catch (err: any) {
     error.value = err.message || 'Sign in failed.'
     oauthLoading.value = false
