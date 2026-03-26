@@ -129,6 +129,10 @@ async function proxyAction(token: string, action: string, eventType?: string) {
   }
 }
 
+async function handleDeploy(token: string) {
+  await proxyAction(token, 'notify', 'deploy_skill')
+}
+
 async function handleReauthorize(token: string) {
   await proxyAction(token, 'notify', 'reauthorize')
 }
@@ -267,6 +271,14 @@ watch(user, (u) => {
           </div>
 
           <div class="device-actions">
+            <button
+              class="action-btn deploy"
+              :disabled="actionLoading === device.token || device.online !== true"
+              @click="handleDeploy(device.token)"
+              title="Deploy compiled skills to device (must be online)"
+            >
+              Deploy
+            </button>
             <button
               class="action-btn reauth"
               :disabled="actionLoading === device.token || device.online !== true"
@@ -565,6 +577,12 @@ watch(user, (u) => {
 .action-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.action-btn.deploy:hover:not(:disabled) {
+  color: var(--c-glow);
+  border-color: var(--c-glow-dim);
+  background: var(--c-glow-faint);
 }
 
 .action-btn.reauth:hover:not(:disabled) {
