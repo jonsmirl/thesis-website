@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { user, getClient, getAuthHeaders } = useAuth()
+const config = useRuntimeConfig()
 
 interface DeviceToken {
   token: string
@@ -9,13 +10,20 @@ interface DeviceToken {
   expires_at: string
 }
 
-const devices = ref<DeviceToken[]>([])
+interface DeviceWithStatus extends DeviceToken {
+  online: boolean | null  // null = not yet checked
+  checking: boolean
+}
+
+const devices = ref<DeviceWithStatus[]>([])
 const loading = ref(true)
 const error = ref('')
 const actionLoading = ref<string | null>(null)
 const confirmDialog = ref<{ token: string; action: 'logout' | 'remove' } | null>(null)
 
 const cesclaw = async () => (await getClient()).schema('cesclaw')
+
+const proxyUrl = computed(() => `${config.public.supabase.url}/functions/v1/device-proxy`)
 
 async function fetchDevices() {
   loading.value = true
@@ -28,11 +36,41 @@ async function fetchDevices() {
       .order('created_at', { ascending: false })
 
     if (err) throw err
-    devices.value = (data as DeviceToken[]) || []
+    devices.value = ((data as DeviceToken[]) || []).map(d => ({
+      ...d,
+      online: null,
+      checking: false,
+    }))
+
+    // Ping each device for live status
+    for (const device of devices.value) {
+      pingDevice(device)
+    }
   } catch (e: any) {
     error.value = e.message || 'Failed to load devices'
   } finally {
     loading.value = false
+  }
+}
+
+async function pingDevice(device: DeviceWithStatus) {
+  device.checking = true
+  try {
+    const headers = await getAuthHeaders()
+    const resp = await fetch(
+      `${proxyUrl.value}?action=status&token=${device.token}`,
+      { headers }
+    )
+    if (resp.ok) {
+      const data = await resp.json()
+      device.online = data.connected
+    } else {
+      device.online = false
+    }
+  } catch {
+    device.online = false
+  } finally {
+    device.checking = false
   }
 }
 
@@ -65,64 +103,46 @@ function truncateToken(token: string): string {
   return token.substring(0, 8) + '...'
 }
 
-async function sendDeviceEvent(token: string, eventType: string) {
+async function proxyAction(token: string, action: string, eventType?: string) {
   actionLoading.value = token
   try {
-    const config = useRuntimeConfig()
     const headers = await getAuthHeaders()
-
-    // Send event via webhook-hub
-    const resp = await fetch(
-      `${config.public.supabase.url}/functions/v1/device-event`,
-      {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          device_token: token,
-          event_type: eventType,
-        }),
-      }
-    )
-
+    const resp = await fetch(proxyUrl.value, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        action,
+        token,
+        event_type: eventType,
+      }),
+    })
     if (!resp.ok) {
       const body = await resp.text()
-      throw new Error(`Failed to send event: ${body}`)
+      throw new Error(body)
     }
+    return await resp.json()
   } catch (e: any) {
     error.value = e.message
+    return null
   } finally {
     actionLoading.value = null
   }
 }
 
 async function handleReauthorize(token: string) {
-  await sendDeviceEvent(token, 'reauthorize')
+  await proxyAction(token, 'notify', 'reauthorize')
 }
 
 async function handleLogout(token: string) {
-  await sendDeviceEvent(token, 'logout')
+  await proxyAction(token, 'notify', 'logout')
   confirmDialog.value = null
-  // Refresh list — device should disappear once it wipes its token
   setTimeout(() => fetchDevices(), 2000)
 }
 
 async function handleRemove(token: string) {
-  actionLoading.value = token
-  try {
-    const db = await cesclaw()
-    const { error: err } = await db
-      .from('device_auth_tokens')
-      .delete()
-      .eq('token', token)
-
-    if (err) throw err
-    devices.value = devices.value.filter(d => d.token !== token)
-  } catch (e: any) {
-    error.value = e.message
-  } finally {
-    actionLoading.value = null
-    confirmDialog.value = null
-  }
+  await proxyAction(token, 'remove')
+  confirmDialog.value = null
+  devices.value = devices.value.filter(d => d.token !== token)
 }
 
 function confirmAction(token: string, action: 'logout' | 'remove') {
@@ -229,12 +249,19 @@ watch(user, (u) => {
 
             <div class="device-info">
               <div class="device-name">
+                <span class="status-dot" :class="{
+                  online: device.online === true,
+                  offline: device.online === false,
+                  checking: device.online === null,
+                }" :title="device.online === true ? 'Online' : device.online === false ? 'Offline' : 'Checking...'"></span>
                 {{ device.device_type }}
                 <span class="device-token" :title="device.token">{{ truncateToken(device.token) }}</span>
               </div>
               <div class="device-meta">
                 Registered {{ formatDate(device.created_at) }}
-                <span v-if="isExpired(device.expires_at)" class="badge badge-expired">token expired</span>
+                <span v-if="device.online === true" class="badge badge-online">online</span>
+                <span v-else-if="device.online === false && !device.checking" class="badge badge-offline">offline</span>
+                <span v-if="isExpired(device.expires_at)" class="badge badge-expired">auth expired</span>
               </div>
             </div>
           </div>
@@ -242,17 +269,17 @@ watch(user, (u) => {
           <div class="device-actions">
             <button
               class="action-btn reauth"
-              :disabled="actionLoading === device.token"
+              :disabled="actionLoading === device.token || device.online !== true"
               @click="handleReauthorize(device.token)"
-              title="Send reauthorize signal to device"
+              title="Send reauthorize signal to device (must be online)"
             >
               Reauthorize
             </button>
             <button
               class="action-btn logout-btn"
-              :disabled="actionLoading === device.token"
+              :disabled="actionLoading === device.token || device.online !== true"
               @click="confirmAction(device.token, 'logout')"
-              title="Remotely log out and wipe device tokens"
+              title="Remotely log out and wipe device tokens (must be online)"
             >
               Logout
             </button>
@@ -476,9 +503,39 @@ watch(user, (u) => {
   letter-spacing: 0.03em;
 }
 
+.badge-online {
+  background: #0d2818;
+  color: #56d364;
+}
+
+.badge-offline {
+  background: var(--c-trench);
+  color: var(--c-drift);
+}
+
 .badge-expired {
   background: #3d1117;
   color: #f85149;
+}
+
+/* Status dot */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--c-shelf);
+}
+.status-dot.online {
+  background: #3fb950;
+  box-shadow: 0 0 6px #3fb95066;
+}
+.status-dot.offline {
+  background: var(--c-shelf);
+}
+.status-dot.checking {
+  background: var(--c-shelf);
+  animation: breathe 1.5s ease-in-out infinite;
 }
 
 /* Actions */
