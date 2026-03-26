@@ -694,5 +694,3 @@ watch(user, (u) => {
   }
 }
 </style>
-</content>
-</invoke>
