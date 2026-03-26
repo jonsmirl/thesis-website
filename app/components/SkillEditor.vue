@@ -8,7 +8,7 @@ import {
 import { getServiceToken } from '~/utils/local-tokens'
 
 type Tab = 'edit' | 'services' | 'compiled' | 'test'
-type CompileStatus = 'idle' | 'compiling' | 'success' | 'cached' | 'error'
+type CompileStatus = 'idle' | 'compiling' | 'success' | 'cached' | 'error' | 'rate_limited'
 type CommandDispatch = 'direct' | 'model'
 type SkillType = 'skill' | 'workflow'
 
@@ -56,6 +56,8 @@ const customExtras = ref<{
 const compiledScript = ref<string | null>(null)
 const compileStatus = ref<CompileStatus>('idle')
 const compileError = ref('')
+const cooldownSeconds = ref(0)
+let cooldownTimer: ReturnType<typeof setInterval> | null = null
 const skillClass = ref<CompiledSkill['skill_class'] | null>(null)
 const llmTier = ref<LlmTier | null>(null)
 const llmSteps = ref<LlmStep[] | null>(null)
@@ -420,6 +422,20 @@ function loadSkill(skill: CompiledSkill) {
 
 // ─── Compile ─────────────────────────────────────────────────────────────────
 
+function startCooldown(seconds: number) {
+  cooldownSeconds.value = seconds
+  if (cooldownTimer) clearInterval(cooldownTimer)
+  cooldownTimer = setInterval(() => {
+    cooldownSeconds.value--
+    if (cooldownSeconds.value <= 0) {
+      clearInterval(cooldownTimer!)
+      cooldownTimer = null
+      compileStatus.value = 'idle'
+      compileError.value = ''
+    }
+  }, 1000)
+}
+
 async function handleCompile() {
   compileStatus.value = 'compiling'
   compileError.value = ''
@@ -435,7 +451,11 @@ async function handleCompile() {
     stepCount.value = result.step_count || 1
     compileStatus.value = result.cached ? 'cached' : 'success'
 
-    if (result.error) {
+    if (result.error === 'rate_limited') {
+      compileStatus.value = 'rate_limited'
+      compileError.value = 'Server busy — too many compilations'
+      startCooldown(result.retry_after || 120)
+    } else if (result.error) {
       compileError.value = result.error
       compileStatus.value = 'error'
     } else {
@@ -604,7 +624,7 @@ defineExpose({ reset, loadSkill, activeSkillId })
         <div class="edit-spacer" />
         <button
           class="compile-btn"
-          :disabled="compileStatus === 'compiling'"
+          :disabled="compileStatus === 'compiling' || compileStatus === 'rate_limited'"
           @click="handleCompile"
         >
           <span v-if="compileStatus === 'compiling'" class="compile-spinner" />
@@ -615,9 +635,15 @@ defineExpose({ reset, loadSkill, activeSkillId })
               'compile-dot--success': compileStatus === 'success',
               'compile-dot--cached': compileStatus === 'cached',
               'compile-dot--error': compileStatus === 'error',
+              'compile-dot--busy': compileStatus === 'rate_limited',
             }"
           />
-          {{ compileStatus === 'compiling' ? 'Compiling...' : 'Compile' }}
+          <template v-if="compileStatus === 'rate_limited'">
+            Busy {{ Math.floor(cooldownSeconds / 60) }}:{{ String(cooldownSeconds % 60).padStart(2, '0') }}
+          </template>
+          <template v-else>
+            {{ compileStatus === 'compiling' ? 'Compiling...' : 'Compile' }}
+          </template>
         </button>
       </div>
 
@@ -1096,6 +1122,16 @@ defineExpose({ reset, loadSkill, activeSkillId })
 
 .compile-dot--error {
   background: var(--c-error);
+}
+
+.compile-dot--busy {
+  background: var(--c-warning, #f59e0b);
+  animation: pulse-busy 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-busy {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 .import-notice {

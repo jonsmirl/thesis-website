@@ -1,5 +1,5 @@
 /**
- * Skills composable — CRUD for compiled skills via Supabase (openclaw schema).
+ * Skills composable — CRUD for compiled skills via Supabase (cesclaw schema).
  */
 
 export type LlmTier = 'none' | 'nano' | 'local_3b' | 'cloud_required'
@@ -53,16 +53,17 @@ export interface CompileResponse {
   step_count: number
   step_manifest: StepManifestEntry[] | null
   error?: string
+  retry_after?: number
 }
 
 export function useSkills() {
   const { getClient } = useAuth()
 
-  // Helper to access the openclaw schema — uses the auth-aware client
-  const openclaw = async () => (await getClient()).schema('openclaw')
+  // Helper to access the cesclaw schema — uses the auth-aware client
+  const cesclaw = async () => (await getClient()).schema('cesclaw')
 
   async function listSkills(): Promise<CompiledSkill[]> {
-    const db = await openclaw()
+    const db = await cesclaw()
     const { data, error } = await db
       .from('compiled_skills')
       .select('*')
@@ -87,7 +88,7 @@ export function useSkills() {
   }
 
   async function deleteSkill(id: string): Promise<void> {
-    const db = await openclaw()
+    const db = await cesclaw()
     const { error } = await db
       .from('compiled_skills')
       .delete()
