@@ -166,6 +166,87 @@ function executeConfirm() {
   }
 }
 
+// Log viewer state
+const logPanel = ref<{ token: string; deviceType: string } | null>(null)
+const logLines = ref<any[]>([])
+const logPage = ref(0)
+const logTotalPages = ref(0)
+const logLoading = ref(false)
+const logError = ref('')
+
+// Device info from RPC
+const deviceInfo = ref<any>(null)
+
+async function queryDevice(token: string, request: any): Promise<any> {
+  const headers = await getAuthHeaders()
+  const resp = await fetch(proxyUrl.value, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ action: 'query', token, request }),
+  })
+  if (!resp.ok) {
+    const body = await resp.text()
+    throw new Error(body)
+  }
+  const data = await resp.json()
+  return data.response
+}
+
+async function openLogs(device: DeviceWithStatus) {
+  logPanel.value = { token: device.token, deviceType: device.device_type }
+  logPage.value = 0
+  logLines.value = []
+  logError.value = ''
+  deviceInfo.value = null
+
+  // Fetch status and logs in parallel
+  await Promise.all([
+    fetchLogs(device.token, 0),
+    fetchDeviceInfo(device.token),
+  ])
+}
+
+async function fetchLogs(token: string, page: number) {
+  logLoading.value = true
+  logError.value = ''
+  try {
+    const result = await queryDevice(token, { type: 'fetch_logs', page, lines: 50 })
+    logLines.value = result.lines || []
+    logPage.value = result.page || 0
+    logTotalPages.value = result.total_pages || 0
+  } catch (e: any) {
+    logError.value = e.message || 'Failed to fetch logs'
+  } finally {
+    logLoading.value = false
+  }
+}
+
+async function fetchDeviceInfo(token: string) {
+  try {
+    const [status, skills] = await Promise.all([
+      queryDevice(token, { type: 'get_status' }),
+      queryDevice(token, { type: 'get_skills' }),
+    ])
+    deviceInfo.value = { ...status, skills: skills?.skills || [] }
+  } catch {
+    // Non-critical
+  }
+}
+
+function closeLogs() {
+  logPanel.value = null
+}
+
+async function logPagePrev() {
+  if (!logPanel.value || logPage.value <= 0) return
+  await fetchLogs(logPanel.value.token, logPage.value - 1)
+}
+
+async function logPageNext() {
+  if (!logPanel.value || logPage.value >= logTotalPages.value - 1) return
+  await fetchLogs(logPanel.value.token, logPage.value + 1)
+}
+
 onMounted(() => {
   if (user.value) fetchDevices()
 })
@@ -280,6 +361,14 @@ watch(user, (u) => {
               Deploy
             </button>
             <button
+              class="action-btn logs-btn"
+              :disabled="device.online !== true"
+              @click="openLogs(device)"
+              title="View device logs and status (must be online)"
+            >
+              Logs
+            </button>
+            <button
               class="action-btn reauth"
               :disabled="actionLoading === device.token || device.online !== true"
               @click="handleReauthorize(device.token)"
@@ -332,6 +421,58 @@ watch(user, (u) => {
               >
                 {{ confirmDialog.action === 'logout' ? 'Log out device' : 'Remove device' }}
               </button>
+            </div>
+          </div>
+        </div>
+      </Teleport>
+
+      <!-- Log panel -->
+      <Teleport to="body">
+        <div v-if="logPanel" class="log-overlay" @click.self="closeLogs">
+          <div class="log-panel">
+            <div class="log-header">
+              <div class="log-title">
+                <span class="log-device-type">{{ logPanel.deviceType }}</span>
+                {{ logPanel.token.substring(0, 8) }}...
+              </div>
+              <button class="log-close" @click="closeLogs">&times;</button>
+            </div>
+
+            <!-- Device info bar -->
+            <div v-if="deviceInfo" class="log-info-bar">
+              <span>v{{ deviceInfo.version || '?' }}</span>
+              <span v-if="deviceInfo.skills?.length">{{ deviceInfo.skills.length }} skill{{ deviceInfo.skills.length !== 1 ? 's' : '' }}</span>
+              <span v-else>No skills</span>
+            </div>
+
+            <!-- Skills list -->
+            <div v-if="deviceInfo?.skills?.length" class="log-skills">
+              <div v-for="skill in deviceInfo.skills" :key="skill.name" class="log-skill-tag">
+                {{ skill.name }}
+                <span class="log-skill-class">{{ skill.skill_class }}</span>
+              </div>
+            </div>
+
+            <!-- Log content -->
+            <div class="log-content">
+              <div v-if="logLoading" class="log-loading">Loading...</div>
+              <div v-else-if="logError" class="log-error">{{ logError }}</div>
+              <div v-else-if="logLines.length === 0" class="log-empty">No log entries</div>
+              <div v-else class="log-entries">
+                <div v-for="(line, i) in logLines" :key="i" class="log-entry">
+                  <span v-if="line.timestamp" class="log-ts">{{ new Date(line.timestamp).toLocaleTimeString() }}</span>
+                  <span v-if="line.event_type" class="log-event">{{ line.event_type }}</span>
+                  <span v-if="line.action" class="log-action">{{ line.action }}</span>
+                  <span class="log-detail">{{ line.message || line.result || JSON.stringify(line) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pagination -->
+            <div v-if="logTotalPages > 1" class="log-pagination">
+              <button class="log-page-btn" :disabled="logPage <= 0" @click="logPagePrev">Prev</button>
+              <span class="log-page-info">{{ logPage + 1 }} / {{ logTotalPages }}</span>
+              <button class="log-page-btn" :disabled="logPage >= logTotalPages - 1" @click="logPageNext">Next</button>
             </div>
           </div>
         </div>
@@ -585,6 +726,11 @@ watch(user, (u) => {
   background: var(--c-glow-faint);
 }
 
+.action-btn.logs-btn:hover:not(:disabled) {
+  color: #58a6ff;
+  border-color: #58a6ff44;
+}
+
 .action-btn.reauth:hover:not(:disabled) {
   color: var(--c-glow);
   border-color: var(--c-glow-dim);
@@ -752,6 +898,185 @@ watch(user, (u) => {
 .confirm-execute.destructive:hover {
   background: #ff6b63;
   box-shadow: 0 0 20px #f8514933;
+}
+
+/* Log panel */
+.log-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(6, 10, 20, 0.85);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn var(--dur-fast) var(--ease-out);
+}
+
+.log-panel {
+  background: var(--c-abyss);
+  border: 1px solid var(--c-trench);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 720px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  animation: fadeInUp var(--dur-normal) var(--ease-spring);
+}
+
+.log-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4) var(--sp-5);
+  border-bottom: 1px solid var(--c-trench);
+}
+
+.log-title {
+  font-family: var(--font-mono);
+  font-size: var(--fs-sm);
+  color: var(--c-crest);
+}
+
+.log-device-type {
+  font-weight: 600;
+  color: var(--c-glow);
+  margin-right: var(--sp-2);
+}
+
+.log-close {
+  background: none;
+  border: none;
+  color: var(--c-drift);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 var(--sp-1);
+  line-height: 1;
+}
+.log-close:hover { color: var(--c-crest); }
+
+.log-info-bar {
+  display: flex;
+  gap: var(--sp-4);
+  padding: var(--sp-2) var(--sp-5);
+  font-size: var(--fs-xs);
+  color: var(--c-drift);
+  border-bottom: 1px solid var(--c-deep);
+}
+
+.log-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-5);
+  border-bottom: 1px solid var(--c-deep);
+}
+
+.log-skill-tag {
+  font-size: var(--fs-xs);
+  background: var(--c-trench);
+  color: var(--c-foam);
+  padding: 0.15em 0.5em;
+  border-radius: var(--radius-sm);
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+.log-skill-class {
+  color: var(--c-drift);
+  font-size: 0.6875rem;
+}
+
+.log-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-3) var(--sp-5);
+  min-height: 200px;
+  max-height: 50vh;
+}
+
+.log-loading, .log-empty {
+  text-align: center;
+  color: var(--c-drift);
+  padding: var(--sp-8);
+  font-size: var(--fs-sm);
+}
+
+.log-error {
+  text-align: center;
+  color: #f85149;
+  padding: var(--sp-8);
+  font-size: var(--fs-sm);
+}
+
+.log-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.log-entry {
+  display: flex;
+  gap: var(--sp-2);
+  padding: var(--sp-1) 0;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+  color: var(--c-foam);
+  border-bottom: 1px solid var(--c-deep);
+}
+
+.log-ts {
+  color: var(--c-drift);
+  flex-shrink: 0;
+  min-width: 5.5em;
+}
+
+.log-event {
+  color: var(--c-glow);
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.log-action {
+  color: #58a6ff;
+  flex-shrink: 0;
+}
+
+.log-detail {
+  color: var(--c-foam);
+  word-break: break-word;
+}
+
+.log-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-5);
+  border-top: 1px solid var(--c-trench);
+}
+
+.log-page-btn {
+  font-family: var(--font-body);
+  font-size: var(--fs-xs);
+  padding: var(--sp-1) var(--sp-3);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--c-trench);
+  background: var(--c-deep);
+  color: var(--c-foam);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.log-page-btn:hover:not(:disabled) { background: var(--c-trench); }
+.log-page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.log-page-info {
+  font-size: var(--fs-xs);
+  color: var(--c-drift);
 }
 
 /* Responsive */
