@@ -257,11 +257,7 @@ async function deploySkills() {
   deploying.value = true
   deployMessage.value = ''
   try {
-    // Send sync_skills event with install/remove lists via sidecar
-    await proxyAction(panel.value.token, 'notify', 'sync_skills')
-
-    // The notify carries the event_type. We need to pass data too.
-    // Use the query RPC to send the skill lists and wait for confirmation.
+    // Send install/remove lists via RPC query — device fetches from Supabase
     const result = await queryDevice(panel.value.token, {
       type: 'sync_skills',
       install: toInstall.value,
