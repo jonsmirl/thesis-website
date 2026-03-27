@@ -129,10 +129,6 @@ async function proxyAction(token: string, action: string, eventType?: string) {
   }
 }
 
-async function handleDeploy(token: string) {
-  await proxyAction(token, 'notify', 'deploy_skill')
-}
-
 async function handleReauthorize(token: string) {
   await proxyAction(token, 'notify', 'reauthorize')
 }
@@ -166,16 +162,30 @@ function executeConfirm() {
   }
 }
 
-// Log viewer state
-const logPanel = ref<{ token: string; deviceType: string } | null>(null)
+// Device panel state
+const panel = ref<{ token: string; deviceType: string } | null>(null)
+const panelTab = ref<'skills' | 'logs'>('skills')
+const deviceInfo = ref<any>(null)
+
+// Skills tab
+interface SkillEntry {
+  name: string
+  skill_class: string
+  compiled_at: string
+  onDevice: boolean
+  selected: boolean
+}
+const allSkills = ref<SkillEntry[]>([])
+const skillsLoading = ref(false)
+const deploying = ref(false)
+const deployMessage = ref('')
+
+// Logs tab
 const logLines = ref<any[]>([])
 const logPage = ref(0)
 const logTotalPages = ref(0)
 const logLoading = ref(false)
 const logError = ref('')
-
-// Device info from RPC
-const deviceInfo = ref<any>(null)
 
 async function queryDevice(token: string, request: any): Promise<any> {
   const headers = await getAuthHeaders()
@@ -192,18 +202,90 @@ async function queryDevice(token: string, request: any): Promise<any> {
   return data.response
 }
 
-async function openLogs(device: DeviceWithStatus) {
-  logPanel.value = { token: device.token, deviceType: device.device_type }
-  logPage.value = 0
-  logLines.value = []
-  logError.value = ''
+async function openPanel(device: DeviceWithStatus) {
+  panel.value = { token: device.token, deviceType: device.device_type }
+  panelTab.value = 'skills'
+  deployMessage.value = ''
   deviceInfo.value = null
+  allSkills.value = []
+  logLines.value = []
 
-  // Fetch status and logs in parallel
-  await Promise.all([
-    fetchLogs(device.token, 0),
-    fetchDeviceInfo(device.token),
-  ])
+  await loadSkillsTab(device.token)
+}
+
+async function loadSkillsTab(token: string) {
+  skillsLoading.value = true
+  try {
+    // Fetch user's skills from Supabase and device's installed skills in parallel
+    const db = await cesclaw()
+    const [supabaseResult, deviceSkills, status] = await Promise.all([
+      db.from('compiled_skills').select('name, skill_class, compiled_at, verified').order('name'),
+      queryDevice(token, { type: 'get_skills' }).catch(() => ({ skills: [] })),
+      queryDevice(token, { type: 'get_status' }).catch(() => null),
+    ])
+
+    deviceInfo.value = status
+    const onDeviceNames = new Set((deviceSkills?.skills || []).map((s: any) => s.name))
+
+    allSkills.value = ((supabaseResult.data || []) as any[]).map(s => ({
+      name: s.name,
+      skill_class: s.skill_class,
+      compiled_at: s.compiled_at,
+      onDevice: onDeviceNames.has(s.name),
+      selected: onDeviceNames.has(s.name),
+    }))
+  } catch (e: any) {
+    error.value = e.message
+  } finally {
+    skillsLoading.value = false
+  }
+}
+
+function toggleSkill(skill: SkillEntry) {
+  skill.selected = !skill.selected
+}
+
+const hasChanges = computed(() => {
+  return allSkills.value.some(s => s.selected !== s.onDevice)
+})
+
+const toInstall = computed(() => allSkills.value.filter(s => s.selected && !s.onDevice).map(s => s.name))
+const toRemove = computed(() => allSkills.value.filter(s => !s.selected && s.onDevice).map(s => s.name))
+
+async function deploySkills() {
+  if (!panel.value || !hasChanges.value) return
+  deploying.value = true
+  deployMessage.value = ''
+  try {
+    // Send sync_skills event with install/remove lists via sidecar
+    await proxyAction(panel.value.token, 'notify', 'sync_skills')
+
+    // The notify carries the event_type. We need to pass data too.
+    // Use the query RPC to send the skill lists and wait for confirmation.
+    const result = await queryDevice(panel.value.token, {
+      type: 'sync_skills',
+      install: toInstall.value,
+      remove: toRemove.value,
+    })
+
+    const installed = result?.installed || 0
+    const removed = result?.removed || 0
+    deployMessage.value = `Deployed: ${installed} installed, ${removed} removed`
+
+    // Refresh skill list
+    await loadSkillsTab(panel.value.token)
+  } catch (e: any) {
+    deployMessage.value = `Error: ${e.message}`
+  } finally {
+    deploying.value = false
+  }
+}
+
+async function switchTab(tab: 'skills' | 'logs') {
+  panelTab.value = tab
+  if (tab === 'logs' && panel.value) {
+    await fetchLogs(panel.value.token, 0)
+  }
 }
 
 async function fetchLogs(token: string, page: number) {
@@ -221,30 +303,18 @@ async function fetchLogs(token: string, page: number) {
   }
 }
 
-async function fetchDeviceInfo(token: string) {
-  try {
-    const [status, skills] = await Promise.all([
-      queryDevice(token, { type: 'get_status' }),
-      queryDevice(token, { type: 'get_skills' }),
-    ])
-    deviceInfo.value = { ...status, skills: skills?.skills || [] }
-  } catch {
-    // Non-critical
-  }
-}
-
-function closeLogs() {
-  logPanel.value = null
+function closePanel() {
+  panel.value = null
 }
 
 async function logPagePrev() {
-  if (!logPanel.value || logPage.value <= 0) return
-  await fetchLogs(logPanel.value.token, logPage.value - 1)
+  if (!panel.value || logPage.value <= 0) return
+  await fetchLogs(panel.value.token, logPage.value - 1)
 }
 
 async function logPageNext() {
-  if (!logPanel.value || logPage.value >= logTotalPages.value - 1) return
-  await fetchLogs(logPanel.value.token, logPage.value + 1)
+  if (!panel.value || logPage.value >= logTotalPages.value - 1) return
+  await fetchLogs(panel.value.token, logPage.value + 1)
 }
 
 onMounted(() => {
@@ -353,20 +423,12 @@ watch(user, (u) => {
 
           <div class="device-actions">
             <button
-              class="action-btn deploy"
-              :disabled="actionLoading === device.token || device.online !== true"
-              @click="handleDeploy(device.token)"
-              title="Deploy compiled skills to device (must be online)"
-            >
-              Deploy
-            </button>
-            <button
-              class="action-btn logs-btn"
+              class="action-btn manage-btn"
               :disabled="device.online !== true"
-              @click="openLogs(device)"
-              title="View device logs and status (must be online)"
+              @click="openPanel(device)"
+              title="Manage skills and view logs (must be online)"
             >
-              Logs
+              Manage
             </button>
             <button
               class="action-btn reauth"
@@ -426,35 +488,75 @@ watch(user, (u) => {
         </div>
       </Teleport>
 
-      <!-- Log panel -->
+      <!-- Device management panel -->
       <Teleport to="body">
-        <div v-if="logPanel" class="log-overlay" @click.self="closeLogs">
+        <div v-if="panel" class="log-overlay" @click.self="closePanel">
           <div class="log-panel">
             <div class="log-header">
               <div class="log-title">
-                <span class="log-device-type">{{ logPanel.deviceType }}</span>
-                {{ logPanel.token.substring(0, 8) }}...
+                <span class="log-device-type">{{ panel.deviceType }}</span>
+                {{ panel.token.substring(0, 8) }}...
+                <span v-if="deviceInfo" class="log-version">v{{ deviceInfo.version || '?' }}</span>
               </div>
-              <button class="log-close" @click="closeLogs">&times;</button>
+              <button class="log-close" @click="closePanel">&times;</button>
             </div>
 
-            <!-- Device info bar -->
-            <div v-if="deviceInfo" class="log-info-bar">
-              <span>v{{ deviceInfo.version || '?' }}</span>
-              <span v-if="deviceInfo.skills?.length">{{ deviceInfo.skills.length }} skill{{ deviceInfo.skills.length !== 1 ? 's' : '' }}</span>
-              <span v-else>No skills</span>
+            <!-- Tabs -->
+            <div class="panel-tabs">
+              <button class="panel-tab" :class="{ active: panelTab === 'skills' }" @click="switchTab('skills')">Skills</button>
+              <button class="panel-tab" :class="{ active: panelTab === 'logs' }" @click="switchTab('logs')">Logs</button>
             </div>
 
-            <!-- Skills list -->
-            <div v-if="deviceInfo?.skills?.length" class="log-skills">
-              <div v-for="skill in deviceInfo.skills" :key="skill.name" class="log-skill-tag">
-                {{ skill.name }}
-                <span class="log-skill-class">{{ skill.skill_class }}</span>
+            <!-- Skills tab -->
+            <div v-if="panelTab === 'skills'" class="log-content">
+              <div v-if="skillsLoading" class="log-loading">Loading skills...</div>
+              <div v-else-if="allSkills.length === 0" class="log-empty">No compiled skills. Create one on the Skills page.</div>
+              <div v-else class="skills-list">
+                <div
+                  v-for="skill in allSkills"
+                  :key="skill.name"
+                  class="skill-row"
+                  :class="{ changed: skill.selected !== skill.onDevice }"
+                  @click="toggleSkill(skill)"
+                >
+                  <div class="skill-check" :class="{ checked: skill.selected }">
+                    <svg v-if="skill.selected" viewBox="0 0 16 16" fill="currentColor"><path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"/></svg>
+                  </div>
+                  <div class="skill-info">
+                    <div class="skill-name">{{ skill.name }}</div>
+                    <div class="skill-meta">
+                      <span class="skill-class-tag">{{ skill.skill_class }}</span>
+                      <span v-if="skill.onDevice && skill.selected" class="skill-status on-device">on device</span>
+                      <span v-else-if="skill.selected && !skill.onDevice" class="skill-status to-install">will install</span>
+                      <span v-else-if="!skill.selected && skill.onDevice" class="skill-status to-remove">will remove</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Log content -->
-            <div class="log-content">
+            <!-- Deploy bar (skills tab only) -->
+            <div v-if="panelTab === 'skills' && allSkills.length > 0" class="deploy-bar">
+              <div class="deploy-summary">
+                <span v-if="!hasChanges" class="deploy-status">No changes</span>
+                <span v-else class="deploy-status has-changes">
+                  {{ toInstall.length ? `+${toInstall.length} install` : '' }}
+                  {{ toInstall.length && toRemove.length ? ', ' : '' }}
+                  {{ toRemove.length ? `-${toRemove.length} remove` : '' }}
+                </span>
+                <span v-if="deployMessage" class="deploy-msg" :class="{ 'deploy-err': deployMessage.startsWith('Error') }">{{ deployMessage }}</span>
+              </div>
+              <button
+                class="deploy-btn"
+                :disabled="!hasChanges || deploying"
+                @click="deploySkills"
+              >
+                {{ deploying ? 'Deploying...' : 'Deploy' }}
+              </button>
+            </div>
+
+            <!-- Logs tab -->
+            <div v-if="panelTab === 'logs'" class="log-content">
               <div v-if="logLoading" class="log-loading">Loading...</div>
               <div v-else-if="logError" class="log-error">{{ logError }}</div>
               <div v-else-if="logLines.length === 0" class="log-empty">No log entries</div>
@@ -468,8 +570,8 @@ watch(user, (u) => {
               </div>
             </div>
 
-            <!-- Pagination -->
-            <div v-if="logTotalPages > 1" class="log-pagination">
+            <!-- Log pagination -->
+            <div v-if="panelTab === 'logs' && logTotalPages > 1" class="log-pagination">
               <button class="log-page-btn" :disabled="logPage <= 0" @click="logPagePrev">Prev</button>
               <span class="log-page-info">{{ logPage + 1 }} / {{ logTotalPages }}</span>
               <button class="log-page-btn" :disabled="logPage >= logTotalPages - 1" @click="logPageNext">Next</button>
@@ -720,15 +822,10 @@ watch(user, (u) => {
   cursor: not-allowed;
 }
 
-.action-btn.deploy:hover:not(:disabled) {
+.action-btn.manage-btn:hover:not(:disabled) {
   color: var(--c-glow);
   border-color: var(--c-glow-dim);
   background: var(--c-glow-faint);
-}
-
-.action-btn.logs-btn:hover:not(:disabled) {
-  color: #58a6ff;
-  border-color: #58a6ff44;
 }
 
 .action-btn.reauth:hover:not(:disabled) {
@@ -956,6 +1053,154 @@ watch(user, (u) => {
   line-height: 1;
 }
 .log-close:hover { color: var(--c-crest); }
+
+.log-version {
+  font-weight: 400;
+  color: var(--c-drift);
+  font-size: var(--fs-xs);
+  margin-left: var(--sp-2);
+}
+
+/* Tabs */
+.panel-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--c-trench);
+}
+
+.panel-tab {
+  flex: 1;
+  padding: var(--sp-2) var(--sp-4);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--c-drift);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.panel-tab:hover { color: var(--c-foam); }
+.panel-tab.active {
+  color: var(--c-glow);
+  border-bottom-color: var(--c-glow);
+}
+
+/* Skills list */
+.skills-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.skill-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-1);
+  border-bottom: 1px solid var(--c-deep);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.skill-row:hover { background: var(--c-glow-faint); }
+.skill-row.changed { background: var(--c-trench); }
+
+.skill-check {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+  border: 2px solid var(--c-shelf);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--dur-fast) var(--ease-out);
+}
+.skill-check.checked {
+  background: var(--c-glow);
+  border-color: var(--c-glow);
+  color: var(--c-abyss);
+}
+.skill-check svg { width: 0.75rem; height: 0.75rem; }
+
+.skill-info { min-width: 0; }
+
+.skill-name {
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--c-crest);
+}
+
+.skill-meta {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  margin-top: 2px;
+}
+
+.skill-class-tag {
+  font-size: 0.6875rem;
+  background: var(--c-trench);
+  color: var(--c-drift);
+  padding: 0.1em 0.4em;
+  border-radius: var(--radius-sm);
+}
+
+.skill-status {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.skill-status.on-device { color: var(--c-drift); }
+.skill-status.to-install { color: var(--c-glow); }
+.skill-status.to-remove { color: #f85149; }
+
+/* Deploy bar */
+.deploy-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-3) var(--sp-5);
+  border-top: 1px solid var(--c-trench);
+  gap: var(--sp-3);
+}
+
+.deploy-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.deploy-status {
+  font-size: var(--fs-xs);
+  color: var(--c-drift);
+}
+.deploy-status.has-changes { color: var(--c-glow); font-weight: 500; }
+
+.deploy-msg {
+  font-size: var(--fs-xs);
+  color: var(--c-glow);
+}
+.deploy-msg.deploy-err { color: #f85149; }
+
+.deploy-btn {
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  padding: var(--sp-2) var(--sp-5);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--c-glow-dim);
+  background: var(--c-glow);
+  color: var(--c-abyss);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+  white-space: nowrap;
+}
+.deploy-btn:hover:not(:disabled) {
+  background: var(--c-glow-bright);
+  box-shadow: var(--shadow-glow);
+}
+.deploy-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .log-info-bar {
   display: flex;
